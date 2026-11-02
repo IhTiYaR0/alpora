@@ -30,7 +30,7 @@ class MetricsStateDTO(BaseDTO):
 class MetricsService(BaseService):
     """Domain service managing Linux system and hardware performance metrics."""
 
-    def __init__(self, cache_ttl_sec: float = 0.5):
+    def __init__(self, cache_ttl_sec: float = 2.0):
         super().__init__("metrics")
         self._cache_ttl = cache_ttl_sec
         self._last_snapshot: Optional[Dict[str, Any]] = None

@@ -90,7 +90,7 @@ Singleton {
         error = ""
     }
 
-    Timer { interval: 2000; repeat: true; running: root.active; onTriggered: root.refresh() }
+    Timer { interval: root.detailsOpen ? 1500 : 4000; repeat: true; running: root.active; onTriggered: root.refresh() }
 
     IpcHandler {
         target: "developer-metrics"

@@ -129,6 +129,22 @@ def weather(paths):
 
 def widgets_control(paths, action, payload):
     if action == 'metrics':
+        sock_path = paths.runtime / 'ipc.sock'
+        if sock_path.exists():
+            try:
+                import socket as _socket
+                if hasattr(_socket, 'AF_UNIX'):
+                    with _socket.socket(_socket.AF_UNIX, _socket.SOCK_STREAM) as s:
+                        s.settimeout(0.8)
+                        s.connect(str(sock_path))
+                        s.sendall(b'{"id":"cli","action":"metrics.snapshot","params":{}}\n')
+                        line = s.makefile('r', encoding='utf-8').readline()
+                        if line:
+                            resp = json.loads(line)
+                            if resp.get('success') and resp.get('data'):
+                                return resp['data']
+            except Exception:
+                pass
         return developer_metrics_snapshot()
     if action == 'weather':
         return weather(paths)

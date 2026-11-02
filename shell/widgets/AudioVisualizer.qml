@@ -27,12 +27,12 @@ Item {
 
     Timer {
         id: animTimer
-        interval: 50
-        running: root.active && root.visible && (!Session.settings || !Session.settings.reducedMotion)
+        interval: 66 // ~15 FPS: balanced fluidity with low interrupt rate
+        running: root.active && root.visible && root.opacity > 0 && (!Session.settings || !Session.settings.reducedMotion)
         repeat: true
         onTriggered: {
-            const next = [];
-            const time = Date.now() / 200.0;
+            const time = Date.now() / 220.0;
+            const cur = root.levels.length === root.barsCount ? root.levels.slice() : [];
             for (let i = 0; i < root.barsCount; ++i) {
                 const norm = i / Math.max(1, root.barsCount - 1);
                 // Multi-octave wave simulating audio spectrum (sub-bass higher amplitude, tapering off in treble)
@@ -41,10 +41,9 @@ Item {
                 const s3 = Math.sin(time * 0.9 + i * 2.3);
                 const raw = (s1 * 0.4 + s2 * 0.35 + s3 * 0.25 + 1.0) / 2.0;
                 const freqWeight = Math.pow(1.0 - norm * 0.4, 0.8);
-                const val = Math.max(0.08, Math.min(1.0, raw * freqWeight));
-                next.push(val);
+                cur[i] = Math.max(0.08, Math.min(1.0, raw * freqWeight));
             }
-            root.levels = next;
+            root.levels = cur;
         }
     }
 
@@ -65,14 +64,12 @@ Item {
                 color: root.active ? root.activeColor : root.inactiveColor
                 opacity: root.active ? (0.65 + 0.35 * targetLevel) : 0.35
 
-                Behavior on height {
+                Behavior on opacity {
                     NumberAnimation {
-                        duration: 60
-                        easing.type: Easing.OutQuad
+                        duration: 180
                     }
                 }
             }
         }
     }
 }
-

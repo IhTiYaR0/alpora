@@ -66,10 +66,10 @@ class ClipboardService(BaseService):
         """Return current state summary."""
         try:
             h = self._ensure_history()
-            with h.db:
-                paused = h.paused
-                total = h.db.execute("SELECT count(*) FROM clips").fetchone()[0]
-                pinned = h.db.execute("SELECT count(*) FROM clips WHERE pinned=1").fetchone()[0]
+            cur = h.db.cursor()
+            paused = h.paused
+            total = cur.execute("SELECT count(*) FROM clips").fetchone()[0]
+            pinned = cur.execute("SELECT count(*) FROM clips WHERE pinned=1").fetchone()[0]
             return ClipboardStateDTO(paused=paused, item_count=total, pinned_count=pinned)
         except Exception as exc:
             logger.error("Error retrieving clipboard state: %s", exc)

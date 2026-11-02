@@ -22,29 +22,43 @@ def _read_cpu_times():
         return None
 
 
+_last_cpu_times = None
+_last_cpu_percent = 0.0
+
+
 def _cpu_percent():
-    first = _read_cpu_times()
-    if first is None:
+    global _last_cpu_times, _last_cpu_percent
+    current = _read_cpu_times()
+    if current is None:
         return None
-    time.sleep(0.12)
-    second = _read_cpu_times()
-    if second is None:
-        return None
-    total = second[0] - first[0]
-    idle = second[1] - first[1]
-    if total <= 0:
+    if _last_cpu_times is None:
+        _last_cpu_times = current
         return 0.0
-    return round(max(0.0, min(100.0, 100.0 * (total - idle) / total)), 1)
+    total = current[0] - _last_cpu_times[0]
+    idle = current[1] - _last_cpu_times[1]
+    _last_cpu_times = current
+    if total <= 0:
+        return _last_cpu_percent
+    _last_cpu_percent = round(max(0.0, min(100.0, 100.0 * (total - idle) / total)), 1)
+    return _last_cpu_percent
+
+
+_cached_cpu_model = None
 
 
 def _cpu_model():
+    global _cached_cpu_model
+    if _cached_cpu_model is not None:
+        return _cached_cpu_model
     try:
         for line in Path("/proc/cpuinfo").read_text(encoding="utf-8", errors="replace").splitlines():
             if line.lower().startswith(("model name", "hardware")) and ":" in line:
-                return line.split(":", 1)[1].strip()
+                _cached_cpu_model = line.split(":", 1)[1].strip()
+                return _cached_cpu_model
     except OSError:
         pass
-    return "CPU"
+    _cached_cpu_model = "CPU"
+    return _cached_cpu_model
 
 
 def _memory():
@@ -119,13 +133,27 @@ def _number(value):
         return None
 
 
+_nvidia_smi_path = None
+_nvidia_smi_checked = False
+_gpu_cache = None
+_gpu_cache_time = 0.0
+
+
 def _gpu():
+    global _nvidia_smi_path, _nvidia_smi_checked, _gpu_cache, _gpu_cache_time
+    now = time.monotonic()
+    if _gpu_cache is not None and (now - _gpu_cache_time) < 4.0:
+        return _gpu_cache
+
     def memory_percent(used, total):
         if used is None or total is None or total <= 0:
             return None
         return round(100.0 * used / total, 1)
 
-    nvidia_smi = shutil.which("nvidia-smi")
+    if not _nvidia_smi_checked:
+        _nvidia_smi_path = shutil.which("nvidia-smi")
+        _nvidia_smi_checked = True
+    nvidia_smi = _nvidia_smi_path
     if nvidia_smi:
         try:
             result = subprocess.run(
@@ -138,7 +166,7 @@ def _gpu():
             if row and len(row) >= 5:
                 used = _number(row[1])
                 total = _number(row[2])
-                return {
+                _gpu_cache = {
                     "available": True,
                     "provider": "NVIDIA",
                     "name": row[0].strip(),
@@ -148,6 +176,8 @@ def _gpu():
                     "temperature_c": _number(row[3]),
                     "power_w": _number(row[4]),
                 }
+                _gpu_cache_time = now
+                return _gpu_cache
         except (OSError, subprocess.SubprocessError, csv.Error):
             pass
 
@@ -176,7 +206,7 @@ def _gpu():
             except OSError:
                 name = "DRM Graphics Adapter"
 
-            return {
+            _gpu_cache = {
                 "available": True,
                 "provider": "DRM",
                 "name": name,
@@ -186,10 +216,12 @@ def _gpu():
                 "temperature_c": None,
                 "power_w": None,
             }
+            _gpu_cache_time = now
+            return _gpu_cache
     except OSError:
         pass
 
-    return {
+    _gpu_cache = {
         "available": False,
         "provider": "",
         "name": "",
@@ -199,6 +231,8 @@ def _gpu():
         "temperature_c": None,
         "power_w": None,
     }
+    _gpu_cache_time = now
+    return _gpu_cache
 def _network():
     interface = ""
     # Prefer the interface used by the IPv4 default route to avoid counting virtual bridges.
@@ -234,14 +268,22 @@ def _network():
         return {"interface": interface or None, "rx_bytes": 0, "tx_bytes": 0}
 
 
+_processes_cache = ([], [])
+_processes_cache_time = 0.0
+
+
 def _processes():
+    global _processes_cache, _processes_cache_time
+    now = time.monotonic()
+    if (now - _processes_cache_time) < 4.0 and _processes_cache != ([], []):
+        return _processes_cache
     try:
         result = subprocess.run(
             ["ps", "-eo", "pid=,comm=,%cpu=,%mem=", "--sort=-%cpu"],
             capture_output=True, text=True, timeout=1.5, check=True,
         )
     except (OSError, subprocess.SubprocessError):
-        return [], []
+        return _processes_cache
     parsed = []
     for line in result.stdout.splitlines():
         parts = line.split()
@@ -252,7 +294,9 @@ def _processes():
                            "cpu_percent": float(parts[-2]), "memory_percent": float(parts[-1])})
         except (ValueError, IndexError):
             continue
-    return parsed[:5], sorted(parsed, key=lambda item: item["memory_percent"], reverse=True)[:5]
+    _processes_cache = (parsed[:5], sorted(parsed, key=lambda item: item["memory_percent"], reverse=True)[:5])
+    _processes_cache_time = now
+    return _processes_cache
 
 
 def snapshot():

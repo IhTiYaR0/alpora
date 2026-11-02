@@ -38,10 +38,10 @@ Item {
 
     property real playbackPulse: 0
     Timer {
-        interval: 50
+        interval: 80
         repeat: true
-        running: !root.isOsd && root.hasMedia && root.isPlaying && !ClockState.sleeping
-        onTriggered: root.playbackPulse += 0.08
+        running: !root.isOsd && root.hasMedia && root.isPlaying && root.visible && root.opacity > 0 && !ClockState.sleeping
+        onTriggered: root.playbackPulse += 0.12
     }
 
     Rectangle {

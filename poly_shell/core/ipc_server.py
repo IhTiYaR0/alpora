@@ -77,7 +77,7 @@ class IPCServer:
             self._server_socket.bind(("127.0.0.1", 0))
             self._port = self._server_socket.getsockname()[1]
 
-        self._server_socket.settimeout(0.5)
+        self._server_socket.settimeout(2.0)
         self._server_socket.listen(10)
         self._running = True
 
