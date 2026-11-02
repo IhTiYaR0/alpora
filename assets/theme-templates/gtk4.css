@@ -51,12 +51,12 @@ headerbar { box-shadow: inset 0 -1px alpha(#a9b99a, 0.12); }
 entry, button { border-radius: 8px; }
 /* Application backgrounds stay opaque; popup glass is owned by the shell. */
 window.background, window.background:backdrop, window.background.csd, window.background.csd:backdrop {
-  background-color: @window_bg_color;
+  background-color: #272d2d;
   background-image: none;
-  color: @window_fg_color;
+  color: #e7e9e5;
 }
 window.background .sidebar, window.background .navigation-sidebar, window.background placessidebar {
-  background-color: @sidebar_bg_color;
+  background-color: #293230;
   background-image: none;
-  color: @sidebar_fg_color;
+  color: #e7e9e5;
 }
