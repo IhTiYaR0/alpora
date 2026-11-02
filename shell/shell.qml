@@ -157,6 +157,8 @@ ShellRoot {
         function stopFrameProbe(): string { return FrameMetrics.finish(); }
         function screenshot(): void { ScreenshotState.open(root.focusedScreen()); }
         function powerMenu(): void { PowerState.toggle(root.focusedScreen()); }
+        function toggleOverview(): void { OverviewState.toggle(root.focusedScreen()); }
+        function toggleDisplayProject(): void { DisplayProjectState.toggle(root.focusedScreen()); }
     }
 
 

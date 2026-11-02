@@ -8,6 +8,7 @@ import "../theme" as PolyTheme
 Item {
     id: root
     readonly property var player: MusicState.player
+    readonly property bool isOsd: OsdState.opened
     readonly property bool hasMedia: !!player && (player.isPlaying || (player.trackTitle && player.trackTitle.length > 0))
     readonly property bool isPlaying: !!player && player.isPlaying
     readonly property string trackTitle: player && player.trackTitle ? player.trackTitle : ""
@@ -16,9 +17,10 @@ Item {
         ? (trackTitle + (trackArtist.length > 0 ? " · " + trackArtist : ""))
         : I18n.tr("music.untitled")
 
-    visible: hasMedia
+    readonly property bool active: isOsd || hasMedia
+    visible: active
     implicitHeight: 28
-    implicitWidth: hasMedia ? Math.min(230, Math.max(88, contentLayout.implicitWidth + 20)) : 0
+    implicitWidth: isOsd ? 172 : (hasMedia ? Math.min(230, Math.max(88, contentLayout.implicitWidth + 20)) : 0)
 
     Behavior on implicitWidth {
         NumberAnimation {
@@ -32,13 +34,13 @@ Item {
             duration: Motion.reduced ? 0 : 200
         }
     }
-    opacity: hasMedia ? 1 : 0
+    opacity: active ? 1 : 0
 
     property real playbackPulse: 0
     Timer {
         interval: 50
         repeat: true
-        running: root.hasMedia && root.isPlaying && !ClockState.sleeping
+        running: !root.isOsd && root.hasMedia && root.isPlaying && !ClockState.sleeping
         onTriggered: root.playbackPulse += 0.08
     }
 
@@ -46,18 +48,78 @@ Item {
         id: pill
         anchors.fill: parent
         radius: Math.min(14, Session.visual.barRadius)
-        color: Glass.tint(Session.surface, mouseArea.containsMouse ? 0.70 : 0.45)
+        color: Glass.tint(Session.surface, root.isOsd ? 0.85 : (mouseArea.containsMouse ? 0.70 : 0.45))
         border.width: Session.visual.barBorder
-        border.color: mouseArea.containsMouse ? Glass.tint(Session.accent, 0.42) : Glass.tint(Session.foreground, 0.08)
+        border.color: root.isOsd
+            ? Glass.tint(Session.accent, 0.65)
+            : (mouseArea.containsMouse ? Glass.tint(Session.accent, 0.42) : Glass.tint(Session.foreground, 0.08))
 
         Behavior on color { ColorAnimation { duration: Motion.responseMs } }
         Behavior on border.color { ColorAnimation { duration: Motion.responseMs } }
 
+        // Dynamic Island / Smart Pill: OSD Mode (Volume / Brightness / Capslock / Mic)
+        Row {
+            id: osdLayout
+            anchors.centerIn: parent
+            spacing: 8
+            height: parent.height
+            visible: root.isOsd
+
+            Icon {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 14
+                height: 14
+                name: OsdState.symbol
+            }
+
+            Text {
+                visible: OsdState.isToggle
+                anchors.verticalCenter: parent.verticalCenter
+                text: OsdState.title + (OsdState.value > 0 ? " ON" : " OFF")
+                color: Session.foreground
+                font.family: Session.fontFamily
+                font.pixelSize: 11
+                font.weight: Font.Medium
+            }
+
+            Row {
+                visible: !OsdState.isToggle
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 6
+
+                Rectangle {
+                    width: 70
+                    height: 5
+                    radius: 2.5
+                    color: Glass.tint(Session.foreground, 0.18)
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Rectangle {
+                        width: Math.min(parent.width, Math.max(0, parent.width * Math.min(1.0, OsdState.value)))
+                        height: parent.height
+                        radius: parent.radius
+                        color: Session.accent
+                    }
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Math.round(OsdState.value * 100) + "%"
+                    color: Session.foreground
+                    font.family: Session.fontFamily
+                    font.pixelSize: 10
+                    font.weight: Font.Medium
+                }
+            }
+        }
+
+        // Media Playback Mode (Visualizer Waveform + Title + Controls)
         Row {
             id: contentLayout
             anchors.centerIn: parent
             spacing: 8
             height: parent.height
+            visible: !root.isOsd && root.hasMedia
 
             // 1. Audio Visualizer Wave (dải sóng âm thanh nhỏ)
             Item {
@@ -101,7 +163,7 @@ Item {
 
                     SequentialAnimation on scrollOffset {
                         id: marqueeAnim
-                        running: root.hasMedia && root.isPlaying && titleText.overflow > 0 && !Motion.reduced
+                        running: !root.isOsd && root.hasMedia && root.isPlaying && titleText.overflow > 0 && !Motion.reduced
                         loops: Animation.Infinite
 
                         PauseAnimation { duration: 1800 }
@@ -149,9 +211,10 @@ Item {
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             cursorShape: Qt.PointingHandCursor
 
-            Accessible.name: I18n.tr("music.mini_player") + " · " + root.displayTitle
+            Accessible.name: root.isOsd ? OsdState.title : (I18n.tr("music.mini_player") + " · " + root.displayTitle)
 
             onClicked: (mouse) => {
+                if (root.isOsd) return;
                 if (mouse.button === Qt.RightButton) {
                     if (root.player && root.player.canGoNext) root.player.next();
                 } else if (mouse.button === Qt.MiddleButton) {

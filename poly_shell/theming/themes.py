@@ -319,7 +319,13 @@ def runtime_border(p):
     if os.environ.get('HYPRLAND_INSTANCE_SIGNATURE'):
         result = subprocess.run(['hyprctl', 'eval', border_lua(p)], capture_output=True, text=True, timeout=5)
         if result.returncode or result.stdout.strip() != 'ok':
-            raise ConfigError('Cannot apply Hyprland border colors')
+            # Fallback to standard Hyprland keyword syntax
+            active = f"rgba({p['accent'][1:]}e6) rgba({p['secondary'][1:]}cc) 45deg"
+            inactive = f"rgba({p['border'][1:]}b3)"
+            res1 = subprocess.run(['hyprctl', 'keyword', 'general:col.active_border', active], capture_output=True, text=True, timeout=5)
+            res2 = subprocess.run(['hyprctl', 'keyword', 'general:col.inactive_border', inactive], capture_output=True, text=True, timeout=5)
+            if res1.returncode != 0 and res2.returncode != 0:
+                raise ConfigError('Cannot apply Hyprland border colors')
 
 
 def notify_toolkit(paths, palette, icon_name):

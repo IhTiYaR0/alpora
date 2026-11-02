@@ -143,5 +143,13 @@ class TimelineTests(unittest.TestCase):
         self.assertEqual(update_session(self.paths)['appearance']['palette'], original)
         self.border.assert_not_called()
 
+    def test_timeline_sync_clock(self):
+        self.select()
+        result = timeline.timeline_control(self.paths, 'sync-clock', {})
+        self.assertTrue(result['synced'])
+        self.assertTrue(result['saved'])
+        self.assertIsInstance(result['minute'], int)
+        self.assertTrue(0 <= result['minute'] <= 1440)
+
 
 if __name__ == '__main__': unittest.main()

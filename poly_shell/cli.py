@@ -268,7 +268,7 @@ def main(argv=None):
     theme_parser.add_argument("action", choices=("list", "apply", "import"))
     theme_parser.add_argument("payload", nargs="?", default="{}")
     timeline_parser = sub.add_parser("timeline", help="saved time of day for the Timeline theme")
-    timeline_parser.add_argument("action", choices=("get", "set", "ready"))
+    timeline_parser.add_argument("action", choices=("get", "set", "ready", "sync-clock"))
     timeline_parser.add_argument("payload", nargs="?", default="{}")
     widgets_parser = sub.add_parser("widgets", help="desktop widgets, layout and weather")
     widgets_parser.add_argument("action", choices=("get", "apply", "weather", "search", "metrics"))
@@ -332,6 +332,18 @@ def main(argv=None):
     demo_parser.add_argument("--port", type=int, default=8080, help="port for the demo HTTP server (default: 8080)")
     demo_parser.add_argument("--no-browser", action="store_true", help="do not auto-open default web browser")
 
+    # Panel, workspace and desktop shortcuts dispatchers
+    sub.add_parser("launcher", help="toggle application launcher and omni-bar")
+    sub.add_parser("quick-settings", help="toggle quick settings control center")
+    sub.add_parser("notifications", help="toggle notifications flyout panel")
+    sub.add_parser("clipboard", help="toggle clipboard history panel")
+    sub.add_parser("overview", help="toggle workspaces and windows overview")
+    sub.add_parser("power-menu", help="toggle session and power menu")
+    sub.add_parser("toggle-mode", help="toggle between Work and Vibe modes")
+    sub.add_parser("display-project", help="toggle display projection menu")
+    sub.add_parser("video-pip", help="alias for floating video picture-in-picture player")
+    sub.add_parser("welcome", help="open ALPORA first-run welcome wizard")
+
     args = parser.parse_args(argv)
     paths = Paths.current()
 
@@ -363,6 +375,16 @@ def main(argv=None):
         "pip": lambda: commands.handle_pip(args),
         "exe": lambda: commands.handle_exe(args),
         "demo": lambda: commands.handle_demo(paths, args),
+        "launcher": lambda: commands.handle_launcher(paths, args),
+        "quick-settings": lambda: commands.handle_quick_settings(paths, args),
+        "notifications": lambda: commands.handle_notifications(paths, args),
+        "clipboard": lambda: commands.handle_clipboard(paths, args),
+        "overview": lambda: commands.handle_overview(paths, args),
+        "power-menu": lambda: commands.handle_power_menu(paths, args),
+        "toggle-mode": lambda: commands.handle_toggle_mode(paths, args),
+        "display-project": lambda: commands.handle_display_project(paths, args),
+        "video-pip": lambda: commands.handle_pip(args),
+        "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 
     try:

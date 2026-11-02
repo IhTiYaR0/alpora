@@ -98,6 +98,21 @@ def timeline_control(paths, action, payload):
                 return {'presented': False}
             release_fallback()
             return {'presented': True}
+        if action == 'sync-clock':
+            from datetime import datetime
+            now = datetime.now()
+            minute = now.hour * 60 + now.minute
+            selected = paths.config / 'appearance.json'
+            if not selected.exists() or read_object(selected).get('theme') != 'timeline':
+                return {'synced': False, 'minute': minute, 'reason': 'Timeline theme not active'}
+            assets()
+            selection = read_object(selected)
+            if selection.get('colorsFromWallpaper', True):
+                from .themes import apply_timeline_palette
+                apply_timeline_palette(paths, minute, palette_for(minute), selection)
+            else:
+                atomic_json(paths.config / 'timeline.json', {'schemaVersion': 1, 'minute': minute})
+            return {'synced': True, 'saved': True, 'minute': minute}
         if action != 'set' or set(payload) != {'minute'}:
             raise ConfigError('Invalid Timeline request')
         minute = validate_minute(payload['minute'])

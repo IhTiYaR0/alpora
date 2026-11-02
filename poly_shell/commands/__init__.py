@@ -18,6 +18,18 @@ from .desktop_cmd import (
     handle_lock_media,
 )
 from .demo_cmd import handle_demo
+from .panel_cmd import (
+    handle_launcher,
+    handle_quick_settings,
+    handle_notifications,
+    handle_clipboard,
+    handle_overview,
+    handle_power_menu,
+    handle_toggle_mode,
+    handle_display_project,
+    handle_welcome,
+    open_welcome,
+)
 from .theme_cmd import (
     handle_theme,
     handle_timeline,
@@ -56,4 +68,14 @@ __all__ = [
     "handle_assets",
     "handle_toolkit_refresh",
     "handle_demo",
+    "handle_launcher",
+    "handle_quick_settings",
+    "handle_notifications",
+    "handle_clipboard",
+    "handle_overview",
+    "handle_power_menu",
+    "handle_toggle_mode",
+    "handle_display_project",
+    "handle_welcome",
+    "open_welcome",
 ]
