@@ -24,3 +24,4 @@ You can write the generated ISO to a USB flash drive using:
   sudo dd bs=4M if=packaging/iso/out/alpora-archlinux-*.iso of=/dev/sdX status=progress oflag=sync
   ```
   *(Replace `/dev/sdX` with your target USB drive).*
+

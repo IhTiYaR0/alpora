@@ -198,7 +198,7 @@ function applyTheme(key, notifyBackend = true) {
   });
 
   if (notifyBackend) {
-    sendAction('theme', key);
+    void sendAction('theme', key);
   }
 }
 
@@ -671,7 +671,7 @@ function initMotionStudies() {
           label.textContent = t.copied;
           setTimeout(() => { label.textContent = orig; }, 1800);
         }
-      });
+      }).catch(() => {});
     };
   });
 }
@@ -683,8 +683,8 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTheme(currentTheme, false);
   tick();
   setInterval(tick, 1000);
-  checkBackend();
-  setInterval(checkBackend, 4000);
+  void checkBackend();
+  setInterval(() => { void checkBackend(); }, 4000);
 
   // Tab Navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -714,12 +714,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnWork.onclick = () => {
       btnWork.classList.add('active');
       btnVibe.classList.remove('active');
-      sendAction('mode', 'work');
+      void sendAction('mode', 'work');
     };
     btnVibe.onclick = () => {
       btnVibe.classList.add('active');
       btnWork.classList.remove('active');
-      sendAction('mode', 'vibe');
+      void sendAction('mode', 'vibe');
     };
   }
 

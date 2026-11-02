@@ -8,12 +8,14 @@ from ..system.preflight import run_preflight, format_preflight_report
 def handle_doctor(paths, args) -> int:
     if getattr(args, "bundle", False):
         out = Path(args.output) if getattr(args, "output", None) else None
-        archive = collect_diagnostic_bundle(output_dir=out)
+        archive = collect_diagnostic_bundle(paths, output_dir=out)
         print(f"Diagnostic bundle written to: {archive}")
         return 0
     from ..system.programs import inventory
-    print(json.dumps(inventory(), indent=2, ensure_ascii=False))
-    return 0
+    items = inventory()
+    print(json.dumps(items, indent=2, ensure_ascii=False))
+    has_missing_required = any(item.get("required") and not item.get("available") for item in items)
+    return 1 if has_missing_required else 0
 
 
 def handle_preflight(paths, args) -> int:

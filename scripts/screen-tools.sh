@@ -43,7 +43,7 @@ case "$MODE" in
         # Extract active window geometry if inside Hyprland
         if command -v hyprctl >/dev/null 2>&1; then
             BOX="$(hyprctl activewindow -j 2>/dev/null | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' 2>/dev/null || echo "")"
-            if [ -n "$BOX" ] && [ "$BOX" != "null,null nullxnull" ]; then
+            if [[ -n "$BOX" && "$BOX" != "null,null nullxnull" ]]; then
                 grim -g "$BOX" "$OUTPUT"
             else
                 grim "$OUTPUT"
@@ -81,7 +81,7 @@ case "$MODE" in
             LANGS="eng+vie"
         fi
         TEXT="$(grim -g "$REGION" - | tesseract stdin stdout -l "$LANGS" 2>/dev/null | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
-        if [ -n "$TEXT" ]; then
+        if [[ -n "$TEXT" ]]; then
             echo -n "$TEXT" | wl-copy
             PREVIEW="${TEXT:0:80}"
             notify "OCR Text Copied" "$PREVIEW..."
@@ -98,7 +98,7 @@ case "$MODE" in
         REGION="$(slurp 2>/dev/null)" || exit 0
         notify "ALPORA QR" "Đang quét mã QR..."
         QR_DATA="$(grim -g "$REGION" - | zbarimg -q --raw - 2>/dev/null || true)"
-        if [ -n "$QR_DATA" ]; then
+        if [[ -n "$QR_DATA" ]]; then
             echo -n "$QR_DATA" | wl-copy
             notify "QR Code Decoded" "$QR_DATA"
         else
@@ -111,20 +111,20 @@ case "$MODE" in
         OUTPUT="$VIDEOS/Recordings/ALPORA-${TIMESTAMP}.mp4"
         PID_FILE="/tmp/alpora-recorder.pid"
 
-        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
             notify "Screen Recorder" "Recording already in progress."
             exit 0
         fi
 
         WITH_AUDIO=false
-        if [ "${2:-}" = "--with-audio" ]; then
+        if [[ "${2:-}" == "--with-audio" ]]; then
             WITH_AUDIO=true
         fi
 
         REGION="$(slurp 2>/dev/null)" || exit 0
 
         if command -v gpu-screen-recorder >/dev/null 2>&1; then
-            if [ "$WITH_AUDIO" = true ]; then
+            if [[ "$WITH_AUDIO" == true ]]; then
                 gpu-screen-recorder -w "$REGION" -f 60 -a default_output -o "$OUTPUT" &
             else
                 gpu-screen-recorder -w "$REGION" -f 60 -o "$OUTPUT" &
@@ -132,7 +132,7 @@ case "$MODE" in
             echo "$!" > "$PID_FILE"
             notify "Screen Recording" "Started recording region..."
         elif command -v wf-recorder >/dev/null 2>&1; then
-            if [ "$WITH_AUDIO" = true ]; then
+            if [[ "$WITH_AUDIO" == true ]]; then
                 wf-recorder --audio -g "$REGION" -f "$OUTPUT" &
             else
                 wf-recorder -g "$REGION" -f "$OUTPUT" &
@@ -147,7 +147,7 @@ case "$MODE" in
 
     record-stop|--stop-record)
         PID_FILE="/tmp/alpora-recorder.pid"
-        if [ -f "$PID_FILE" ]; then
+        if [[ -f "$PID_FILE" ]]; then
             PID="$(cat "$PID_FILE")"
             if kill -0 "$PID" 2>/dev/null; then
                 kill -INT "$PID" 2>/dev/null || kill "$PID" 2>/dev/null

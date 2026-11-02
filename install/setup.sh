@@ -72,7 +72,7 @@ PACKAGES=(
 
 cd "$DOTFILES_DIR"
 for pkg in "${PACKAGES[@]}"; do
-    if [ -d "$pkg" ]; then
+    if [[ -d "$pkg" ]]; then
         echo "  -> Stowing package: $pkg"
         stow -R -v 1 -t "$TARGET_DIR" "$pkg" 2>&1 | sed 's/^/     /'
     else
@@ -82,7 +82,7 @@ done
 
 # 5. Install Typography Fonts
 echo "[4/5] Installing ALPORA typography fonts..."
-if [ -d "$SCRIPT_DIR/../assets/fonts" ]; then
+if [[ -d "$SCRIPT_DIR/../assets/fonts" ]]; then
     cp -u "$SCRIPT_DIR/../assets/fonts/"*.ttf "$TARGET_DIR/.local/share/fonts/alpora/" 2>/dev/null || true
     echo "  [OK] Installed fonts: Inter, JetBrains Mono, Outfit, Symbols Nerd Font"
     if command -v fc-cache >/dev/null 2>&1; then

@@ -245,13 +245,13 @@ def start_demo_server(
         return DemoRequestHandler(*args, paths=paths, **kwargs)
 
     server = ThreadedTCPServer(("127.0.0.1", actual_port), handler_factory)
-    url = f"http://127.0.0.1:{actual_port}/shell/demos/web/index.html"
+    url = f"http://127.0.0.1:{actual_port}/shell/demos/web/index.html"  # NOSONAR - local loopback only
 
     _safe_print("=" * 68)
     _safe_print("      ALPORA Interactive Design Lab & Shell Simulator Server        ")
     _safe_print("=" * 68)
     _safe_print(f"  * URL:            {url}")
-    _safe_print(f"  * Live Telemetry: http://127.0.0.1:{actual_port}/api/state")
+    _safe_print(f"  * Live Telemetry: http://127.0.0.1:{actual_port}/api/state")  # NOSONAR
     _safe_print(f"  * Serving from:   {ROOT}")
     _safe_print("  * Press Ctrl+C to stop the server.")
     _safe_print("=" * 68)
@@ -261,7 +261,7 @@ def start_demo_server(
 
     if blocking:
         try:
-            server.serve_forever()
+            server.serve_forever()  # NOSONAR - local development simulation server
         except KeyboardInterrupt:
             print("\n[ALPORA Demo Server] Stopping server...")
         finally:

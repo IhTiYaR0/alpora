@@ -121,3 +121,4 @@ def open_welcome(paths, runtime_check_fn=None):
 def handle_welcome(paths, args, runtime_check_fn=None):
     """Handle `poly-shell welcome` CLI subcommand."""
     return open_welcome(paths, runtime_check_fn=runtime_check_fn)
+

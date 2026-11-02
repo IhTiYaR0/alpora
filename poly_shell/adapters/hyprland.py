@@ -30,8 +30,13 @@ class HyprlandAdapter(BaseCompositorAdapter):
         sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
         if not sig:
             return None
-        runtime_dir = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}" if hasattr(os, "getuid") else "/tmp")
-        candidate = Path(runtime_dir) / "hypr" / sig / ".socket2.sock"
+        if "XDG_RUNTIME_DIR" in os.environ:
+            runtime_dir = Path(os.environ["XDG_RUNTIME_DIR"])
+        elif hasattr(os, "getuid"):
+            runtime_dir = Path(f"/run/user/{os.getuid()}")
+        else:
+            return None
+        candidate = runtime_dir / "hypr" / sig / ".socket2.sock"
         return candidate if candidate.exists() else None
 
     @classmethod

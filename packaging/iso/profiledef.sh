@@ -22,3 +22,4 @@ file_permissions=(
   ["/root/.automated_script.sh"]="0:0:755"
   ["/usr/local/bin/alpora-install"]="0:0:755"
 )
+
