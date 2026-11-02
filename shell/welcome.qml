@@ -34,8 +34,12 @@ ShellRoot {
 
     IpcHandler {
         target: "welcome-app"
-        function raiseWindow(): void { root.show(); }
-        function close(): void { root.close(); }
+        function raiseWindow(): void {
+            root.show();
+        }
+        function close(): void {
+            root.close();
+        }
     }
 
     Process {
@@ -57,7 +61,10 @@ ShellRoot {
         color: "transparent"
         visible: true
 
-        Shortcut { sequence: "Escape"; onActivated: root.close() }
+        Shortcut {
+            sequence: "Escape"
+            onActivated: root.close()
+        }
 
         Rectangle {
             id: container
@@ -129,10 +136,22 @@ ShellRoot {
 
                     Repeater {
                         model: [
-                            { id: "shortcuts", label: "Phím tắt cốt lõi" },
-                            { id: "ime", label: "Gõ Tiếng Việt" },
-                            { id: "themes", label: "Giao diện & Chế độ" },
-                            { id: "doctor", label: "Tình trạng hệ thống" }
+                            {
+                                id: "shortcuts",
+                                label: "Phím tắt cốt lõi"
+                            },
+                            {
+                                id: "ime",
+                                label: "Gõ Tiếng Việt"
+                            },
+                            {
+                                id: "themes",
+                                label: "Giao diện & Chế độ"
+                            },
+                            {
+                                id: "doctor",
+                                label: "Tình trạng hệ thống"
+                            }
                         ]
 
                         Button {
@@ -186,16 +205,46 @@ ShellRoot {
 
                             Repeater {
                                 model: [
-                                    { key: "Super + Space", desc: "Mở Spotlight Launcher & Omni-Bar (Tìm app, tính toán, tra từ, web)" },
-                                    { key: "Super + V", desc: "Mở lịch sử Clipboard & Quản lý khay nhớ tạm" },
-                                    { key: "Super + I", desc: "Mở Quick Settings Control Center (Wi-Fi, Bluetooth, Âm lượng, Độ sáng)" },
-                                    { key: "Super + ~", desc: "Mở Quake Dropdown Terminal (Cửa sổ terminal trượt từ trên xuống)" },
-                                    { key: "Super + Return", desc: "Mở Terminal tiêu chuẩn (Foot / Kitty)" },
-                                    { key: "Super + E", desc: "Mở Trình quản lý tệp Nautilus" },
-                                    { key: "Super + Tab", desc: "Mở Workspace & Window Overview toàn cảnh" },
-                                    { key: "Super + W", desc: "Chuyển đổi tức thì chế độ Work Mode và Vibe Mode" },
-                                    { key: "Super + Q", desc: "Đóng cửa sổ đang chọn" },
-                                    { key: "Super + Shift + S", desc: "Chụp ảnh màn hình (Chọn vùng, cửa sổ hoặc toàn bộ)" }
+                                    {
+                                        key: "Super + Space",
+                                        desc: "Mở Spotlight Launcher & Omni-Bar (Tìm app, tính toán, tra từ, web)"
+                                    },
+                                    {
+                                        key: "Super + V",
+                                        desc: "Mở lịch sử Clipboard & Quản lý khay nhớ tạm"
+                                    },
+                                    {
+                                        key: "Super + I",
+                                        desc: "Mở Quick Settings Control Center (Wi-Fi, Bluetooth, Âm lượng, Độ sáng)"
+                                    },
+                                    {
+                                        key: "Super + ~",
+                                        desc: "Mở Quake Dropdown Terminal (Cửa sổ terminal trượt từ trên xuống)"
+                                    },
+                                    {
+                                        key: "Super + Return",
+                                        desc: "Mở Terminal tiêu chuẩn (Foot / Kitty)"
+                                    },
+                                    {
+                                        key: "Super + E",
+                                        desc: "Mở Trình quản lý tệp Nautilus"
+                                    },
+                                    {
+                                        key: "Super + Tab",
+                                        desc: "Mở Workspace & Window Overview toàn cảnh"
+                                    },
+                                    {
+                                        key: "Super + W",
+                                        desc: "Chuyển đổi tức thì chế độ Work Mode và Vibe Mode"
+                                    },
+                                    {
+                                        key: "Super + Q",
+                                        desc: "Đóng cửa sổ đang chọn"
+                                    },
+                                    {
+                                        key: "Super + Shift + S",
+                                        desc: "Chụp ảnh màn hình (Chọn vùng, cửa sổ hoặc toàn bộ)"
+                                    }
                                 ]
 
                                 Rectangle {
@@ -331,7 +380,9 @@ ShellRoot {
                             }
                         }
 
-                        Item { Layout.fillHeight: true }
+                        Item {
+                            Layout.fillHeight: true
+                        }
                     }
 
                     // 3. Tab Themes
@@ -387,11 +438,26 @@ ShellRoot {
 
                             Repeater {
                                 model: [
-                                    { id: "alpine", name: "Alpine Sage" },
-                                    { id: "moon-lake", name: "Moon Lake" },
-                                    { id: "forest-mist", name: "Forest Mist" },
-                                    { id: "warm-desert", name: "Warm Desert" },
-                                    { id: "timeline", name: "Timeline Auto-Chrono" }
+                                    {
+                                        id: "alpine",
+                                        name: "Alpine Sage"
+                                    },
+                                    {
+                                        id: "moon-lake",
+                                        name: "Moon Lake"
+                                    },
+                                    {
+                                        id: "forest-mist",
+                                        name: "Forest Mist"
+                                    },
+                                    {
+                                        id: "warm-desert",
+                                        name: "Warm Desert"
+                                    },
+                                    {
+                                        id: "timeline",
+                                        name: "Timeline Auto-Chrono"
+                                    }
                                 ]
 
                                 Button {
@@ -420,7 +486,9 @@ ShellRoot {
                             }
                         }
 
-                        Item { Layout.fillHeight: true }
+                        Item {
+                            Layout.fillHeight: true
+                        }
                     }
 
                     // 4. Tab Doctor & Health
@@ -453,8 +521,17 @@ ShellRoot {
                                 ColumnLayout {
                                     anchors.centerIn: parent
                                     spacing: 4
-                                    Text { text: "Compositor"; color: Session.muted; font.pixelSize: 11 }
-                                    Text { text: "Hyprland (Wayland)"; color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                    Text {
+                                        text: "Compositor"
+                                        color: Session.muted
+                                        font.pixelSize: 11
+                                    }
+                                    Text {
+                                        text: "Hyprland (Wayland)"
+                                        color: Session.foreground
+                                        font.pixelSize: 13
+                                        font.weight: Font.DemiBold
+                                    }
                                 }
                             }
 
@@ -469,8 +546,17 @@ ShellRoot {
                                 ColumnLayout {
                                     anchors.centerIn: parent
                                     spacing: 4
-                                    Text { text: "Giao diện Shell"; color: Session.muted; font.pixelSize: 11 }
-                                    Text { text: "Quickshell Qt6"; color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                    Text {
+                                        text: "Giao diện Shell"
+                                        color: Session.muted
+                                        font.pixelSize: 11
+                                    }
+                                    Text {
+                                        text: "Quickshell Qt6"
+                                        color: Session.foreground
+                                        font.pixelSize: 13
+                                        font.weight: Font.DemiBold
+                                    }
                                 }
                             }
 
@@ -485,8 +571,17 @@ ShellRoot {
                                 ColumnLayout {
                                     anchors.centerIn: parent
                                     spacing: 4
-                                    Text { text: "Âm thanh & Multimedia"; color: Session.muted; font.pixelSize: 11 }
-                                    Text { text: "PipeWire / WirePlumber"; color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                    Text {
+                                        text: "Âm thanh & Multimedia"
+                                        color: Session.muted
+                                        font.pixelSize: 11
+                                    }
+                                    Text {
+                                        text: "PipeWire / WirePlumber"
+                                        color: Session.foreground
+                                        font.pixelSize: 13
+                                        font.weight: Font.DemiBold
+                                    }
                                 }
                             }
                         }
@@ -541,7 +636,9 @@ ShellRoot {
                             }
                         }
 
-                        Item { Layout.fillHeight: true }
+                        Item {
+                            Layout.fillHeight: true
+                        }
                     }
                 }
 
@@ -557,7 +654,9 @@ ShellRoot {
                         onCheckedChanged: root.dontShowAgain = checked
                     }
 
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     Button {
                         text: "Bắt đầu trải nghiệm"
@@ -583,4 +682,3 @@ ShellRoot {
         }
     }
 }
-
