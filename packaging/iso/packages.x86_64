@@ -3,9 +3,6 @@ base
 base-devel
 linux
 linux-firmware
-linux-headers
-linux-hardened
-linux-hardened-headers
 intel-ucode
 amd-ucode
 
