@@ -75,6 +75,7 @@ jobs:
 
       - name: 4. Compute Checksums & List Output
         run: |
+          sudo chown -R $USER:$USER packaging/iso/out
           cd packaging/iso/out
           sha256sum *.iso > sha256sums.txt
           ls -lh
@@ -93,6 +94,7 @@ jobs:
         if: github.event_name == 'release' || inputs.upload_release == true
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.release.tag_name || 'v1.0.0' }}
           files: |
             packaging/iso/out/*.iso
             packaging/iso/out/sha256sums.txt
