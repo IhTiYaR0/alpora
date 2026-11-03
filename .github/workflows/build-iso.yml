@@ -96,4 +96,3 @@ jobs:
           files: |
             packaging/iso/out/*.iso
             packaging/iso/out/sha256sums.txt
-
