@@ -82,3 +82,4 @@ def handle_update(args: argparse.Namespace) -> int:
         return 0
 
     return 0
+

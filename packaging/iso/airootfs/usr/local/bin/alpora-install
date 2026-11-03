@@ -10,9 +10,9 @@ echo "Preparing ALPORA Desktop installer..."
 
 if [[ -d /opt/alpora ]]; then
     cd /opt/alpora
-    sudo ./install/install.sh "$@"
+    ./install/install.sh --harden "$@"
 else
     echo "Fetching latest ALPORA installer from online repository..."
-    curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash -s -- "$@"
+    curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash -s -- --harden "$@"
 fi
 

@@ -19,6 +19,7 @@ from ..services.metrics_service import MetricsService
 from ..services.clipboard_service import ClipboardService
 from ..services.game_mode import GameModeService
 from ..services.phone_service import PhoneService
+from ..services.security_service import SecurityService
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class PolyShellDaemon:
         self.clipboard_service = ClipboardService()
         self.gamemode_service = GameModeService()
         self.phone_service = PhoneService()
+        self.security_service = SecurityService(socket_path=socket_path)
 
         self.registry.register(self.audio_service)
         self.registry.register(self.network_service)
@@ -49,6 +51,7 @@ class PolyShellDaemon:
         self.registry.register(self.clipboard_service)
         self.registry.register(self.gamemode_service)
         self.registry.register(self.phone_service)
+        self.registry.register(self.security_service)
 
         self._setup_ipc_handlers()
 
@@ -118,6 +121,10 @@ class PolyShellDaemon:
         self.ipc_server.register_handler("phone.ping", lambda p: self.phone_service.send_ping(p.get("device_id"), p.get("message", "ALPORA Ping")))
         self.ipc_server.register_handler("phone.share_clipboard", lambda p: self.phone_service.share_clipboard(p.get("text"), p.get("device_id")))
         self.ipc_server.register_handler("phone.send_file", lambda p: self.phone_service.send_file(p.get("file_path", ""), p.get("device_id")))
+
+        # Security & Hardening endpoints
+        self.ipc_server.register_handler("security.audit", lambda _p: self.security_service.audit().to_dict())
+        self.ipc_server.register_handler("security.hardening", lambda _p: self.security_service.get_hardening_commands())
 
         # System health
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())

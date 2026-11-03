@@ -376,6 +376,14 @@ def main(argv=None):
     update_apply.add_argument("--branch", default="main", help="target git branch to update from")
     update_sub.add_parser("status", help="show current ALPORA OS version and update state")
 
+    # System Security and Hardening Audit
+    sec_parser = sub.add_parser("security", help="audit Linux security posture and apply kernel hardening")
+    sec_sub = sec_parser.add_subparsers(dest="security_action")
+    sec_sub.add_parser("status", help="check system security score and active protections")
+    sec_sub.add_parser("audit", help="run comprehensive security & performance assessment")
+    sec_sub.add_parser("harden", help="view recommended commands to harden Arch Linux and UFW")
+    sec_sub.add_parser("sysctl", help="output hardened sysctl.d configurations")
+
     # Panel, workspace and desktop shortcuts dispatchers
     sub.add_parser("launcher", help="toggle application launcher and omni-bar")
     sub.add_parser("quick-settings", help="toggle quick settings control center")
@@ -431,6 +439,7 @@ def main(argv=None):
         "game": lambda: commands.handle_game(args),
         "phone": lambda: commands.handle_phone(args),
         "update": lambda: commands.handle_update(args),
+        "security": lambda: commands.handle_security(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 

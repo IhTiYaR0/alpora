@@ -207,3 +207,4 @@ class UpdateService(BaseService):
         except Exception as exc:
             logger.error("Error during ALPORA update: %s", exc)
             return {"success": False, "error": str(exc)}
+

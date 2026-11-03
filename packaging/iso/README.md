@@ -47,6 +47,16 @@ Upon completion, the bootable `.iso` image and checksum will be placed in `packa
 
 ---
 
+## Security Hardening & Performance Built-in
+
+ALPORA OS ISO comes pre-hardened out of the box:
+* **Wayland Protocol Isolation:** Hyprland isolates every client window, preventing unauthorized keylogging and background screen capture.
+* **Firewall (UFW):** Default deny incoming traffic, allow outgoing, with explicit pinhole allowance for ALPORA Phone / KDE Connect ecosystem (ports 1714:1764).
+* **Mandatory Access Control (AppArmor):** `apparmor.service` enabled for zero-day mitigation and untrusted process sandboxing.
+* **Kernel & Multi-core Optimization:** Sysctl profiles (`99-alpora-security.conf` and `99-alpora-performance.conf`) configure `kernel.kptr_restrict`, `dmesg_restrict`, `unprivileged_bpf_disabled`, `vm.swappiness = 10`, and `vm.max_map_count = 1048576` for peak Wine/Proton gaming frame stability (Honkai, ZZZ) and low memory usage.
+
+---
+
 ## Flashing to USB
 
 You can write the generated ISO to a USB flash drive using:

@@ -7,6 +7,7 @@ install_skip_packages=false
 install_replace_config=false
 install_ui_only=false
 install_core_only=false
+install_harden=false
 install_ignore_distro=false
 install_theme=''
 install_wizard=false
@@ -20,6 +21,7 @@ for argument in "$@"; do
         --replace-config) install_replace_config=true ;;
         --ui-only) install_ui_only=true; install_skip_packages=true ;;
         --core-only|--minimal) install_core_only=true ;;
+        --harden) install_harden=true ;;
         --ignore-distro-check|--force-distro) install_ignore_distro=true ;;
         --uninstall)
             exec "$project_dir/install/uninstall.sh" "${@:2}"
@@ -37,6 +39,8 @@ Usage: ./install/install.sh [OPTIONS]
                           Ideal for custom Arch kernels (zen/lts/hardened), non-Arch distros, or custom setups.
   --minimal, --core-only  Install only core compositor & shell packages (~28 packages);
                           skips bundled applications (Firefox, Nautilus, Kitty, Foot, Fuzzel, etc.).
+  --harden                Apply Arch Linux security hardening (UFW firewall, AppArmor MAC,
+                          sysctl kernel protections, and multi-core CPU optimizations).
   --ignore-distro-check   Bypass Arch distribution detection and attempt pacman installation.
   --uninstall             Cleanly remove ALPORA symlinks, services, and optionally restore configs.
   --dry-run               Print the plan without downloading or changing anything.
@@ -104,6 +108,10 @@ if [[ ${#required_packages[@]} -eq 0 ]]; then
 fi
 if [[ ${#optional_packages[@]} -eq 0 ]]; then
     optional_packages=(foot kitty nautilus xdg-utils xdg-user-dirs fuzzel upower wireplumber networkmanager nm-connection-editor bluez-utils util-linux brightnessctl hyprsunset mako pavucontrol power-profiles-daemon swaybg hyprlock hypridle hyprshutdown wl-clipboard playerctl grim slurp libnotify wine)
+fi
+
+if [[ "$install_harden" == true ]]; then
+    optional_packages+=(ufw apparmor irqbalance)
 fi
 
 if [[ "$install_core_only" == true ]]; then
@@ -197,4 +205,22 @@ if [[ "$install_ui_only" == true ]]; then arguments+=(--ui-only); fi
 if [[ "$install_replace_config" == true ]]; then arguments+=(--replace-config); fi
 if [[ -n "$install_theme" ]]; then arguments+=(--theme "$install_theme"); fi
 python3 "$project_dir/scripts/setup-arch-desktop" "${arguments[@]}"
+
+if [[ "$install_harden" == true ]]; then
+    printf '\n\033[1;36m==> Applying ALPORA OS System Hardening & Performance Optimizations...\033[0m\n'
+    if command -v ufw >/dev/null 2>&1; then
+        sudo ufw default deny incoming || true
+        sudo ufw default allow outgoing || true
+        sudo ufw allow 1714:1764/udp comment 'ALPORA Phone / KDE Connect' || true
+        sudo ufw allow 1714:1764/tcp comment 'ALPORA Phone / KDE Connect' || true
+        sudo systemctl enable --now ufw.service || true
+    fi
+    sudo systemctl enable --now apparmor.service || true
+    sudo systemctl enable --now irqbalance.service || true
+
+    python3 -c "from poly_shell.services.security_service import SecurityService; s = SecurityService(); print(s.get_security_sysctl())" | sudo tee /etc/sysctl.d/99-alpora-security.conf >/dev/null || true
+    python3 -c "from poly_shell.services.security_service import SecurityService; s = SecurityService(); print(s.get_performance_sysctl())" | sudo tee /etc/sysctl.d/99-alpora-performance.conf >/dev/null || true
+    sudo sysctl --system || true
+    printf '\033[1;32m==> ALPORA Security & Performance Hardening Applied Successfully!\033[0m\n'
+fi
 

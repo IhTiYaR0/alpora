@@ -118,3 +118,22 @@ class PhoneStateDTO(BaseDTO):
     devices: List[PhoneDeviceDTO] = field(default_factory=list)
     active_device_id: Optional[str] = None
 
+
+@dataclass
+class SecurityAuditDTO(BaseDTO):
+    """System security posture and kernel/runtime hardening assessment."""
+
+    score: int = 100
+    rating: str = "Hardened"
+    wayland_session: bool = True
+    ufw_active: bool = False
+    apparmor_active: bool = False
+    kptr_restrict: int = 0
+    dmesg_restrict: int = 0
+    unprivileged_bpf_disabled: int = 0
+    swappiness: int = 60
+    max_map_count: int = 65530
+    ipc_socket_secure: bool = True
+    recommendations: List[str] = field(default_factory=list)
+
+
