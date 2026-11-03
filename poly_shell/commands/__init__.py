@@ -20,6 +20,7 @@ from .desktop_cmd import (
 from .demo_cmd import handle_demo
 from .game_cmd import handle_game
 from .phone_cmd import handle_phone
+from .update_cmd import handle_update
 from .panel_cmd import (
     handle_launcher,
     handle_quick_settings,
@@ -72,6 +73,7 @@ __all__ = [
     "handle_demo",
     "handle_game",
     "handle_phone",
+    "handle_update",
     "handle_launcher",
     "handle_quick_settings",
     "handle_notifications",

@@ -152,11 +152,12 @@ jobs:
             tests/test_shortcuts.py \
             tests/test_demo.py
 
-      - name: Run Game Mode & Phone Ecosystem Tests
+      - name: Run Game Mode, Phone & Update Service Tests
         run: |
           python -u -m unittest -v \
             tests/test_game_mode.py \
-            tests/test_phone_service.py
+            tests/test_phone_service.py \
+            tests/test_update_service.py
 
   # ---------------------------------------------------------------------------
   # 3. Dry-Run Installation Test (Clean Arch Linux Container)

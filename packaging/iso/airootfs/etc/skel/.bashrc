@@ -7,3 +7,4 @@ fi
 
 printf '\n\033[1;36m==> Welcome to ALPORA OS Live Desktop!\033[0m\n'
 printf '    To install ALPORA OS permanently to disk, run: \033[1;32malpora-install\033[0m\n\n'
+

@@ -21,3 +21,4 @@ chmod 440 /etc/sudoers.d/* || true
 chmod 755 /usr/local/bin/* || true
 
 echo "==> ALPORA Live RootFS customization completed successfully."
+

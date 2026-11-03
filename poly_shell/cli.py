@@ -367,6 +367,15 @@ def main(argv=None):
     phone_file.add_argument("file", help="path to local file")
     phone_file.add_argument("--device", dest="device_id", help="optional target device ID")
 
+    # System Update Center (Windows Update style OTA updater)
+    update_parser = sub.add_parser("update", help="check, download, and apply ALPORA OS updates")
+    update_sub = update_parser.add_subparsers(dest="update_action")
+    update_check = update_sub.add_parser("check", help="check for new ALPORA OS releases on GitHub")
+    update_check.add_argument("--json", action="store_true", help="output update info in JSON")
+    update_apply = update_sub.add_parser("apply", help="download and apply latest ALPORA OS update")
+    update_apply.add_argument("--branch", default="main", help="target git branch to update from")
+    update_sub.add_parser("status", help="show current ALPORA OS version and update state")
+
     # Panel, workspace and desktop shortcuts dispatchers
     sub.add_parser("launcher", help="toggle application launcher and omni-bar")
     sub.add_parser("quick-settings", help="toggle quick settings control center")
@@ -421,6 +430,7 @@ def main(argv=None):
         "video-pip": lambda: commands.handle_pip(args),
         "game": lambda: commands.handle_game(args),
         "phone": lambda: commands.handle_phone(args),
+        "update": lambda: commands.handle_update(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 
