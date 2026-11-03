@@ -25,6 +25,13 @@ fi
 
 mkdir -p "${WORK_DIR}" "${OUT_DIR}"
 
+if [[ -d /usr/share/archiso/configs/releng ]]; then
+    echo "Syncing standard bootloader files from archiso releng template..."
+    cp -rn /usr/share/archiso/configs/releng/efiboot "${SCRIPT_DIR}/" 2>/dev/null || true
+    cp -rn /usr/share/archiso/configs/releng/syslinux "${SCRIPT_DIR}/" 2>/dev/null || true
+    cp -rn /usr/share/archiso/configs/releng/grub "${SCRIPT_DIR}/" 2>/dev/null || true
+fi
+
 echo "Starting mkarchiso build..."
 echo "Profile directory: ${SCRIPT_DIR}"
 echo "Output directory:  ${OUT_DIR}"
