@@ -153,7 +153,7 @@ const THEME_PRESETS = {
 const THEMES = {};
 for (const [key, t] of Object.entries(THEME_PRESETS)) {
   THEMES[key] = Object.assign({}, t, {
-    wallpaper: "/assets/wallpapers/" + t.file,
+    wallpaper: "assets/wallpapers/" + t.file,
     altWallpaper: "../../../assets/wallpapers/" + t.file
   });
 }
