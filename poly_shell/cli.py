@@ -384,6 +384,34 @@ def main(argv=None):
     sec_sub.add_parser("harden", help="view recommended commands to harden Arch Linux and UFW")
     sec_sub.add_parser("sysctl", help="output hardened sysctl.d configurations")
 
+    # Storage Guard & Anti-Bloat CleanGuard
+    storage_parser = sub.add_parser("storage", help="storage management, Btrfs subvolumes, and anti-bloat clean")
+    storage_sub = storage_parser.add_subparsers(dest="storage_action")
+    storage_sub.add_parser("status", help="overview of disk usage, Btrfs subvolumes, and cleanable caches")
+    storage_sub.add_parser("overview", help="detailed partition metrics and cleanable sizes")
+    storage_sub.add_parser("clean", help="reclaim disk space by safely clearing redundant caches")
+    storage_move = storage_sub.add_parser("move", help="move heavy data folder to secondary disk and symlink")
+    storage_move.add_argument("source", help="source directory path to move")
+    storage_move.add_argument("target", help="target parent directory on another partition/drive")
+
+    # Developer CLI Hub & Isolated Toolchain Hub
+    dev_parser = sub.add_parser("dev", help="developer CLI toolchain hub and isolated binary management")
+    dev_sub = dev_parser.add_subparsers(dest="dev_action")
+    dev_sub.add_parser("list", help="list managed developer CLI tools and status")
+    dev_inst = dev_sub.add_parser("install", help="install/link a CLI tool into ~/.alpora/dev/bin without sudo")
+    dev_inst.add_argument("tool", help="name of CLI tool to install (lazygit, uv, bun, ripgrep, etc.)")
+    dev_rem = dev_sub.add_parser("remove", help="cleanly remove a developer CLI tool")
+    dev_rem.add_argument("tool", help="name of CLI tool to remove")
+    dev_sub.add_parser("doctor", help="diagnose $PATH health and clean broken symlinks")
+    dev_exp = dev_sub.add_parser("export", help="export installed developer tools profile to JSON")
+    dev_exp.add_argument("--out", default="alpora-dev-stack.json", help="output profile JSON path")
+    dev_imp = dev_sub.add_parser("import", help="import developer tools profile JSON")
+    dev_imp.add_argument("file", help="profile JSON file to import")
+
+    # File and Folder Properties Inspector
+    prop_parser = sub.add_parser("properties", help="comprehensive file properties, sizes, and integrity hashes")
+    prop_parser.add_argument("target", help="path to file or directory to inspect")
+
     # Panel, workspace and desktop shortcuts dispatchers
     sub.add_parser("launcher", help="toggle application launcher and omni-bar")
     sub.add_parser("quick-settings", help="toggle quick settings control center")
@@ -440,6 +468,9 @@ def main(argv=None):
         "phone": lambda: commands.handle_phone(args),
         "update": lambda: commands.handle_update(args),
         "security": lambda: commands.handle_security(args),
+        "storage": lambda: commands.handle_storage(args),
+        "dev": lambda: commands.handle_dev(args),
+        "properties": lambda: commands.handle_properties(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 

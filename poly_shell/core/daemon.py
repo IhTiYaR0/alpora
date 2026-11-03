@@ -20,6 +20,8 @@ from ..services.clipboard_service import ClipboardService
 from ..services.game_mode import GameModeService
 from ..services.phone_service import PhoneService
 from ..services.security_service import SecurityService
+from ..services.storage_service import StorageService
+from ..services.dev_toolbox import DevToolboxService
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +45,8 @@ class PolyShellDaemon:
         self.gamemode_service = GameModeService()
         self.phone_service = PhoneService()
         self.security_service = SecurityService(socket_path=socket_path)
+        self.storage_service = StorageService()
+        self.dev_toolbox_service = DevToolboxService()
 
         self.registry.register(self.audio_service)
         self.registry.register(self.network_service)
@@ -52,6 +56,8 @@ class PolyShellDaemon:
         self.registry.register(self.gamemode_service)
         self.registry.register(self.phone_service)
         self.registry.register(self.security_service)
+        self.registry.register(self.storage_service)
+        self.registry.register(self.dev_toolbox_service)
 
         self._setup_ipc_handlers()
 
@@ -125,6 +131,20 @@ class PolyShellDaemon:
         # Security & Hardening endpoints
         self.ipc_server.register_handler("security.audit", lambda _p: self.security_service.audit().to_dict())
         self.ipc_server.register_handler("security.hardening", lambda _p: self.security_service.get_hardening_commands())
+
+        # Storage Guard & CleanGuard endpoints
+        self.ipc_server.register_handler("storage.overview", lambda _p: self.storage_service.get_overview().to_dict())
+        self.ipc_server.register_handler("storage.clean", lambda p: self.storage_service.clean(p.get("targets")).to_dict())
+        self.ipc_server.register_handler(
+            "storage.move",
+            lambda p: self.storage_service.move_directory_library(p.get("source", ""), p.get("target", "")),
+        )
+
+        # Developer CLI Hub endpoints
+        self.ipc_server.register_handler("dev.status", lambda _p: self.dev_toolbox_service.get_status().to_dict())
+        self.ipc_server.register_handler("dev.install", lambda p: self.dev_toolbox_service.install_tool(p.get("tool", "")))
+        self.ipc_server.register_handler("dev.remove", lambda p: self.dev_toolbox_service.remove_tool(p.get("tool", "")))
+        self.ipc_server.register_handler("dev.doctor", lambda _p: self.dev_toolbox_service.doctor())
 
         # System health
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())

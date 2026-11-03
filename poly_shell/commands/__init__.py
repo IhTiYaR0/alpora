@@ -22,6 +22,9 @@ from .game_cmd import handle_game
 from .phone_cmd import handle_phone
 from .update_cmd import handle_update
 from .security_cmd import handle_security
+from .storage_cmd import handle_storage
+from .dev_cmd import handle_dev
+from .properties_cmd import handle_properties
 from .panel_cmd import (
     handle_launcher,
     handle_quick_settings,
@@ -76,6 +79,9 @@ __all__ = [
     "handle_phone",
     "handle_update",
     "handle_security",
+    "handle_storage",
+    "handle_dev",
+    "handle_properties",
     "handle_launcher",
     "handle_quick_settings",
     "handle_notifications",

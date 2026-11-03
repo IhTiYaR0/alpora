@@ -137,3 +137,68 @@ class SecurityAuditDTO(BaseDTO):
     recommendations: List[str] = field(default_factory=list)
 
 
+@dataclass
+class StoragePartitionDTO(BaseDTO):
+    """Storage filesystem or Btrfs subvolume status."""
+
+    mount_point: str
+    filesystem: str
+    total_bytes: int
+    used_bytes: int
+    free_bytes: int
+    percent_used: float
+    is_btrfs: bool = False
+    subvolume_name: Optional[str] = None
+
+
+@dataclass
+class StorageCleanResultDTO(BaseDTO):
+    """Summary of cleaned disk caches and reclaimed bytes."""
+
+    freed_bytes: int = 0
+    freed_human: str = "0 B"
+    cleaned_targets: List[str] = field(default_factory=list)
+    success: bool = True
+
+
+@dataclass
+class StorageOverviewDTO(BaseDTO):
+    """Holistic view of system partitions, dynamic pools, and cache sizes."""
+
+    partitions: List[StoragePartitionDTO] = field(default_factory=list)
+    has_btrfs_pool: bool = False
+    pacman_cache_bytes: int = 0
+    journal_log_bytes: int = 0
+    thumbnail_cache_bytes: int = 0
+    total_cleanable_bytes: int = 0
+
+
+@dataclass
+class DevCliToolDTO(BaseDTO):
+    """Developer CLI tool information and installation metadata."""
+
+    name: str
+    version: str = "unknown"
+    installed: bool = False
+    binary_path: str = ""
+    source: str = "alpora-hub"
+    size_bytes: int = 0
+    description: str = ""
+    category: str = "tools"
+
+
+@dataclass
+class DevToolboxDTO(BaseDTO):
+    """Status overview of developer CLI tools and environment PATH."""
+
+    bin_dir: str = ""
+    packages_dir: str = ""
+    in_path: bool = False
+    total_tools: int = 0
+    installed_tools: int = 0
+    total_size_bytes: int = 0
+    tools: List[DevCliToolDTO] = field(default_factory=list)
+    path_issues: List[str] = field(default_factory=list)
+
+
+

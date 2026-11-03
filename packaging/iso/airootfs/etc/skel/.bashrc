@@ -1,5 +1,5 @@
 # ALPORA Live Environment Shell Config
-export PATH="$HOME/.local/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.alpora/dev/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
 if [[ -f /usr/local/bin/alpora-fetch ]]; then
     /usr/local/bin/alpora-fetch --once 2>/dev/null || true
