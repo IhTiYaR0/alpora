@@ -1,27 +1,58 @@
 # ALPORA Custom Arch Linux Live ISO Profile
 
-This directory contains the `archiso` profile definition for creating a bootable, live Arch Linux ISO featuring the complete **ALPORA Desktop Environment** stack preconfigured.
+This directory contains the `archiso` profile definition for creating **ALPORA OS**: a bootable, live Arch Linux ISO featuring the complete **ALPORA Desktop Environment** stack preconfigured with auto-login into Hyprland and offline installer capabilities.
 
-## Requirements
+---
+
+## Method 1: Cloud Build via GitHub Actions (Recommended)
+
+You don't need a local Linux machine or 15 GB of disk space to build the ISO. GitHub Actions will build it in the cloud for you:
+
+1. Navigate to the **Actions** tab on your GitHub repository: `https://github.com/pnam-it309/alpora/actions`.
+2. Under **Workflows**, click **Build ALPORA OS Live ISO**.
+3. Click **Run workflow** (select branch `main`).
+4. Wait for the build to complete (~25-35 minutes).
+5. Download `alpora-os-live-iso.zip` containing the bootable `.iso` and SHA256 checksums from the **Artifacts** section!
+
+*(When you publish a new GitHub Release, this workflow automatically compiles the ISO and attaches it to the release assets).*
+
+---
+
+## Method 2: Local Build on Arch Linux
+
+### Requirements
 - An active Arch Linux system with root permissions.
 - The `archiso` package (`sudo pacman -S archiso`).
-- At least 15 GB of free disk space for the build directory and squashfs rootfs.
+- At least 15 GB of free disk space for squashfs rootfs creation.
 
-## Building the ISO
-Run the builder script with `sudo`:
+### Building
+Run the builder script with root privileges:
 
 ```bash
 sudo ./packaging/iso/build-iso.sh
 ```
 
-Upon completion, the bootable `.iso` image will be placed in `packaging/iso/out/`.
+Upon completion, the bootable `.iso` image and checksum will be placed in `packaging/iso/out/`.
 
-## Flashing & Booting
+---
+
+## Live Desktop Experience & Installation
+
+* **Auto-Login:** The Live USB automatically logs into the `alpora` desktop user with `sudo` access.
+* **Instant Hyprland Session:** Hyprland starts immediately on boot with ALPORA TopBar, Dynamic Island, and Fcitx5 Bamboo Vietnamese input.
+* **Install to Disk:** To permanently install ALPORA OS onto your computer's hard drive, open a terminal or press `Super+Return` and run:
+  ```bash
+  alpora-install
+  ```
+
+---
+
+## Flashing to USB
+
 You can write the generated ISO to a USB flash drive using:
-- **Ventoy**: Simply copy the `.iso` file into your Ventoy USB drive.
-- **dd**:
+* **Ventoy**: Simply copy the `.iso` file into your Ventoy USB drive.
+* **Rufus (Windows)**: Select the ISO in Rufus and write in *DD Image mode*.
+* **dd (Linux)**:
   ```bash
   sudo dd bs=4M if=packaging/iso/out/alpora-archlinux-*.iso of=/dev/sdX status=progress oflag=sync
   ```
-  *(Replace `/dev/sdX` with your target USB drive).*
-

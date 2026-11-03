@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Interactive installer launcher for ALPORA OS
+set -euo pipefail
+
+clear
+echo "=========================================================="
+echo "             ALPORA OS System Installation                "
+echo "=========================================================="
+echo "Preparing ALPORA Desktop installer..."
+
+if [[ -d /opt/alpora ]]; then
+    cd /opt/alpora
+    sudo ./install/install.sh "$@"
+else
+    echo "Fetching latest ALPORA installer from online repository..."
+    curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash -s -- "$@"
+fi

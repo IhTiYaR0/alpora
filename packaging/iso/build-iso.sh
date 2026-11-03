@@ -6,8 +6,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORK_DIR="${SCRIPT_DIR}/work"
-OUT_DIR="${SCRIPT_DIR}/out"
+WORK_DIR="${WORK_DIR:-${SCRIPT_DIR}/work}"
+OUT_DIR="${OUT_DIR:-${SCRIPT_DIR}/out}"
 
 echo "=========================================================="
 echo "          ALPORA Arch Linux ISO Builder                   "

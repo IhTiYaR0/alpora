@@ -150,3 +150,4 @@ class PhoneService(BaseService):
 
         res = SafeRunner.run(["kdeconnect-cli", "--device", dev_id, "--share", str(path)], timeout=5.0)
         return res.returncode == 0
+

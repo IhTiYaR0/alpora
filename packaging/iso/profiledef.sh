@@ -4,7 +4,7 @@
 
 iso_name="alpora-archlinux"
 iso_label="ALPORA_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="ALPORA Desktop <https://github.com/nickh93/alpora>"
+iso_publisher="ALPORA Desktop <https://github.com/pnam-it309/alpora>"
 iso_application="ALPORA Desktop Live System & Installer"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
@@ -18,8 +18,9 @@ airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd')
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
+  ["/etc/sudoers.d/alpora"]="0:0:440"
   ["/root"]="0:0:750"
-  ["/root/.automated_script.sh"]="0:0:755"
+  ["/root/customize_airootfs.sh"]="0:0:755"
   ["/usr/local/bin/alpora-install"]="0:0:755"
 )
 

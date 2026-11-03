@@ -1,0 +1,98 @@
+name: Build ALPORA OS Live ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_release:
+        description: 'Publish generated ISO to GitHub Release'
+        required: false
+        type: boolean
+        default: false
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-iso:
+    name: Build & Package ALPORA OS ISO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout ALPORA repository
+        uses: actions/checkout@v5
+
+      - name: 1. Maximize free build space on runner
+        run: |
+          echo "Current disk space before cleanup:"
+          df -h /
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -a --force || true
+          echo "Cleaned disk space:"
+          df -h /
+
+      - name: 2. Prepare Live Desktop filesystem & dotfiles
+        run: |
+          echo "Injecting ALPORA user desktop and dotfiles into archiso skel..."
+          mkdir -p packaging/iso/airootfs/etc/skel/.config/hypr
+          mkdir -p packaging/iso/airootfs/etc/skel/.config/kitty
+          mkdir -p packaging/iso/airootfs/etc/skel/.config/foot
+          mkdir -p packaging/iso/airootfs/usr/local/bin
+          mkdir -p packaging/iso/airootfs/opt/alpora
+
+          # Copy dotfiles for default live session
+          cp -r dotfiles/hypr/.config/hypr/* packaging/iso/airootfs/etc/skel/.config/hypr/ || true
+          cp -r dotfiles/kitty/.config/kitty/* packaging/iso/airootfs/etc/skel/.config/kitty/ || true
+          cp -r dotfiles/foot/.config/foot/* packaging/iso/airootfs/etc/skel/.config/foot/ || true
+
+          # Copy neofetch-style alpora-fetch
+          cp bin/alpora-fetch packaging/iso/airootfs/usr/local/bin/alpora-fetch || true
+          chmod +x packaging/iso/airootfs/usr/local/bin/*
+
+          # Bundle local ALPORA project into live filesystem /opt/alpora for offline installation
+          rsync -av --exclude='.git' --exclude='packaging/iso/work' --exclude='packaging/iso/out' \
+            ./ packaging/iso/airootfs/opt/alpora/
+
+          chmod +x packaging/iso/*.sh packaging/iso/airootfs/root/*.sh || true
+
+      - name: 3. Compile ALPORA OS with official mkarchiso
+        run: |
+          echo "Launching Arch Linux container to compile Live ISO..."
+          docker run --privileged --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -e WORK_DIR="/tmp/archiso-work" \
+            -e OUT_DIR="/workspace/packaging/iso/out" \
+            archlinux:base-devel bash -c "
+              pacman -Syu --noconfirm archiso git python sudo &&
+              cd /workspace &&
+              ./packaging/iso/build-iso.sh
+            "
+
+      - name: 4. Compute Checksums & List Output
+        run: |
+          cd packaging/iso/out
+          sha256sum *.iso > sha256sums.txt
+          ls -lh
+          cat sha256sums.txt
+
+      - name: 5. Upload ISO Artifact (14-day retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpora-os-live-iso
+          path: |
+            packaging/iso/out/*.iso
+            packaging/iso/out/sha256sums.txt
+          retention-days: 14
+
+      - name: 6. Publish ISO to GitHub Release
+        if: github.event_name == 'release' || inputs.upload_release == true
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            packaging/iso/out/*.iso
+            packaging/iso/out/sha256sums.txt
