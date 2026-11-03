@@ -4,7 +4,8 @@
 # ==============================================================================
 set -euo pipefail
 
-# 1. Create default non-root user 'alpora'
+# 1. Unlock root and create default non-root user 'alpora'
+passwd -d root || true
 if ! id -u alpora >/dev/null 2>&1; then
     useradd -m -g users -G wheel,audio,video,optical,storage,input,network -s /bin/bash alpora
     passwd -d alpora

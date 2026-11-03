@@ -3,7 +3,7 @@
 # Documentation: https://wiki.archlinux.org/title/archiso
 
 iso_name="alpora-archlinux"
-iso_label="ALPORA_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
+iso_label="ALPORA_V1"
 iso_publisher="ALPORA Desktop <https://github.com/pnam-it309/alpora>"
 iso_application="ALPORA Desktop Live System & Installer"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
