@@ -22,6 +22,8 @@ from ..services.phone_service import PhoneService
 from ..services.security_service import SecurityService
 from ..services.storage_service import StorageService
 from ..services.dev_toolbox import DevToolboxService
+from ..services.snapshot_service import SnapshotService
+from ..services.privacy_service import PrivacyService
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +49,8 @@ class PolyShellDaemon:
         self.security_service = SecurityService(socket_path=socket_path)
         self.storage_service = StorageService()
         self.dev_toolbox_service = DevToolboxService()
+        self.snapshot_service = SnapshotService()
+        self.privacy_service = PrivacyService()
 
         self.registry.register(self.audio_service)
         self.registry.register(self.network_service)
@@ -58,6 +62,8 @@ class PolyShellDaemon:
         self.registry.register(self.security_service)
         self.registry.register(self.storage_service)
         self.registry.register(self.dev_toolbox_service)
+        self.registry.register(self.snapshot_service)
+        self.registry.register(self.privacy_service)
 
         self._setup_ipc_handlers()
 
@@ -145,6 +151,18 @@ class PolyShellDaemon:
         self.ipc_server.register_handler("dev.install", lambda p: self.dev_toolbox_service.install_tool(p.get("tool", "")))
         self.ipc_server.register_handler("dev.remove", lambda p: self.dev_toolbox_service.remove_tool(p.get("tool", "")))
         self.ipc_server.register_handler("dev.doctor", lambda _p: self.dev_toolbox_service.doctor())
+
+        # Snapshot & Instant Recovery endpoints
+        self.ipc_server.register_handler("snapshot.list", lambda p: self.snapshot_service.list_snapshots(p.get("config", "root")).to_dict())
+        self.ipc_server.register_handler("snapshot.create", lambda p: self.snapshot_service.create_snapshot(p.get("description", "Manual Backup")))
+
+        # Application Privacy & Sandboxing endpoints
+        self.ipc_server.register_handler("privacy.audit", lambda _p: self.privacy_service.audit().to_dict())
+        self.ipc_server.register_handler("privacy.isolate", lambda p: self.privacy_service.isolate_app(p.get("app", "")))
+        self.ipc_server.register_handler(
+            "privacy.set_permission",
+            lambda p: self.privacy_service.set_permission(p.get("app", ""), p.get("permission", ""), bool(p.get("allowed", True))),
+        )
 
         # System health
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())

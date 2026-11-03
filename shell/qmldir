@@ -89,6 +89,7 @@ PanelReveal 1.0 components/PanelReveal.qml
 QuickActionButton 1.0 components/QuickActionButton.qml
 QuickSwitchTile 1.0 components/QuickSwitchTile.qml
 QuickTile 1.0 components/QuickTile.qml
+SecurityShieldCard 1.0 components/SecurityShieldCard.qml
 SettingsBadge 1.0 components/SettingsBadge.qml
 SettingsCard 1.0 components/SettingsCard.qml
 SettingsImage 1.0 components/SettingsImage.qml

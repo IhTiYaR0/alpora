@@ -116,5 +116,21 @@ def handle_dev(args: argparse.Namespace) -> int:
             _safe_print(f"❌ {res.get('error')}")
             return 1
 
+    if action == "clone":
+        src = getattr(args, "source", None)
+        dst = getattr(args, "destination", None)
+        if not src or not dst:
+            _safe_print("Lỗi: Vui lòng truyền đủ <source> và <destination> để nhân bản reflink.")
+            _safe_print("Ví dụ: poly-shell dev clone ./my-project ./my-project-copy")
+            return 1
+        res = service.clone_reflink(src, dst)
+        if res.get("success"):
+            _safe_print(f"✅ {res.get('message')}")
+            return 0
+        else:
+            _safe_print(f"❌ {res.get('error')}")
+            return 1
+
     _safe_print(f"Lệnh dev không xác định: {action}")
     return 1
+

@@ -335,6 +335,24 @@ PanelWindow {
                         SettingsRow { width: parent.width; height: 53; enabled: !popup.preview; text: I18n.tr("quick.power_mode"); subtitle: popup.profileLabel; symbol: "performance"; onClicked: popup.page = "profiles" }
                         Rectangle { y: 61; width: parent.width; height: 1; color: Glass.tint(Session.accent, 0.22) }
                     }
+                    Item { width: 1; height: 8 * popup.expansionCurve }
+                    Item {
+                        width: parent.width; height: 104 * popup.expansionCurve; clip: true
+                        opacity: popup.expansionCurve
+                        SecurityShieldCard {
+                            anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                            enabled: !popup.preview
+                            onAuditRequested: {
+                                Session.closeQuickSettings();
+                                popup.launchTerminal(["poly-shell", "security", "status"]);
+                            }
+                            onHardenRequested: {
+                                Session.closeQuickSettings();
+                                popup.launchTerminal(["poly-shell", "security", "harden"]);
+                            }
+                        }
+                    }
+                    Item { width: 1; height: 8 * popup.expansionCurve }
                     Item {
                         width: parent.width; height: 40 * (1 - popup.expansionCurve); clip: true
                         QuickActionButton { width: parent.width; height: 40; enabled: popup.preview; text: I18n.tr("quick.open_control_center"); symbol: "settings"; onClicked: BarState.expandQuick() }

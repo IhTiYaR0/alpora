@@ -15,25 +15,28 @@ Rectangle {
     signal auditRequested()
     signal hardenRequested()
 
-    implicitHeight: 120
-    radius: 14
-    color: Glass.tint(Session.surface, 0.45)
+    implicitHeight: 96
+    radius: (Session.visual && Session.visual.panelRadius !== undefined) ? Session.visual.panelRadius : 14
+    color: hoverHandler.hovered ? Glass.tint(Session.surface, 0.65) : Glass.tint(Session.surface, 0.45)
     border.width: 1
-    border.color: score >= 80 ? Glass.tint(Session.accent, 0.40) : Glass.tint(Session.muted, 0.25)
+    border.color: hoverHandler.hovered ? Session.accent : (score >= 80 ? Glass.tint(Session.accent, 0.40) : Glass.tint(Session.muted, 0.25))
+
+    HoverHandler { id: hoverHandler }
+    TapHandler { onTapped: root.auditRequested() }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 14
-        spacing: 10
+        anchors.margins: 12
+        spacing: 8
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 12
+            spacing: 10
 
             Rectangle {
-                Layout.preferredWidth: 38
-                Layout.preferredHeight: 38
-                radius: 19
+                Layout.preferredWidth: 34
+                Layout.preferredHeight: 34
+                radius: width / 2
                 color: root.score >= 80 ? Glass.tint(Session.accent, 0.25) : Glass.tint(Session.muted, 0.20)
                 border.width: 1.5
                 border.color: root.score >= 80 ? Session.accent : Session.muted
@@ -41,7 +44,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: root.score >= 80 ? "🛡️" : "⚠️"
-                    font.pixelSize: 18
+                    font.pixelSize: 16
                 }
             }
 
@@ -61,15 +64,15 @@ Rectangle {
                     text: root.statusText
                     color: Session.foreground
                     font.family: Session.fontFamily
-                    font.pixelSize: 13
+                    font.pixelSize: 12
                     font.weight: Font.Bold
                 }
             }
 
             Rectangle {
-                Layout.preferredHeight: 24
-                Layout.preferredWidth: 64
-                radius: 12
+                Layout.preferredHeight: 22
+                Layout.preferredWidth: 58
+                radius: 11
                 color: Glass.tint(Session.accent, 0.20)
                 border.width: 1
                 border.color: Session.accent

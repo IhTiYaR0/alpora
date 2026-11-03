@@ -25,6 +25,8 @@ from .security_cmd import handle_security
 from .storage_cmd import handle_storage
 from .dev_cmd import handle_dev
 from .properties_cmd import handle_properties
+from .snapshot_cmd import handle_snapshot
+from .privacy_cmd import handle_privacy
 from .panel_cmd import (
     handle_launcher,
     handle_quick_settings,
@@ -82,6 +84,8 @@ __all__ = [
     "handle_storage",
     "handle_dev",
     "handle_properties",
+    "handle_snapshot",
+    "handle_privacy",
     "handle_launcher",
     "handle_quick_settings",
     "handle_notifications",

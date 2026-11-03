@@ -407,10 +407,35 @@ def main(argv=None):
     dev_exp.add_argument("--out", default="alpora-dev-stack.json", help="output profile JSON path")
     dev_imp = dev_sub.add_parser("import", help="import developer tools profile JSON")
     dev_imp.add_argument("file", help="profile JSON file to import")
+    dev_clone = dev_sub.add_parser("clone", help="clone directory or file using Btrfs CoW reflink (0 bytes extra)")
+    dev_clone.add_argument("source", help="source path")
+    dev_clone.add_argument("destination", help="destination path")
 
     # File and Folder Properties Inspector
     prop_parser = sub.add_parser("properties", help="comprehensive file properties, sizes, and integrity hashes")
     prop_parser.add_argument("target", help="path to file or directory to inspect")
+
+    # Instant System Rollback & Btrfs Snapshots
+    snap_parser = sub.add_parser("snapshot", help="instant Btrfs system recovery snapshots and bootloader rollbacks")
+    snap_sub = snap_parser.add_subparsers(dest="snapshot_action")
+    snap_sub.add_parser("list", help="list available rollback snapshots")
+    snap_create = snap_sub.add_parser("create", help="create instant rollback snapshot")
+    snap_create.add_argument("description", nargs="?", default="Manual ALPORA Backup", help="snapshot description")
+    snap_del = snap_sub.add_parser("delete", help="delete snapshot by ID")
+    snap_del.add_argument("id", type=int, help="snapshot ID")
+
+    # Application Privacy & Sandboxing Matrix
+    priv_parser = sub.add_parser("privacy", help="application sandbox permissions and privacy control center")
+    priv_sub = priv_parser.add_subparsers(dest="privacy_action")
+    priv_sub.add_parser("status", help="audit application sandbox permissions")
+    priv_iso = priv_sub.add_parser("isolate", help="isolate app from reading ~/.ssh or user home")
+    priv_iso.add_argument("app", help="app ID (e.g. com.discordapp.Discord)")
+    priv_allow = priv_sub.add_parser("allow", help="allow specific app permission (mic, camera, network)")
+    priv_allow.add_argument("app", help="app ID")
+    priv_allow.add_argument("permission", choices=("mic", "camera", "network"), help="permission name")
+    priv_rev = priv_sub.add_parser("revoke", help="revoke specific app permission")
+    priv_rev.add_argument("app", help="app ID")
+    priv_rev.add_argument("permission", choices=("mic", "camera", "network"), help="permission name")
 
     # Panel, workspace and desktop shortcuts dispatchers
     sub.add_parser("launcher", help="toggle application launcher and omni-bar")
@@ -471,6 +496,8 @@ def main(argv=None):
         "storage": lambda: commands.handle_storage(args),
         "dev": lambda: commands.handle_dev(args),
         "properties": lambda: commands.handle_properties(args),
+        "snapshot": lambda: commands.handle_snapshot(args),
+        "privacy": lambda: commands.handle_privacy(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 

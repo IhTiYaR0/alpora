@@ -101,3 +101,4 @@ class FileInspectorService:
             "is_executable": bool(mode & stat.S_IXUSR),
             "is_hidden": path.name.startswith("."),
         }
+

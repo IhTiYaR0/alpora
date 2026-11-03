@@ -338,3 +338,43 @@ class DevToolboxService(BaseService):
             return {"success": True, "count": len(results), "results": results}
         except Exception as exc:
             return {"success": False, "error": str(exc)}
+
+    def clone_reflink(self, source_path: str, destination_path: str) -> Dict[str, Any]:
+        """Create a zero-extra-storage Copy-on-Write (reflink) clone of a directory or file."""
+        src = Path(source_path).expanduser().resolve()
+        dst = Path(destination_path).expanduser().resolve()
+
+        if not src.exists():
+            return {"success": False, "error": f"Đường dẫn nguồn không tồn tại: {src}"}
+        if dst.exists():
+            return {"success": False, "error": f"Đường dẫn đích đã tồn tại: {dst}"}
+
+        # Try cp --reflink=always (Btrfs / XFS copy-on-write zero storage)
+        if shutil.which("cp"):
+            from ..adapters.base import SafeRunner
+            res = SafeRunner.run(["cp", "-a", "--reflink=always", str(src), str(dst)], timeout_sec=15.0)
+            if res.returncode == 0:
+                return {
+                    "success": True,
+                    "reflink_enabled": True,
+                    "source": str(src),
+                    "destination": str(dst),
+                    "message": f"Đã nhân bản CoW (Reflink) thành công từ '{src.name}' sang '{dst.name}'! (Tốn 0 MB dung lượng)",
+                }
+
+        # Fallback to standard copytree
+        try:
+            if src.is_dir():
+                shutil.copytree(str(src), str(dst))
+            else:
+                shutil.copy2(str(src), str(dst))
+            return {
+                "success": True,
+                "reflink_enabled": False,
+                "source": str(src),
+                "destination": str(dst),
+                "message": f"Đã sao chép tiêu chuẩn từ '{src.name}' sang '{dst.name}'.",
+            }
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+

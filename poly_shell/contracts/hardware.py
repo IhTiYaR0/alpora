@@ -201,4 +201,49 @@ class DevToolboxDTO(BaseDTO):
     path_issues: List[str] = field(default_factory=list)
 
 
+@dataclass
+class SnapshotItemDTO(BaseDTO):
+    """Btrfs system or home snapshot metadata."""
+
+    id: int
+    date: str
+    description: str = ""
+    cleanup: str = "number"
+    is_current: bool = False
+
+
+@dataclass
+class SnapshotOverviewDTO(BaseDTO):
+    """Status overview of system rollback snapshots."""
+
+    available: bool = False
+    config_name: str = "root"
+    count: int = 0
+    snapshots: List[SnapshotItemDTO] = field(default_factory=list)
+
+
+@dataclass
+class AppPermissionDTO(BaseDTO):
+    """Application sandbox privacy permissions and access rights."""
+
+    app_id: str
+    app_name: str
+    has_network: bool = True
+    has_mic: bool = False
+    has_camera: bool = False
+    has_home_access: bool = True
+    is_sandboxed: bool = True
+
+
+@dataclass
+class AppPrivacyReportDTO(BaseDTO):
+    """Holistic privacy audit of desktop applications."""
+
+    total_apps: int = 0
+    isolated_apps: int = 0
+    exposed_apps: int = 0
+    apps: List[AppPermissionDTO] = field(default_factory=list)
+
+
+
 

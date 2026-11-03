@@ -23,6 +23,9 @@ efibootmgr
 dosfstools
 e2fsprogs
 btrfs-progs
+snapper
+snap-pac
+compsize
 ntfs-3g
 os-prober
 

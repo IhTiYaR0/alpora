@@ -54,6 +54,9 @@ ALPORA OS ISO comes pre-hardened out of the box:
 * **Firewall (UFW):** Default deny incoming traffic, allow outgoing, with explicit pinhole allowance for ALPORA Phone / KDE Connect ecosystem (ports 1714:1764).
 * **Mandatory Access Control (AppArmor):** `apparmor.service` enabled for zero-day mitigation and untrusted process sandboxing.
 * **Kernel & Multi-core Optimization:** Sysctl profiles (`99-alpora-security.conf` and `99-alpora-performance.conf`) configure `kernel.kptr_restrict`, `dmesg_restrict`, `unprivileged_bpf_disabled`, `vm.swappiness = 10`, and `vm.max_map_count = 1048576` for peak Wine/Proton gaming frame stability (Honkai, ZZZ) and low memory usage.
+* **Instant System Recovery (Btrfs Snapshots & Snapper):** Pre-configured with `snapper` and `snap-pac` to automatically capture pre/post update snapshots, enabling 5-second rollbacks directly from the bootloader menu.
+* **Storage Guard & Anti-Bloat:** Systemd journal capped to 150MB, pacman cache auto-prune, and `poly-shell storage` for seamless data library moving.
+* **Developer CLI Hub:** Isolated developer binary environment in `~/.alpora/dev/bin` without requiring sudo, featuring instant CoW reflink project cloning (`poly-shell dev clone`).
 
 ---
 

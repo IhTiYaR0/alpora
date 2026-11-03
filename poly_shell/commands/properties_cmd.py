@@ -59,3 +59,4 @@ def handle_properties(args: argparse.Namespace) -> int:
 
     _safe_print("=" * 65)
     return 0
+

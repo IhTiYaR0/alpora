@@ -73,6 +73,18 @@ class DevToolboxServiceTests(unittest.TestCase):
         self.assertTrue(imp_res.get("success"))
         self.assertGreaterEqual(imp_res.get("count", 0), 1)
 
+    def test_clone_reflink(self):
+        """Reflink clone should replicate files and directories cleanly."""
+        src = self.root_path / "project_src"
+        src.mkdir()
+        (src / "package.json").write_text('{"name": "test"}', encoding="utf-8")
+        dst = self.root_path / "project_dst"
+
+        res = self.service.clone_reflink(str(src), str(dst))
+        self.assertTrue(res.get("success"))
+        self.assertTrue(dst.exists())
+        self.assertTrue((dst / "package.json").exists())
+
 
 class DevCommandTests(unittest.TestCase):
     """Test suite for poly-shell dev CLI subcommands."""
@@ -98,3 +110,4 @@ class DevCommandTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
