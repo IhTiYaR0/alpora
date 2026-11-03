@@ -60,18 +60,30 @@ jobs:
 
           chmod +x packaging/iso/*.sh packaging/iso/airootfs/root/*.sh || true
 
+      - name: 2.5. Cache Arch Pacman Packages
+        uses: actions/cache@v4
+        with:
+          path: /tmp/pacman-pkg-cache
+          key: pacman-cache-${{ hashFiles('packaging/iso/packages.x86_64') }}
+          restore-keys: |
+            pacman-cache-
+
       - name: 3. Compile ALPORA OS with official mkarchiso
         run: |
-          echo "Launching Arch Linux container to compile Live ISO..."
+          mkdir -p /tmp/pacman-pkg-cache
+          echo "Launching Arch Linux container with ParallelDownloads and Pacman Cache..."
           docker run --privileged --rm \
             -v "$GITHUB_WORKSPACE:/workspace" \
+            -v "/tmp/pacman-pkg-cache:/var/cache/pacman/pkg" \
             -e WORK_DIR="/tmp/archiso-work" \
             -e OUT_DIR="/workspace/packaging/iso/out" \
             archlinux:base-devel bash -c "
+              echo 'ParallelDownloads = 10' >> /etc/pacman.conf &&
               pacman -Syu --noconfirm archiso git python sudo &&
               cd /workspace &&
               ./packaging/iso/build-iso.sh
             "
+          sudo chown -R $USER:$USER /tmp/pacman-pkg-cache || true
 
       - name: 4. Compute Checksums & List Output
         run: |
