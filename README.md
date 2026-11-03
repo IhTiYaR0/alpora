@@ -93,6 +93,13 @@ Download or clone this repository into a permanent directory, then open a termin
 inside it. The installer creates links into the checkout, so keep that directory.
 
 ```sh
+# One-line online installer (auto-clones and runs interactive setup)
+curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash
+```
+
+Or clone manually:
+
+```sh
 git clone https://github.com/pnam-it309/alpora.git
 cd alpora
 
