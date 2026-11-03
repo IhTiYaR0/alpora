@@ -17,6 +17,8 @@ from ..services.network_service import NetworkService
 from ..services.power_service import PowerService
 from ..services.metrics_service import MetricsService
 from ..services.clipboard_service import ClipboardService
+from ..services.game_mode import GameModeService
+from ..services.phone_service import PhoneService
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +39,16 @@ class PolyShellDaemon:
         self.power_service = PowerService()
         self.metrics_service = MetricsService()
         self.clipboard_service = ClipboardService()
+        self.gamemode_service = GameModeService()
+        self.phone_service = PhoneService()
 
         self.registry.register(self.audio_service)
         self.registry.register(self.network_service)
         self.registry.register(self.power_service)
         self.registry.register(self.metrics_service)
         self.registry.register(self.clipboard_service)
+        self.registry.register(self.gamemode_service)
+        self.registry.register(self.phone_service)
 
         self._setup_ipc_handlers()
 
@@ -97,6 +103,21 @@ class PolyShellDaemon:
             )
         except ImportError:
             pass
+
+        # Game Mode endpoints
+        self.ipc_server.register_handler("gamemode.state", lambda _p: self.gamemode_service.get_state().to_dict())
+        self.ipc_server.register_handler("gamemode.enable", lambda p: self.gamemode_service.enable(p.get("game")))
+        self.ipc_server.register_handler("gamemode.disable", lambda _p: self.gamemode_service.disable())
+        self.ipc_server.register_handler("gamemode.toggle", lambda p: self.gamemode_service.toggle(p.get("game")))
+        self.ipc_server.register_handler("gamemode.hoyo", lambda p: self.gamemode_service.get_hoyoverse_preset(p.get("game", "zzz")))
+
+        # Phone Ecosystem endpoints
+        self.ipc_server.register_handler("phone.state", lambda _p: self.phone_service.get_state().to_dict())
+        self.ipc_server.register_handler("phone.devices", lambda _p: [d.to_dict() for d in self.phone_service.get_devices()])
+        self.ipc_server.register_handler("phone.ring", lambda p: self.phone_service.ring_device(p.get("device_id")))
+        self.ipc_server.register_handler("phone.ping", lambda p: self.phone_service.send_ping(p.get("device_id"), p.get("message", "ALPORA Ping")))
+        self.ipc_server.register_handler("phone.share_clipboard", lambda p: self.phone_service.share_clipboard(p.get("text"), p.get("device_id")))
+        self.ipc_server.register_handler("phone.send_file", lambda p: self.phone_service.send_file(p.get("file_path", ""), p.get("device_id")))
 
         # System health
         self.ipc_server.register_handler("system.health", lambda _p: self.registry.health_report())

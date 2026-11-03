@@ -84,3 +84,37 @@ class DisplayStateDTO(BaseDTO):
     dnd: bool = False
     dnd_available: bool = False
 
+
+@dataclass
+class GameModeDTO(BaseDTO):
+    """Game performance mode, CPU governor and compositor optimizations."""
+
+    enabled: bool = False
+    active_game: Optional[str] = None
+    cpu_governor: str = "balanced"
+    animations_disabled: bool = False
+    blur_disabled: bool = False
+    gamemode_available: bool = False
+    optimizations: List[str] = field(default_factory=list)
+
+
+@dataclass
+class PhoneDeviceDTO(BaseDTO):
+    """Connected phone device via KDE Connect ecosystem."""
+
+    id: str
+    name: str
+    is_reachable: bool = False
+    is_trusted: bool = True
+    battery: Optional[int] = None
+    is_charging: bool = False
+
+
+@dataclass
+class PhoneStateDTO(BaseDTO):
+    """Ecosystem connectivity status across paired mobile devices."""
+
+    available: bool = False
+    devices: List[PhoneDeviceDTO] = field(default_factory=list)
+    active_device_id: Optional[str] = None
+

@@ -332,6 +332,41 @@ def main(argv=None):
     demo_parser.add_argument("--port", type=int, default=8080, help="port for the demo HTTP server (default: 8080)")
     demo_parser.add_argument("--no-browser", action="store_true", help="do not auto-open default web browser")
 
+    # Game performance mode & Hoyoverse tweaks
+    game_parser = sub.add_parser("game", help="game performance mode and Hoyoverse gaming optimizations (Honkai, ZZZ)")
+    game_sub = game_parser.add_subparsers(dest="game_action")
+    game_on = game_sub.add_parser("on", help="activate Game Mode (reduce Hyprland load, set performance governor)")
+    game_on.add_argument("game", nargs="?", default="", help="optional target game name")
+    game_sub.add_parser("off", help="deactivate Game Mode and restore balanced compositor state")
+    game_toggle = game_sub.add_parser("toggle", help="toggle Game Mode on or off")
+    game_toggle.add_argument("game", nargs="?", default="", help="optional target game name")
+    game_status = game_sub.add_parser("status", help="check Game Mode status, CPU governor and applied tweaks")
+    game_status.add_argument("--json", action="store_true", help="output status in JSON format")
+    game_hoyo = game_sub.add_parser("hoyo", help="view Hoyoverse gaming profile and recommended env vars (ZZZ, Honkai Star Rail)")
+    game_hoyo.add_argument("target", nargs="?", default="zzz", choices=("zzz", "honkai", "genshin"), help="Hoyoverse game title (zzz, honkai, genshin)")
+    game_launch = game_sub.add_parser("launch", help="launch a game wrapped inside ALPORA Game Mode")
+    game_launch.add_argument("--game", help="game title preset to apply")
+    game_launch.add_argument("command", nargs="+", help="command or executable path to execute")
+
+    # Phone Ecosystem (KDE Connect integration)
+    phone_parser = sub.add_parser("phone", help="phone ecosystem and connectivity integration (KDE Connect)")
+    phone_sub = phone_parser.add_subparsers(dest="phone_action")
+    phone_list = phone_sub.add_parser("list", help="list paired and reachable phone devices")
+    phone_list.add_argument("--json", action="store_true", help="output devices in JSON format")
+    phone_status = phone_sub.add_parser("status", help="check phone ecosystem connectivity status")
+    phone_status.add_argument("--json", action="store_true", help="output status in JSON format")
+    phone_ring = phone_sub.add_parser("ring", help="ring phone to find it")
+    phone_ring.add_argument("device_id", nargs="?", help="optional device ID")
+    phone_ping = phone_sub.add_parser("ping", help="send ping test notification to phone")
+    phone_ping.add_argument("device_id", nargs="?", help="optional device ID")
+    phone_ping.add_argument("--message", default="ALPORA Ecosystem Connected", help="custom ping message")
+    phone_clip = phone_sub.add_parser("share-clipboard", help="sync clipboard text to phone")
+    phone_clip.add_argument("text", nargs="?", help="text to share (defaults to current desktop clipboard)")
+    phone_clip.add_argument("--device", dest="device_id", help="optional target device ID")
+    phone_file = phone_sub.add_parser("send-file", help="send a file wirelessly to phone")
+    phone_file.add_argument("file", help="path to local file")
+    phone_file.add_argument("--device", dest="device_id", help="optional target device ID")
+
     # Panel, workspace and desktop shortcuts dispatchers
     sub.add_parser("launcher", help="toggle application launcher and omni-bar")
     sub.add_parser("quick-settings", help="toggle quick settings control center")
@@ -384,6 +419,8 @@ def main(argv=None):
         "toggle-mode": lambda: commands.handle_toggle_mode(paths, args),
         "display-project": lambda: commands.handle_display_project(paths, args),
         "video-pip": lambda: commands.handle_pip(args),
+        "game": lambda: commands.handle_game(args),
+        "phone": lambda: commands.handle_phone(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
     }
 

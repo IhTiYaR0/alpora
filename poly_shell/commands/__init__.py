@@ -18,6 +18,8 @@ from .desktop_cmd import (
     handle_lock_media,
 )
 from .demo_cmd import handle_demo
+from .game_cmd import handle_game
+from .phone_cmd import handle_phone
 from .panel_cmd import (
     handle_launcher,
     handle_quick_settings,
@@ -68,6 +70,8 @@ __all__ = [
     "handle_assets",
     "handle_toolkit_refresh",
     "handle_demo",
+    "handle_game",
+    "handle_phone",
     "handle_launcher",
     "handle_quick_settings",
     "handle_notifications",

@@ -53,6 +53,18 @@ class DesktopControlsTests(unittest.TestCase):
         with self.assertRaises(ConfigError):
             control(self.paths, "font", "   ")
 
+    def test_gamemode_control(self):
+        res = control(self.paths, "gamemode", "on")
+        self.assertTrue(res["gameMode"])
+
+        res_off = control(self.paths, "gamemode", "off")
+        self.assertFalse(res_off["gameMode"])
+
+    def test_phone_control(self):
+        res = control(self.paths, "phone")
+        self.assertIn("available", res)
+        self.assertIn("devices", res)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,8 @@ from .network_service import NetworkService
 from .power_service import PowerService
 from .metrics_service import MetricsService
 from .clipboard_service import ClipboardService
+from .game_mode import GameModeService
+from .phone_service import PhoneService
 
 __all__ = [
     "AudioService",
@@ -11,5 +13,7 @@ __all__ = [
     "PowerService",
     "MetricsService",
     "ClipboardService",
+    "GameModeService",
+    "PhoneService",
 ]
 

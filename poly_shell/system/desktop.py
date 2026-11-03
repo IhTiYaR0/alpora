@@ -264,6 +264,8 @@ def status(paths):
         'airplaneManaged': (paths.state / 'airplane-restore.json').exists(),
         'caffeineAvailable': True,
         'caffeine': (paths.state / 'caffeine.active').exists(),
+        'gameMode': (paths.state / 'gamemode.active').exists(),
+        'phoneAvailable': bool(shutil.which('kdeconnect-cli')),
     }
 
 
@@ -343,7 +345,9 @@ VALID_CONTROL_ACTIONS = {
     'ui-scale': 'ui-scale',
     'touchpad': 'touchpad',
     'font': 'font',
-    'caffeine': 'caffeine'
+    'caffeine': 'caffeine',
+    'gamemode': 'gamemode',
+    'phone': 'phone'
 }
 
 
@@ -408,6 +412,26 @@ def control(paths, action, value=None):
     elif safe_action == 'hotspot':
         with state_lock(paths):
             set_hotspot(paths, value)
+    elif safe_action == 'gamemode':
+        from ..services.game_mode import GameModeService
+        srv = GameModeService(paths)
+        if value in ('on', 'true', '1'):
+            srv.enable()
+        elif value in ('off', 'false', '0'):
+            srv.disable()
+        else:
+            srv.toggle()
+        return {'gameMode': srv.get_state().enabled}
+    elif safe_action == 'phone':
+        from ..services.phone_service import PhoneService
+        psrv = PhoneService(paths)
+        if value == 'ring':
+            return {'ring': psrv.ring_device()}
+        elif value == 'ping':
+            return {'ping': psrv.send_ping()}
+        elif value == 'clip':
+            return {'clip': psrv.share_clipboard()}
+        return {'available': psrv.health_check(), 'devices': [d.to_dict() for d in psrv.get_devices()]}
     elif safe_action == 'wifi-connect':
         return connect_wifi(value)
     elif action == 'ui-scale':

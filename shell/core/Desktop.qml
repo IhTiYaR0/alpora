@@ -4,11 +4,11 @@ import Quickshell
 
 Singleton {
     id: root
-    property var data: ({ brightness: 100, brightnessAvailable: false, dnd: false, dndAvailable: false, nightLight: false, nightLightAvailable: false, powerProfilesAvailable: false, powerProfiles: [], powerProfile: "", powerDegraded: "", airplaneAvailable: false, airplane: false, airplaneHardwareBlocked: false, airplaneManaged: false, hotspotAvailable: false, hotspot: false, hotspotSsid: "Alpora-Hotspot", hotspotPassword: "", hotspotClients: 0 })
+    property var data: ({ brightness: 100, brightnessAvailable: false, dnd: false, dndAvailable: false, nightLight: false, nightLightAvailable: false, powerProfilesAvailable: false, powerProfiles: [], powerProfile: "", powerDegraded: "", airplaneAvailable: false, airplane: false, airplaneHardwareBlocked: false, airplaneManaged: false, hotspotAvailable: false, hotspot: false, hotspotSsid: "Alpora-Hotspot", hotspotPassword: "", hotspotClients: 0, gameMode: false, phoneAvailable: false })
     property string error: ""
     readonly property bool changingSettings: IpcClient.busy
 
-    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine"]
+    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine", "gamemode", "phone"]
 
     function request(action: string, value: string): void {
         if (!validActions.includes(action)) {
