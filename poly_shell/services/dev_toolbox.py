@@ -313,7 +313,7 @@ class DevToolboxService(BaseService):
         status = self.get_status()
         installed = [t.to_dict() for t in status.tools if t.installed]
         data = {
-            "alpora_version": "0.1.0-dev",
+            "alpora_version": "1.0.0",
             "installed_count": len(installed),
             "tools": installed,
         }

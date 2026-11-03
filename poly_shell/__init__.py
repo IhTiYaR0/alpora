@@ -5,7 +5,7 @@ import importlib
 import sys
 import types
 
-__version__ = "0.1.0-dev"
+__version__ = "1.0.0"
 
 # Mapping of legacy flat root module names to their clean domain subpackages
 _DOMAIN_MODULES = {

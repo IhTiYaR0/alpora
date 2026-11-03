@@ -12,7 +12,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/ARCH_LINUX-HYPRLAND-b8cba1?style=flat-square&amp;labelColor=202829" alt="Arch Linux / Hyprland">
-  <img src="https://img.shields.io/badge/STATUS-PREVIEW-f1b791?style=flat-square&amp;labelColor=202829" alt="Development preview">
+  <img src="https://img.shields.io/badge/RELEASE-v1.0.0-58a6ff?style=flat-square&amp;labelColor=202829" alt="ALPORA OS v1.0.0">
   <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-a4c5c5?style=flat-square&amp;labelColor=202829" alt="MIT license"></a>
 </p>
 
