@@ -1,17 +1,23 @@
 post_install() {
     cat <<'EOF'
-:: ALPORA has been installed successfully!
-:: To start ALPORA in your current Hyprland/Wayland session:
-     poly-shell start
-
-:: To preview themes and current system configuration:
-     alpora-fetch
-
-:: To manage shortcuts, wallpapers, and settings:
-     poly-shell settings
-
-:: To make ALPORA your primary default shell with automatic session management:
-     poly-shell activate
+:: ====================================================================
+:: ALPORA Shell has been installed successfully!
+:: ====================================================================
+:: To launch ALPORA in your current Hyprland session:
+::      poly-shell start
+::
+:: To preview themes and current system info:
+::      alpora-fetch
+::
+:: To manage shortcuts, wallpapers, and appearance settings:
+::      poly-shell settings
+::
+:: To set up user dotfiles (Hyprland, Fcitx5, Foot, Fastfetch):
+::      /usr/share/alpora/install/setup.sh
+::
+:: To make ALPORA your primary default shell:
+::      poly-shell activate
+:: ====================================================================
 EOF
 }
 
@@ -22,4 +28,3 @@ post_upgrade() {
 post_remove() {
     echo ":: ALPORA has been removed. You can restore your previous shell config with 'poly-shell deactivate' if backed up."
 }
-

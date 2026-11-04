@@ -14,7 +14,15 @@ import shutil
 import tempfile
 import threading
 
-ROOT = Path(__file__).resolve().parents[2]
+_candidate_root = Path(__file__).resolve().parents[2]
+if os.environ.get("POLY_SHELL_ROOT"):
+    ROOT = Path(os.environ["POLY_SHELL_ROOT"]).resolve()
+elif (_candidate_root / "assets").exists():
+    ROOT = _candidate_root
+elif Path("/usr/share/alpora/assets").exists():
+    ROOT = Path("/usr/share/alpora")
+else:
+    ROOT = _candidate_root
 MODES = ("work", "vibe")
 
 

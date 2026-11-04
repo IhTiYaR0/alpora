@@ -1,7 +1,7 @@
 # Maintainer: Alpora Developers <https://github.com/pnam-it309/alpora>
-pkgname=alpora-git
+pkgname=alpora-shell-git
 _pkgname=alpora
-pkgver=1.0.0.r20261103
+pkgver=1.0.0.r20261104.9c25efa
 pkgrel=1
 pkgdesc="Fluid Wayland desktop shell, multi-compositor HAL, and workspace control center built with Quickshell"
 arch=('any')
@@ -24,24 +24,24 @@ depends=(
     'libnotify'
 )
 optdepends=(
-    'sway: Sway compositor support'
-    'niri: Niri scrolling-tiling compositor support'
+    'stow: Dotfile symlinking and package management'
+    'fcitx5: Modular IME framework'
+    'fcitx5-bamboo: Vietnamese IME engine for fcitx5'
     'mako: Notification daemon with action support'
     'hyprlock: Fast GPU-accelerated lockscreen'
     'hypridle: Wayland idle management daemon'
     'hyprsunset: Night Light blue light temperature filter'
-    'hyprpolkitagent: Polkit authentication agent'
-    'fcitx5: Modular IME framework'
-    'fcitx5-bamboo: Vietnamese IME engine for fcitx5'
-    'ntfs-3g: Read/write support for Windows NTFS partitions'
-    'exfatprogs: Userspace utilities for exFAT filesystems'
-    'dosfstools: Utilities for FAT32 filesystems'
-    'udisks2: Automatic removable storage drive mounting'
-    'cifs-utils: Windows SMB/CIFS network share support'
+    'foot: Minimal fast Wayland terminal'
+    'kitty: GPU-accelerated terminal emulator'
+    'nautilus: GNOME files manager'
     'playerctl: MPRIS media player controls'
+    'sway: Sway compositor support'
+    'niri: Niri scrolling-tiling compositor support'
+    'ntfs-3g: Read/write support for Windows NTFS partitions'
+    'dosfstools: Utilities for FAT32 filesystems'
 )
-provides=('alpora')
-conflicts=('alpora')
+provides=('alpora-shell' 'alpora-desktop' 'alpora')
+conflicts=('alpora-shell' 'alpora-desktop' 'alpora')
 install='alpora.install'
 source=("git+https://github.com/pnam-it309/alpora.git")
 sha256sums=('SKIP')
@@ -60,21 +60,38 @@ package() {
     install -dm755 "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell"
     cp -r poly_shell/* "$pkgdir/usr/lib/python${python_version}/site-packages/poly_shell/"
 
-    # Install Shared Assets, Shell QML & Dotfiles
+    # Install Shared Assets, Shell QML, Dotfiles & Scripts
     install -dm755 "$pkgdir/usr/share/alpora"
     cp -r shell "$pkgdir/usr/share/alpora/"
     cp -r assets "$pkgdir/usr/share/alpora/"
     cp -r dotfiles "$pkgdir/usr/share/alpora/"
     cp -r config "$pkgdir/usr/share/alpora/" 2>/dev/null || true
     cp -r scripts "$pkgdir/usr/share/alpora/"
+    cp -r install "$pkgdir/usr/share/alpora/"
+
+    # Install Systemd user service
+    install -dm755 "$pkgdir/usr/lib/systemd/user"
+    install -m644 dotfiles/systemd/.config/systemd/user/poly-shell.service "$pkgdir/usr/lib/systemd/user/poly-shell.service"
 
     # Install Executable Binaries
     install -dm755 "$pkgdir/usr/bin"
     install -m755 bin/poly-shell "$pkgdir/usr/bin/poly-shell"
     install -m755 bin/alpora-fetch "$pkgdir/usr/bin/alpora-fetch"
 
+    # Install Desktop Entry
+    install -dm755 "$pkgdir/usr/share/applications"
+    cat > "$pkgdir/usr/share/applications/alpora-settings.desktop" <<'EOF'
+[Desktop Entry]
+Name=ALPORA Settings
+Comment=Configure ALPORA Shell, Themes and Widgets
+Exec=poly-shell settings
+Icon=preferences-desktop
+Terminal=false
+Type=Application
+Categories=Settings;DesktopSettings;
+EOF
+
     # Install License
     install -dm755 "$pkgdir/usr/share/licenses/$pkgname"
     install -m644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
-
