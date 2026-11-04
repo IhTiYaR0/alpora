@@ -13,8 +13,11 @@ EnumerateSkipFirst=False
 1=Control+Shift_R
 2=Super+space
 
+[Hotkey/EnumerateForwardKeys]
+0=Control+Shift_L
+1=Control+Shift_R
+
 [Hotkey/AltTriggerKeys]
-0=Shift_L
 
 [Behavior]
 # Active By Default
@@ -29,4 +32,3 @@ ShowInputMethodInformation=True
 showInputMethodInformationWhenFirstUsed=True
 # Compact profile list
 CompactProfileList=True
-

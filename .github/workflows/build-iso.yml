@@ -42,6 +42,7 @@ jobs:
           mkdir -p packaging/iso/airootfs/etc/skel/.config/hypr
           mkdir -p packaging/iso/airootfs/etc/skel/.config/kitty
           mkdir -p packaging/iso/airootfs/etc/skel/.config/foot
+          mkdir -p packaging/iso/airootfs/etc/skel/.config/fcitx5
           mkdir -p packaging/iso/airootfs/usr/local/bin
           mkdir -p packaging/iso/airootfs/opt/alpora
 
@@ -49,6 +50,7 @@ jobs:
           cp -r dotfiles/hypr/.config/hypr/* packaging/iso/airootfs/etc/skel/.config/hypr/ || true
           cp -r dotfiles/kitty/.config/kitty/* packaging/iso/airootfs/etc/skel/.config/kitty/ || true
           cp -r dotfiles/foot/.config/foot/* packaging/iso/airootfs/etc/skel/.config/foot/ || true
+          cp -r dotfiles/fcitx5/.config/fcitx5/* packaging/iso/airootfs/etc/skel/.config/fcitx5/ || true
 
           # Copy neofetch-style alpora-fetch
           cp bin/alpora-fetch packaging/iso/airootfs/usr/local/bin/alpora-fetch || true
