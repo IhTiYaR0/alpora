@@ -1,0 +1,8 @@
+enable NetworkManager.service
+enable bluetooth.service
+enable systemd-timesyncd.service
+enable apparmor.service
+enable irqbalance.service
+enable ufw.service
+enable alpora-live-init.service
+

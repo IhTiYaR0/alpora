@@ -1,0 +1,12 @@
+root:x:0:root
+adm:x:4:alpora
+wheel:x:10:alpora
+audio:x:24:alpora
+video:x:986:alpora
+optical:x:990:alpora
+storage:x:988:alpora
+input:x:97:alpora
+network:x:90:alpora
+users:x:985:alpora
+alpora:x:1000:
+

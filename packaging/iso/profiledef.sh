@@ -16,12 +16,13 @@ airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '9')
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
+  ["/etc/gshadow"]="0:0:400"
   ["/etc/sudoers.d/alpora"]="0:0:440"
   ["/etc/sysctl.d/99-alpora-security.conf"]="0:0:644"
   ["/etc/sysctl.d/99-alpora-performance.conf"]="0:0:644"
   ["/etc/systemd/journald.conf.d/alpora.conf"]="0:0:644"
   ["/root"]="0:0:750"
-  ["/root/customize_airootfs.sh"]="0:0:755"
   ["/usr/local/bin/alpora-install"]="0:0:755"
+  ["/usr/local/bin/alpora-fetch"]="0:0:755"
+  ["/usr/local/bin/alpora-live-init"]="0:0:755"
 )
-
