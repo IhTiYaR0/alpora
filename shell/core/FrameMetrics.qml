@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import ".."
 import Quickshell
 
 // Opt-in GUI animation-driver timing, not a claim about compositor presentation.

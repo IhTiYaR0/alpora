@@ -1,4 +1,5 @@
 import QtQuick
+import ".."
 
 // Match Hyprland's polyPanel fade exactly; no movement or scaling.
 Item {

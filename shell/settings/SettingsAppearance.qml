@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import QtQuick.Layouts
 import "../theme" as PolyTheme
 import "../logic/AppearanceCatalog.js" as Catalog

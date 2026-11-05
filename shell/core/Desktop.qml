@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import ".."
 import Quickshell
 
 Singleton {

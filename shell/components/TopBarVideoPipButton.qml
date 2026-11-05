@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import QtQuick.Controls
 import "../theme" as PolyTheme
 
@@ -36,7 +37,6 @@ Button {
             name: "video"
             width: 15
             height: 15
-            color: VideoPipState.open ? Session.accent : Session.foreground
         }
 
         // Active indicator dot

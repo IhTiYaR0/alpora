@@ -1,5 +1,6 @@
 // qmllint disable import unresolved-type
 import QtQuick
+import ".."
 import Quickshell.Hyprland
 
 // Quickshell's installed GlobalShortcut metadata omits its PostReloadHook

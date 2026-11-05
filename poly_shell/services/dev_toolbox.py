@@ -349,10 +349,10 @@ class DevToolboxService(BaseService):
         if dst.exists():
             return {"success": False, "error": f"Đường dẫn đích đã tồn tại: {dst}"}
 
-        # Try cp --reflink=always (Btrfs / XFS copy-on-write zero storage)
+        # Try cp --reflink=auto (Btrfs / XFS copy-on-write zero storage, or standard fallback)
         if shutil.which("cp"):
             from ..adapters.base import SafeRunner
-            res = SafeRunner.run(["cp", "-a", "--reflink=always", str(src), str(dst)], timeout_sec=15.0)
+            res = SafeRunner.run(["cp", "-a", "--reflink=auto", str(src), str(dst)], timeout_sec=15.0)
             if res.returncode == 0:
                 return {
                     "success": True,
@@ -361,6 +361,11 @@ class DevToolboxService(BaseService):
                     "destination": str(dst),
                     "message": f"Đã nhân bản CoW (Reflink) thành công từ '{src.name}' sang '{dst.name}'! (Tốn 0 MB dung lượng)",
                 }
+            # Clean up partial dst if cp created it and failed
+            if dst.is_dir():
+                shutil.rmtree(str(dst), ignore_errors=True)
+            elif dst.exists():
+                dst.unlink(missing_ok=True)
 
         # Fallback to standard copytree
         try:

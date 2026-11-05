@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland

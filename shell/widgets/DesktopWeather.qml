@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import QtQuick.Controls
 import Quickshell.Io
 import "../logic/WidgetGeometry.js" as Geometry

@@ -39,8 +39,11 @@ class SafeRunner:
         check: bool = False,
         default_output: str = "",
         use_circuit_breaker: bool = True,
+        timeout_sec: float | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """Execute a command safely with Circuit Breaker protection. Never raises FileNotFoundError or TimeoutExpired."""
+        if timeout_sec is not None:
+            timeout = timeout_sec
         if not cmd:
             return subprocess.CompletedProcess(list(cmd), returncode=1, stdout="", stderr="Empty command")
 

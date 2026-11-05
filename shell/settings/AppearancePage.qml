@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../logic/AppearanceCatalog.js" as Catalog

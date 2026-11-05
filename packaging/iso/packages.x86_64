@@ -45,6 +45,7 @@ rsync
 
 # Wayland, Hyprland & Display
 hyprland
+quickshell
 wayland
 xorg-xwayland
 qt5-wayland
@@ -86,7 +87,9 @@ slurp
 swappy
 sudo
 which
+archinstall
 arch-install-scripts
+stow
 gamemode
 kdeconnect
 libnotify

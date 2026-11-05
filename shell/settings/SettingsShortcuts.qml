@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import QtQuick.Controls
 import QtQuick.Layouts
 
@@ -92,6 +93,7 @@ ColumnLayout {
                         Repeater {
                             model: sItem.keys
                             Rectangle {
+                                required property string modelData
                                 radius: 5; height: 24
                                 width: Math.max(26, kLabel.implicitWidth + 12)
                                 color: Glass.tint(Session.surface, 0.85)

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import ".."
 import "../theme" as PolyTheme
 import QtQuick.Layouts
 import Quickshell

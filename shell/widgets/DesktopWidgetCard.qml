@@ -1,4 +1,5 @@
 import QtQuick
+import ".."
 import "../theme" as PolyTheme
 
 Rectangle {

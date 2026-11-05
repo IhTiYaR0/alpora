@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import "../theme" as PolyTheme
 
 // Single-clock liquid surface; corner curvature preserves the button anchor. Content stays native and is never

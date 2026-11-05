@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import ".."
 
 QtObject {
     // Only the material is translucent. Text, icons and focus rings stay crisp.

@@ -1,4 +1,5 @@
 import QtQuick
+import ".."
 
 // Sample a retargetable tween from the companion's existing clock. Avoid costly
 // per-frame NumberAnimation restarts and keep joint updates on the travel clock.

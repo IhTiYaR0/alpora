@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import ".."
 import "../logic/StatusLogic.js" as StatusLogic
 import "../theme" as PolyTheme
 import QtQuick.Controls

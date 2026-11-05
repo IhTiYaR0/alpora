@@ -1,4 +1,5 @@
 import QtQuick
+import ".."
 import "../theme" as PolyTheme
 
 // A finite glint and contact wave. No timers or animation loops while idle.

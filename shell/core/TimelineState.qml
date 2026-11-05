@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import ".."
 import Quickshell
 import Quickshell.Io
 import "../logic/TimelineMath.js" as TimelineMath

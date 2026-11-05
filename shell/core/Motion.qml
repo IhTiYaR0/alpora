@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import ".."
 
 QtObject {
     readonly property var panelCurve: [0.2, 0, 0.2, 1, 1, 1]

@@ -1,4 +1,5 @@
 import QtQuick
+import ".."
 import Quickshell.Io
 
 Process {

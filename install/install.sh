@@ -88,14 +88,12 @@ if [[ "$install_ui_only" != true && "$install_ignore_distro" != true ]]; then
         exit 1
     fi
 fi
-if [[ "$install_wizard" == true ]]; then
-    interactive_theme="$(alpora_theme_wizard "${install_theme:-alpine}")"
-    if [[ -n "$interactive_theme" ]]; then
-        install_theme="$interactive_theme"
-    fi
-fi
+alpora_colour
 alpora_banner
-printf 'Selected theme: %s\n' "${install_theme:-alpine (default)}"
+if [[ "$install_wizard" == true || ( -t 0 && -t 1 && -z "$install_theme" && "$install_dry_run" != true ) ]]; then
+    alpora_choose_theme
+fi
+alpora_summary
 required_packages=()
 optional_packages=()
 if command -v python3 >/dev/null 2>&1; then

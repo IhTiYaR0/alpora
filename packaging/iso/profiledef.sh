@@ -24,5 +24,6 @@ file_permissions=(
   ["/root"]="0:0:750"
   ["/usr/local/bin/alpora-install"]="0:0:755"
   ["/usr/local/bin/alpora-fetch"]="0:0:755"
+  ["/usr/local/bin/poly-shell"]="0:0:755"
   ["/usr/local/bin/alpora-live-init"]="0:0:755"
 )
