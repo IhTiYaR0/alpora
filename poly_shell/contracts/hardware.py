@@ -245,5 +245,38 @@ class AppPrivacyReportDTO(BaseDTO):
     apps: List[AppPermissionDTO] = field(default_factory=list)
 
 
+@dataclass
+class WorkspaceMemoryDTO(BaseDTO):
+    """Memory consumption mapped to a compositor workspace."""
+
+    workspace_id: int
+    total_rss_mb: float = 0.0
+    app_count: int = 0
+    apps: List[str] = field(default_factory=list)
+
+
+@dataclass
+class MemoryStateDTO(BaseDTO):
+    """Comprehensive snapshot of RAM, zRAM, Swap, and Pressure Stall metrics."""
+
+    total_mb: float = 0.0
+    used_mb: float = 0.0
+    free_mb: float = 0.0
+    available_mb: float = 0.0
+    cached_mb: float = 0.0
+    percent: float = 0.0
+    swap_total_mb: float = 0.0
+    swap_used_mb: float = 0.0
+    has_zram: bool = False
+    zram_orig_mb: float = 0.0
+    zram_compr_mb: float = 0.0
+    zram_ratio: float = 1.0
+    psi_some_avg10: float = 0.0
+    psi_full_avg10: float = 0.0
+    is_thrashing: bool = False
+    workspaces: List[WorkspaceMemoryDTO] = field(default_factory=list)
+
+
+
 
 

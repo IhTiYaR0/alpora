@@ -11,6 +11,7 @@ ufw
 apparmor
 flatpak
 irqbalance
+zram-generator
 
 # Bootloader & Filesystems
 systemd

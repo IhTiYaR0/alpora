@@ -394,6 +394,15 @@ def main(argv=None):
     storage_move.add_argument("source", help="source directory path to move")
     storage_move.add_argument("target", help="target parent directory on another partition/drive")
 
+    # Memory Shield & Anti-Thrashing Drop-RAM Engine
+    mem_parser = sub.add_parser("memory", aliases=["mem"], help="RAM shield, zRAM compression, and anti-thrashing workspace optimizer")
+    mem_sub = mem_parser.add_subparsers(dest="action")
+    mem_sub.add_parser("status", help="view RAM, zRAM compression ratio, PSI stall pressure, and workspace allocation")
+    mem_sub.add_parser("drop", help="drop caches, compact memory pages, and reclaim free RAM")
+    mem_sub.add_parser("clean", help="alias for drop")
+    mem_sub.add_parser("eco", help="throttle background workspace apps to prevent memory and CPU lag")
+    mem_sub.add_parser("setup-zram", help="setup Zstandard compressed RAM swap and systemd-oomd")
+
     # Developer CLI Hub & Isolated Toolchain Hub
     dev_parser = sub.add_parser("dev", help="developer CLI toolchain hub and isolated binary management")
     dev_sub = dev_parser.add_subparsers(dest="dev_action")
@@ -494,6 +503,8 @@ def main(argv=None):
         "update": lambda: commands.handle_update(args),
         "security": lambda: commands.handle_security(args),
         "storage": lambda: commands.handle_storage(args),
+        "memory": lambda: commands.handle_memory(args),
+        "mem": lambda: commands.handle_memory(args),
         "dev": lambda: commands.handle_dev(args),
         "properties": lambda: commands.handle_properties(args),
         "snapshot": lambda: commands.handle_snapshot(args),

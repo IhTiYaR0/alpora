@@ -23,6 +23,7 @@ from .phone_cmd import handle_phone
 from .update_cmd import handle_update
 from .security_cmd import handle_security
 from .storage_cmd import handle_storage
+from .memory_cmd import handle_memory
 from .dev_cmd import handle_dev
 from .properties_cmd import handle_properties
 from .snapshot_cmd import handle_snapshot
@@ -82,6 +83,7 @@ __all__ = [
     "handle_update",
     "handle_security",
     "handle_storage",
+    "handle_memory",
     "handle_dev",
     "handle_properties",
     "handle_snapshot",
