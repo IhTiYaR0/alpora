@@ -111,3 +111,4 @@ def handle_memory(args: argparse.Namespace) -> int:
 
     _safe_print(f"Hành động không hợp lệ: {action}. Các lựa chọn: status, drop, eco, setup-zram")
     return 1
+

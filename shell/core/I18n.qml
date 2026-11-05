@@ -29,10 +29,14 @@ Singleton {
 
     // Full path to the locales directory, resolved from the project root.
     readonly property string localesDir: {
-        // POLY_SHELL_ROOT is set by the run script; fall back to a
-        // path relative to the shell/ directory.
+        // POLY_SHELL_ROOT is set by the run script; fall back to POLY_SHELL_ASSETS,
+        // then resolve relative to this file's location.
         const root = Quickshell.env("POLY_SHELL_ROOT") || "";
-        return root ? root + "/assets/locales" : "";
+        const assets = Quickshell.env("POLY_SHELL_ASSETS") || "";
+        if (root) return root + "/assets/locales";
+        if (assets) return assets + "/locales";
+        const resolved = Qt.resolvedUrl("../../assets/locales").toString();
+        return resolved.replace(/^file:\/\//, "");
     }
 
     // ── Public API ──────────────────────────────────────────────────────
@@ -81,6 +85,7 @@ Singleton {
     // ── Loading ─────────────────────────────────────────────────────────
 
     onLocaleChanged: reload()
+    onLocalesDirChanged: reload()
     Component.onCompleted: reload()
 
     function reload(): void {

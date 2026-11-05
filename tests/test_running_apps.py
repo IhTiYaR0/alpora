@@ -26,6 +26,26 @@ class RunningAppsHelperTests(unittest.TestCase):
         self.assertNotIn("abc123", command)
         self.assertIn("<redacted>", command)
 
+    def test_running_apps_cli_snapshot_handler(self):
+        from poly_shell.commands.running_apps_cmd import handle_running_apps
+        from argparse import Namespace
+        import io
+        import sys
+        import json
+
+        captured = io.StringIO()
+        old_stdout = sys.stdout
+        try:
+            sys.stdout = captured
+            ret = handle_running_apps(Namespace(action="snapshot", args=["[]"]))
+            self.assertEqual(ret, 0)
+            data = json.loads(captured.getvalue())
+            self.assertTrue(data.get("ok"))
+            self.assertIn("processes", data)
+        finally:
+            sys.stdout = old_stdout
+
+
 
 if __name__ == "__main__":
     unittest.main()

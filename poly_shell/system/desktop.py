@@ -580,8 +580,12 @@ def _wallpaper(paths, image=None, *, reset=False, quiet=False, transition=None, 
         from ..core.state import settings_for
         if settings_for(paths).get('reducedMotion'):
             transition = None
-        _animated_wallpaper(paths, image, previous_saved, transition, seed)
-        return
+        try:
+            _animated_wallpaper(paths, image, previous_saved, transition, seed)
+            return
+        except ConfigError:
+            # Fallback to static wallpaper when animated renderer (awww/swww) is not available
+            pass
     uid_str = str(os.getuid()) if hasattr(os, 'getuid') else '1000'
     previous = command(['pgrep', '-u', uid_str, '-x', 'swaybg'], check=False)
     # A detached child still belongs to the settings service's cgroup. Give the

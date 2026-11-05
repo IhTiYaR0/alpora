@@ -322,3 +322,4 @@ class MemoryService(BaseService):
             except (json.JSONDecodeError, KeyError, IndexError):
                 pass
         return 1
+

@@ -129,6 +129,15 @@ class WallpaperTests(unittest.TestCase):
         self.assertEqual(args[args.index('--transition-type') + 1], 'fade')
         self.assertEqual(args[args.index('--transition-duration') + 1], '0.25')
 
+    def test_transition_falls_back_to_static_wallpaper_when_awww_missing(self):
+        # When awww and swww are not available, transition should fall back gracefully to swaybg
+        with patch('poly_shell.desktop.shutil.which', return_value=None):
+            self.desktop._wallpaper(self.paths, str(self.image), transition='fade')
+        args = next(c for c in self.calls if c[0] == 'systemd-run')
+        self.assertEqual(args[-5:], ['swaybg', '-i', str(self.image), '-m', 'fill'])
+        self.assertEqual(read_object(self.paths.config / 'wallpaper.json')['image'], str(self.image))
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -88,10 +88,17 @@ def run(paths):
         except Exception as exc:
             print(f"Warning: Failed to start IPC daemon: {exc}", file=sys.stderr)
 
-        environment = dict(os.environ, POLY_SHELL_STATE=str(paths.session),
-                           POLY_SHELL_READY=str(ready), POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
-                           POLY_SHELL_ASSETS=str(ROOT / "assets"),
-                           POLY_SHELL_SOCK=daemon.ipc_server.endpoint_address)
+        environment = dict(
+            os.environ,
+            POLY_SHELL_ROOT=str(ROOT),
+            POLY_SHELL_STATE=str(paths.session),
+            POLY_SHELL_READY=str(ready),
+            POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
+            POLY_SHELL_ASSETS=str(ROOT / "assets"),
+            POLY_SHELL_SOCK=daemon.ipc_server.endpoint_address,
+            PYTHONPATH=f"{ROOT}:{os.environ.get('PYTHONPATH', '')}".rstrip(":"),
+            PATH=f"{ROOT / 'bin'}:{Path.home() / '.local/bin'}:{os.environ.get('PATH', '')}".rstrip(":"),
+        )
         process = subprocess.Popen(["quickshell", "--path", str(ROOT / "shell")], env=environment)
         stopping = False
 
@@ -208,9 +215,14 @@ def open_settings(paths):
             "WAYLAND_DISPLAY", "DISPLAY", "HYPRLAND_INSTANCE_SIGNATURE",
             "XDG_CURRENT_DESKTOP", "XDG_SESSION_TYPE", "XDG_CONFIG_HOME", "XDG_STATE_HOME",
             "XDG_DATA_HOME") if os.environ.get(name)}
-        environment.update(POLY_SHELL_STATE=str(paths.session),
-                           POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
-                           POLY_SHELL_ASSETS=str(ROOT / "assets"))
+        environment.update(
+            POLY_SHELL_ROOT=str(ROOT),
+            POLY_SHELL_STATE=str(paths.session),
+            POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
+            POLY_SHELL_ASSETS=str(ROOT / "assets"),
+            PYTHONPATH=f"{ROOT}:{os.environ.get('PYTHONPATH', '')}".rstrip(":"),
+            PATH=f"{ROOT / 'bin'}:{Path.home() / '.local/bin'}:{os.environ.get('PATH', '')}".rstrip(":"),
+        )
         active = systemctl("is-active", "--quiet", "poly-shell-settings.service", check=False, capture=True)
         if active.returncode:
             command = ["systemd-run", "--user", "--quiet", "--collect",
@@ -457,6 +469,10 @@ def main(argv=None):
     sub.add_parser("display-project", help="toggle display projection menu")
     sub.add_parser("video-pip", help="alias for floating video picture-in-picture player")
     sub.add_parser("welcome", help="open ALPORA first-run welcome wizard")
+    running_apps_parser = sub.add_parser("running-apps", help="ALPORA process manager helper")
+    running_apps_parser.add_argument("action", nargs="?", default="snapshot", choices=["snapshot", "signal"])
+    running_apps_parser.add_argument("args", nargs="*", help="arguments for snapshot or signal")
+    sub.add_parser("clipboard-serve", help="run clipboard history service")
 
     args = parser.parse_args(argv)
     paths = Paths.current()
@@ -510,6 +526,8 @@ def main(argv=None):
         "snapshot": lambda: commands.handle_snapshot(args),
         "privacy": lambda: commands.handle_privacy(args),
         "welcome": lambda: commands.handle_welcome(paths, args, runtime_check),
+        "running-apps": lambda: commands.handle_running_apps(args),
+        "clipboard-serve": lambda: commands.handle_clipboard_serve(),
     }
 
     try:

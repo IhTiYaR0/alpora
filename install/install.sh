@@ -216,17 +216,8 @@ if [[ "$install_harden" == true ]]; then
     sudo systemctl enable --now apparmor.service || true
     sudo systemctl enable --now irqbalance.service || true
 
-    # Configure zRAM Memory Compression Shield (Anti-Thrashing)
-    if command -v pacman >/dev/null 2>&1; then
-        sudo pacman -S --needed --noconfirm zram-generator || true
-        python3 -c "from poly_shell.services.memory_service import MemoryService; m = MemoryService(); print(m.get_zram_config())" | sudo tee /etc/systemd/zram-generator.conf >/dev/null || true
-        sudo systemctl daemon-reload || true
-        sudo systemctl restart systemd-zram-setup@zram0.service || true
-        sudo systemctl enable --now systemd-oomd.service || true
-    fi
-
     python3 -c "from poly_shell.services.security_service import SecurityService; s = SecurityService(); print(s.get_security_sysctl())" | sudo tee /etc/sysctl.d/99-alpora-security.conf >/dev/null || true
-    python3 -c "from poly_shell.services.memory_service import MemoryService; m = MemoryService(); print(m.get_performance_sysctl())" | sudo tee /etc/sysctl.d/99-alpora-performance.conf >/dev/null || true
+    python3 -c "from poly_shell.services.security_service import SecurityService; s = SecurityService(); print(s.get_performance_sysctl())" | sudo tee /etc/sysctl.d/99-alpora-performance.conf >/dev/null || true
     sudo sysctl --system || true
     printf '\033[1;32m==> ALPORA Security & Performance Hardening Applied Successfully!\033[0m\n'
 fi

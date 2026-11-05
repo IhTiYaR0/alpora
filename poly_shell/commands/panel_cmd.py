@@ -106,9 +106,12 @@ def open_welcome(paths, runtime_check_fn=None):
             "XDG_CURRENT_DESKTOP", "XDG_SESSION_TYPE", "XDG_CONFIG_HOME", "XDG_STATE_HOME",
             "XDG_DATA_HOME") if os.environ.get(name)}
         environment.update(
+            POLY_SHELL_ROOT=str(ROOT),
             POLY_SHELL_STATE=str(paths.session),
             POLY_SHELL_CTL=str(ROOT / "bin/poly-shell"),
-            POLY_SHELL_ASSETS=str(ROOT / "assets")
+            POLY_SHELL_ASSETS=str(ROOT / "assets"),
+            PYTHONPATH=f"{ROOT}:{os.environ.get('PYTHONPATH', '')}".rstrip(":"),
+            PATH=f"{ROOT / 'bin'}:{Path.home() / '.local/bin'}:{os.environ.get('PATH', '')}".rstrip(":"),
         )
         subprocess.Popen(["quickshell", "--path", str(entry), "--no-duplicate"], env=environment)
         for _ in range(30):
