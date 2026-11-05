@@ -14,3 +14,4 @@ def handle_clipboard_serve() -> int:
     from ..services.clipboard import main as clipboard_main
     clipboard_main()
     return 0
+

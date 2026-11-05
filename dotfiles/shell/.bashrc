@@ -2,11 +2,11 @@
 # ALPORA Shell Configuration (.bashrc)
 # ==============================================================================
 
+# Path additions (ensure available in both interactive and non-interactive sessions)
+export PATH="$HOME/.local/bin:$PATH"
+
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-
-# Path additions
-export PATH="$HOME/.local/bin:$PATH"
 
 # Wayland & Desktop environment flags
 export XDG_CURRENT_DESKTOP="Hyprland"
