@@ -1,24 +1,31 @@
 """Exercise live theme following in a real PTY without changing the desktop."""
 from contextlib import contextmanager
-import fcntl
 import json
 import os
 from pathlib import Path
-import pty
 import select
 import signal
 import struct
 import subprocess
 import tempfile
-import termios
 import time
 import unittest
+
+try:
+    import fcntl
+    import pty
+    import termios
+except ImportError:
+    fcntl = None
+    pty = None
+    termios = None
 
 from poly_shell.timeline import palette_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+@unittest.skipIf(fcntl is None or pty is None, "POSIX PTY required for alpora-fetch live terminal tests")
 class FetchTests(unittest.TestCase):
     @contextmanager
     def terminal(self):

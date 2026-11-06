@@ -1,133 +1,164 @@
-singleton Session 1.0 Session.qml
-CompanionTween 1.0 CompanionTween.qml
-singleton LandscapeState 1.0 LandscapeState.qml
-LivingLandscape 1.0 LivingLandscape.qml
-LandscapeButton 1.0 LandscapeButton.qml
-singleton DockState 1.0 DockState.qml
-Dock 1.0 Dock.qml
-DockButton 1.0 DockButton.qml
-singleton OverviewState 1.0 OverviewState.qml
-WorkspaceOverview 1.0 WorkspaceOverview.qml
-singleton AppearanceState 1.0 AppearanceState.qml
-AppearancePage 1.0 AppearancePage.qml
-AppearanceSlider 1.0 AppearanceSlider.qml
-AppearancePreview 1.0 AppearancePreview.qml
-AppearanceButton 1.0 AppearanceButton.qml
-AppearanceSection 1.0 AppearanceSection.qml
-singleton FrameMetrics 1.0 FrameMetrics.qml
-singleton Desktop 1.0 Desktop.qml
-Bar 1.0 Bar.qml
-ActionButton 1.0 ActionButton.qml
-TopBar 1.0 TopBar.qml
-NativeShortcut 1.0 NativeShortcut.qml
-QuickSettings 1.0 QuickSettings.qml
-Icon 1.0 Icon.qml
-IconButton 1.0 IconButton.qml
-FacetedMark 1.0 FacetedMark.qml
-BatteryIcon 1.0 BatteryIcon.qml
-WorkspaceButton 1.0 WorkspaceButton.qml
-SoftShadow 1.0 SoftShadow.qml
-ControlSlider 1.0 ControlSlider.qml
-QuickTile 1.0 QuickTile.qml
-FacetSurface 1.0 FacetSurface.qml
-MountainRidge 1.0 MountainRidge.qml
-ControlRow 1.0 ControlRow.qml
-SettingsRow 1.0 SettingsRow.qml
-GemMark 1.0 GemMark.qml
-singleton BarState 1.0 BarState.qml
-BarButton 1.0 BarButton.qml
-TrayButton 1.0 TrayButton.qml
-ClockRidge 1.0 ClockRidge.qml
-BarPopup 1.0 BarPopup.qml
-CalendarCard 1.0 CalendarCard.qml
-singleton DayState 1.0 DayState.qml
-singleton ClockState 1.0 ClockState.qml
-DayPanel 1.0 DayPanel.qml
-DayField 1.0 DayField.qml
-DayAction 1.0 DayAction.qml
-singleton MusicState 1.0 MusicState.qml
-CenterPanel 1.0 CenterPanel.qml
-MusicPanel 1.0 MusicPanel.qml
-PanelHeader 1.0 PanelHeader.qml
-singleton AppCatalog 1.0 AppCatalog.qml
-AppTile 1.0 AppTile.qml
-Launcher 1.0 Launcher.qml
-singleton Motion 1.0 Motion.qml
-PanelMotion 1.0 PanelMotion.qml
-PointerExitGuard 1.0 PointerExitGuard.qml
-InteractionMotion 1.0 InteractionMotion.qml
-EntranceMotion 1.0 EntranceMotion.qml
-PageMotion 1.0 PageMotion.qml
-PanelReveal 1.0 PanelReveal.qml
-UnfoldPanel 1.0 UnfoldPanel.qml
-SurfaceLight 1.0 SurfaceLight.qml
-PointerTilt 1.0 PointerTilt.qml
-singleton Glass 1.0 Glass.qml
-singleton OsdState 1.0 OsdState.qml
-Osd 1.0 Osd.qml
-NotificationCard 1.0 NotificationCard.qml
-NotificationsPanel 1.0 NotificationsPanel.qml
-SettingsCard 1.0 SettingsCard.qml
-SettingsBadge 1.0 SettingsBadge.qml
-SettingsToggle 1.0 SettingsToggle.qml
-SettingsNav 1.0 SettingsNav.qml
-SettingsTile 1.0 SettingsTile.qml
-SettingsOverview 1.0 SettingsOverview.qml
-SettingsDetails 1.0 SettingsDetails.qml
-SettingsAppearance 1.0 SettingsAppearance.qml
-SettingsImage 1.0 SettingsImage.qml
-singleton ThemeState 1.0 ThemeState.qml
-ThemePage 1.0 ThemePage.qml
+# ALPORA Shell Module Definition
+# Auto-generated and structured for enterprise modular architecture
 
-singleton WidgetState 1.0 WidgetState.qml
-singleton WeatherState 1.0 WeatherState.qml
-DesktopWidgets 1.0 DesktopWidgets.qml
-DesktopThemeMenu 1.0 DesktopThemeMenu.qml
-WallpaperReveal 1.0 WallpaperReveal.qml
-DesktopWidgetCard 1.0 DesktopWidgetCard.qml
-DesktopClock 1.0 DesktopClock.qml
-ClockDigit 1.0 ClockDigit.qml
-ClockLandscape 1.0 ClockLandscape.qml
-DesktopWeather 1.0 DesktopWeather.qml
-DesktopMusic 1.0 DesktopMusic.qml
-WeatherGlyph 1.0 WeatherGlyph.qml
-WeatherScene 1.0 WeatherScene.qml
-SettingsWidgets 1.0 SettingsWidgets.qml
+# Singletons (core)
+singleton IpcClient 1.0 core/IpcClient.qml
+singleton Session 1.0 core/Session.qml
+singleton BarState 1.0 core/BarState.qml
+singleton Desktop 1.0 core/Desktop.qml
+singleton Glass 1.0 core/Glass.qml
+singleton Motion 1.0 core/Motion.qml
+singleton I18n 1.0 core/I18n.qml
+singleton AudioFeedback 1.0 core/AudioFeedback.qml
+singleton FrameMetrics 1.0 core/FrameMetrics.qml
+singleton WindowTracker 1.0 core/WindowTracker.qml
+singleton AppearanceState 1.0 core/AppearanceState.qml
+singleton ClipboardState 1.0 core/ClipboardState.qml
+singleton ClockState 1.0 core/ClockState.qml
+singleton CompanionState 1.0 core/CompanionState.qml
+singleton DayState 1.0 core/DayState.qml
+singleton DeveloperMetricsState 1.0 core/DeveloperMetricsState.qml
+singleton DisplayProjectState 1.0 core/DisplayProjectState.qml
+singleton DockState 1.0 core/DockState.qml
+singleton LandscapeState 1.0 core/LandscapeState.qml
+singleton MusicState 1.0 core/MusicState.qml
+singleton OsdState 1.0 core/OsdState.qml
+singleton OverviewState 1.0 core/OverviewState.qml
+singleton PowerState 1.0 core/PowerState.qml
+singleton RunningAppsState 1.0 core/RunningAppsState.qml
+singleton ScreenshotState 1.0 core/ScreenshotState.qml
+singleton ShortcutsState 1.0 core/ShortcutsState.qml
+singleton ThemeState 1.0 core/ThemeState.qml
+singleton TimelineState 1.0 core/TimelineState.qml
+singleton VideoPipState 1.0 core/VideoPipState.qml
+singleton WeatherState 1.0 core/WeatherState.qml
+singleton WidgetState 1.0 core/WidgetState.qml
+singleton AppCatalog 1.0 panels/AppCatalog.qml
 
-WidgetAnimatedText 1.0 WidgetAnimatedText.qml
-MusicWaveform 1.0 MusicWaveform.qml
-MusicArtwork 1.0 MusicArtwork.qml
+# Core Controls & Helpers
+EntranceMotion 1.0 core/EntranceMotion.qml
+InteractionMotion 1.0 core/InteractionMotion.qml
+NativeShortcut 1.0 core/NativeShortcut.qml
+PageMotion 1.0 core/PageMotion.qml
+PanelMotion 1.0 core/PanelMotion.qml
+PointerExitGuard 1.0 core/PointerExitGuard.qml
+PointerTilt 1.0 core/PointerTilt.qml
 
-singleton TimelineState 1.0 TimelineState.qml
-TimelineWallpaper 1.0 TimelineWallpaper.qml
-TimelinePanel 1.0 TimelinePanel.qml
+# Controls (Atoms)
+ActionButton 1.0 controls/ActionButton.qml
+BatteryIcon 1.0 controls/BatteryIcon.qml
+ClockDigit 1.0 controls/ClockDigit.qml
+ClockRidge 1.0 controls/ClockRidge.qml
+ControlRow 1.0 controls/ControlRow.qml
+ControlSlider 1.0 controls/ControlSlider.qml
+CutSurface 1.0 controls/CutSurface.qml
+FacetDivider 1.0 controls/FacetDivider.qml
+FacetedMark 1.0 controls/FacetedMark.qml
+FacetSurface 1.0 controls/FacetSurface.qml
+GemMark 1.0 controls/GemMark.qml
+GlowSectionDivider 1.0 controls/GlowSectionDivider.qml
+Icon 1.0 controls/Icon.qml
+IconButton 1.0 controls/IconButton.qml
+MountainRidge 1.0 controls/MountainRidge.qml
+MusicArtwork 1.0 controls/MusicArtwork.qml
+MusicWaveform 1.0 controls/MusicWaveform.qml
+SoftShadow 1.0 controls/SoftShadow.qml
+StatusIcon 1.0 controls/StatusIcon.qml
+SurfaceLight 1.0 controls/SurfaceLight.qml
+WeatherGlyph 1.0 controls/WeatherGlyph.qml
 
-StatusIcon 1.0 StatusIcon.qml
+# Components (Molecules)
+AppearanceButton 1.0 components/AppearanceButton.qml
+AppearancePreview 1.0 components/AppearancePreview.qml
+AppearanceSection 1.0 components/AppearanceSection.qml
+AppearanceSlider 1.0 components/AppearanceSlider.qml
+CalendarCard 1.0 components/CalendarCard.qml
+ClipboardEntry 1.0 components/ClipboardEntry.qml
+CompanionSprite 1.0 components/CompanionSprite.qml
+CompanionTween 1.0 components/CompanionTween.qml
+DayAction 1.0 components/DayAction.qml
+DayField 1.0 components/DayField.qml
+FocusCard 1.0 components/FocusCard.qml
+HoverControl 1.0 components/HoverControl.qml
+HoverStatusTile 1.0 components/HoverStatusTile.qml
+LandscapeButton 1.0 components/LandscapeButton.qml
+MacroActionTile 1.0 components/MacroActionTile.qml
+NotificationCard 1.0 components/NotificationCard.qml
+PanelHeader 1.0 components/PanelHeader.qml
+PanelReveal 1.0 components/PanelReveal.qml
+QuickActionButton 1.0 components/QuickActionButton.qml
+QuickSwitchTile 1.0 components/QuickSwitchTile.qml
+QuickTile 1.0 components/QuickTile.qml
+SecurityShieldCard 1.0 components/SecurityShieldCard.qml
+SettingsBadge 1.0 components/SettingsBadge.qml
+SettingsCard 1.0 components/SettingsCard.qml
+SettingsImage 1.0 components/SettingsImage.qml
+SettingsRow 1.0 components/SettingsRow.qml
+SettingsTile 1.0 components/SettingsTile.qml
+SettingsToggle 1.0 components/SettingsToggle.qml
+TopBarVideoPipButton 1.0 components/TopBarVideoPipButton.qml
+TrayButton 1.0 components/TrayButton.qml
+UnfoldPanel 1.0 components/UnfoldPanel.qml
+WidgetAnimatedText 1.0 components/WidgetAnimatedText.qml
+WorkspaceButton 1.0 components/WorkspaceButton.qml
 
-QuickSwitchTile 1.0 QuickSwitchTile.qml
-QuickActionButton 1.0 QuickActionButton.qml
+# Panels
+AppTile 1.0 panels/AppTile.qml
+Bar 1.0 panels/Bar.qml
+BarButton 1.0 panels/BarButton.qml
+BarPopup 1.0 panels/BarPopup.qml
+BrightnessOverlay 1.0 panels/BrightnessOverlay.qml
+CenterPanel 1.0 panels/CenterPanel.qml
+CenterPreview 1.0 panels/CenterPreview.qml
+ClipboardPanel 1.0 panels/ClipboardPanel.qml
+ClipboardPreview 1.0 panels/ClipboardPreview.qml
+DayPanel 1.0 panels/DayPanel.qml
+DesktopThemeMenu 1.0 panels/DesktopThemeMenu.qml
+DisplayProjectMenu 1.0 panels/DisplayProjectMenu.qml
+Dock 1.0 panels/Dock.qml
+DockButton 1.0 panels/DockButton.qml
+Launcher 1.0 panels/Launcher.qml
+MusicPanel 1.0 panels/MusicPanel.qml
+NotificationsPanel 1.0 panels/NotificationsPanel.qml
+NotificationsPreview 1.0 panels/NotificationsPreview.qml
+Osd 1.0 panels/Osd.qml
+PowerMenu 1.0 panels/PowerMenu.qml
+QuickHoverContent 1.0 panels/QuickHoverContent.qml
+QuickSettings 1.0 panels/QuickSettings.qml
+QuickSettingsSubpages 1.0 panels/QuickSettingsSubpages.qml
+ScreenshotOverlay 1.0 panels/ScreenshotOverlay.qml
+TimelinePanel 1.0 panels/TimelinePanel.qml
+TopBar 1.0 panels/TopBar.qml
+TopBarMiniPlayer 1.0 panels/TopBarMiniPlayer.qml
+VideoPipOverlay 1.0 panels/VideoPipOverlay.qml
+WorkspaceOverview 1.0 panels/WorkspaceOverview.qml
 
-CutSurface 1.0 CutSurface.qml
-HoverControl 1.0 HoverControl.qml
-HoverStatusTile 1.0 HoverStatusTile.qml
-FacetDivider 1.0 FacetDivider.qml
-QuickHoverContent 1.0 QuickHoverContent.qml
+# Widgets
+AudioVisualizer 1.0 widgets/AudioVisualizer.qml
+ClockLandscape 1.0 widgets/ClockLandscape.qml
+DesktopClock 1.0 widgets/DesktopClock.qml
+DesktopCompanion 1.0 widgets/DesktopCompanion.qml
+DesktopDayGlance 1.0 widgets/DesktopDayGlance.qml
+DesktopDeveloperWidget 1.0 widgets/DeveloperMetricsWidget.qml
+DeveloperMetricsPanel 1.0 widgets/DeveloperMetricsPanel.qml
+DesktopInputRegion 1.0 widgets/DesktopInputRegion.qml
+DesktopMusic 1.0 widgets/DesktopMusic.qml
+DesktopNotificationTicker 1.0 widgets/DesktopNotificationTicker.qml
+DesktopRunningApps 1.0 widgets/DesktopRunningApps.qml
+DesktopWeather 1.0 widgets/DesktopWeather.qml
+DesktopWidgetCard 1.0 widgets/DesktopWidgetCard.qml
+DesktopWidgets 1.0 widgets/DesktopWidgets.qml
+LivingLandscape 1.0 widgets/LivingLandscape.qml
+TimelineWallpaper 1.0 widgets/TimelineWallpaper.qml
+WallpaperReveal 1.0 widgets/WallpaperReveal.qml
+WeatherScene 1.0 widgets/WeatherScene.qml
 
-NotificationsPreview 1.0 NotificationsPreview.qml
-
-CenterPreview 1.0 CenterPreview.qml
-
-FocusCard 1.0 FocusCard.qml
-
-singleton ClipboardState 1.0 ClipboardState.qml
-ClipboardPanel 1.0 ClipboardPanel.qml
-
-ClipboardEntry 1.0 ClipboardEntry.qml
-ClipboardPreview 1.0 ClipboardPreview.qml
-DesktopInputRegion 1.0 DesktopInputRegion.qml
-singleton CompanionState 1.0 CompanionState.qml
-CompanionSprite 1.0 CompanionSprite.qml
-DesktopCompanion 1.0 DesktopCompanion.qml
-
-singleton ShortcutsState 1.0 ShortcutsState.qml
-SettingsShortcuts 1.0 SettingsShortcuts.qml
+# Settings
+AppearancePage 1.0 settings/AppearancePage.qml
+SettingsAppearance 1.0 settings/SettingsAppearance.qml
+SettingsDetails 1.0 settings/SettingsDetails.qml
+SettingsNav 1.0 settings/SettingsNav.qml
+SettingsOverview 1.0 settings/SettingsOverview.qml
+SettingsShortcuts 1.0 settings/SettingsShortcuts.qml
+SettingsWidgets 1.0 settings/SettingsWidgets.qml
+ThemePage 1.0 settings/ThemePage.qml

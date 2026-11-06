@@ -41,8 +41,10 @@ class LandscapeTests(unittest.TestCase):
         self.assertNotEqual(files_a[Path(a['ridge'])], files_b[Path(b['ridge'])])
 
     def test_custom_wallpaper_identity_is_repeatable(self):
-        self.assertEqual(kind_for('custom-1234'), kind_for('custom-1234'))
-        self.assertIn(kind_for('custom-1234'), KINDS.values())
+        first_kind = kind_for('custom-1234')
+        second_kind = kind_for('custom-1234')
+        self.assertEqual(first_kind, second_kind)
+        self.assertIn(first_kind, KINDS.values())
 
     def test_assets_survive_mode_refresh_and_failed_theme_switch(self):
         with patch('poly_shell.themes.runtime_border'), patch('poly_shell.themes.subprocess.run'), patch('poly_shell.desktop._wallpaper') as wallpaper:

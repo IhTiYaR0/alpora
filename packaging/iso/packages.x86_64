@@ -1,0 +1,106 @@
+# Base Arch Linux System & Kernel
+base
+base-devel
+linux
+linux-firmware
+intel-ucode
+amd-ucode
+
+# System Security & Sandboxing
+ufw
+apparmor
+flatpak
+irqbalance
+zram-generator
+
+# Bootloader & Filesystems
+systemd
+systemd-sysvcompat
+grub
+syslinux
+efibootmgr
+edk2-shell
+memtest86+
+memtest86+-efi
+dosfstools
+e2fsprogs
+btrfs-progs
+snapper
+snap-pac
+compsize
+ntfs-3g
+os-prober
+
+# Network & Connectivity
+networkmanager
+iwd
+wireless_tools
+wpa_supplicant
+bluez
+bluez-utils
+curl
+wget
+git
+openssh
+rsync
+
+# Wayland, Hyprland & Display
+hyprland
+quickshell
+wayland
+xorg-xwayland
+qt5-wayland
+qt6-wayland
+qt6-declarative
+qt6-quicktimeline
+qt6-svg
+polkit-kde-agent
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-utils
+
+# Audio & Media
+pipewire
+pipewire-alsa
+pipewire-pulse
+pipewire-jack
+wireplumber
+pavucontrol
+playerctl
+
+# Vietnamese Native IME
+fcitx5
+fcitx5-gtk
+fcitx5-qt
+fcitx5-bamboo
+fcitx5-configtool
+
+# Terminal & Utilities
+foot
+kitty
+nautilus
+fastfetch
+btop
+brightnessctl
+wl-clipboard
+grim
+slurp
+swappy
+sudo
+which
+archinstall
+arch-install-scripts
+stow
+gamemode
+kdeconnect
+libnotify
+swaybg
+awww
+mako
+
+# Python & Dependencies for ALPORA
+python
+python-pip
+python-setuptools
+python-pillow
+

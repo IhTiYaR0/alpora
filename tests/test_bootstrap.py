@@ -41,6 +41,7 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual((backup/'hyprland.conf').read_text(),'personal legacy')
         self.assertFalse(legacy.exists());self.assertEqual(extra.read_text(),'keep')
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
     def test_failed_hook_restores_external_symlink_and_all_original_files(self):
         external=self.root/'external.lua';external.write_text('-- external config')
         main=self.hypr/'hyprland.lua';main.symlink_to(external)
@@ -66,18 +67,20 @@ class BootstrapTests(unittest.TestCase):
         self.assertIn('moon-lake.png',read_object(self.paths.config/'wallpaper.json')['image'])
         self.assertTrue((self.paths.state/'hyprlock-theme.conf').exists())
 
+    @unittest.skipIf(os.name == 'nt', 'Bash installer requires Linux / POSIX environment')
     def test_install_dry_run_changes_nothing(self):
         env=dict(os.environ,HOME=str(self.root),XDG_CONFIG_HOME=str(self.root/'config'),XDG_STATE_HOME=str(self.root/'state'))
         for flags,marker in ((['--dry-run'],'no changes'),
                              (['--preview','--theme=northern-lights'],'PREVIEW / No installation')):
             with self.subTest(flags=flags):
-                result=subprocess.run([str(ROOT/'install.sh'),*flags],env=env,capture_output=True,text=True,timeout=5)
+                result=subprocess.run([str(ROOT/'install/install.sh'),*flags],env=env,capture_output=True,text=True,timeout=5)
                 self.assertEqual(result.returncode,0,result.stderr)
                 self.assertIn(marker,result.stdout)
                 self.assertNotIn('\x1b[',result.stdout)
                 self.assertFalse((self.root/'state').exists())
                 self.assertFalse(list(self.hypr.iterdir()))
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
     def test_setup_orchestration_runs_offline_and_preserves_running_signature(self):
         env={'HOME':str(self.root),'XDG_CONFIG_HOME':str(self.root/'config'),
              'XDG_STATE_HOME':str(self.root/'local-state'),'XDG_DATA_HOME':str(self.root/'data'),
@@ -100,6 +103,21 @@ class BootstrapTests(unittest.TestCase):
             self.assertEqual(assets_install.call_count,2);self.assertEqual(assets_apply.call_count,2)
             border.assert_not_called();notify.assert_not_called();wallpaper.assert_not_called()
 
+    @unittest.skipIf(os.name == 'nt', 'Symlink creation requires Linux / POSIX environment')
+    def test_ui_only_install_does_not_touch_hypr_config(self):
+        env={'HOME':str(self.root),'XDG_CONFIG_HOME':str(self.root/'config'),
+             'XDG_STATE_HOME':str(self.root/'local-state'),'XDG_DATA_HOME':str(self.root/'data'),
+             'XDG_RUNTIME_DIR':str(self.root/'runtime')}
+        personal_hypr = self.hypr / 'hyprland.conf'
+        personal_hypr.write_text('# My personal hyprland config\n')
+        with patch.dict(os.environ,env),patch('poly_shell.cli.runtime_check'),patch.object(bootstrap.shutil,'which',return_value='/usr/bin/quickshell'),patch.object(bootstrap.desktop_assets,'install'),patch.object(bootstrap.desktop_assets,'apply'),patch.object(themes,'runtime_border'),patch.object(themes,'notify_toolkit'),patch('poly_shell.desktop._wallpaper'):
+            self.assertEqual(bootstrap.main(['--ui-only']),0)
+            self.assertEqual(personal_hypr.read_text(),'# My personal hyprland config\n')
+            self.assertFalse((self.hypr/'alpora-session.lua').exists())
+            self.assertFalse((self.hypr/'hyprland.lua').exists())
+            self.assertTrue((self.root/'.local/bin/poly-shell').is_symlink())
+            self.assertTrue((self.root/'.local/bin/alpora-fetch').is_symlink())
+
     def test_reference_preset_matches_release_geometry_and_preserves_existing_preferences(self):
         from poly_shell.state import atomic_json
         existing=self.paths.config/'widgets.json'
@@ -117,13 +135,14 @@ class BootstrapTests(unittest.TestCase):
         self.assertFalse((self.paths.config/'organizer.json').exists())
         self.assertFalse((self.paths.config/'clipboard').exists())
 
+    @unittest.skipIf(os.name == 'nt', 'PTY wizard requires Linux / POSIX environment')
     def test_real_wizard_selection_is_preview_only(self):
         import pty
         import select
         import time
         master,slave=pty.openpty()
         env=dict(os.environ,HOME=str(self.root),XDG_CONFIG_HOME=str(self.root/'config'),XDG_STATE_HOME=str(self.root/'state'),TERM='xterm-256color',NO_COLOR='1')
-        process=subprocess.Popen([str(ROOT/'install.sh'),'--dry-run','--wizard'],stdin=slave,stdout=slave,stderr=slave,env=env)
+        process=subprocess.Popen([str(ROOT/'install/install.sh'),'--dry-run','--wizard'],stdin=slave,stdout=slave,stderr=slave,env=env)
         os.close(slave)
         output=b''
         try:

@@ -14,7 +14,7 @@ class CompanionTweenTests(unittest.TestCase):
     def test_retarget_wrap_pause_and_reduced_motion(self):
         with tempfile.TemporaryDirectory(prefix='poly-companion-tween-') as temporary:
             directory = Path(temporary)
-            shutil.copy(ROOT / 'shell/CompanionTween.qml', directory)
+            shutil.copy(ROOT / 'shell/components/CompanionTween.qml', directory)
             (directory / 'shell.qml').write_text('''import QtQuick
 import Quickshell
 ShellRoot {

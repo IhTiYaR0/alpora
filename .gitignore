@@ -1,14 +1,78 @@
+# Python bytecode & environments
 __pycache__/
 *.py[cod]
+*$py.class
 .venv/
-*.log
-.DS_Store
+env/
+venv/
+build/
+dist/
+*.egg-info/
 
-# Private configuration and local credentials
+# Logs & debugging traces
+*.log
+*.trace
+*.qmltrace
+*.crash
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+.directory
+
+# Editor swap & workspace
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Arch Linux packaging artifacts (makepkg)
+pkg/
+src/
+*.pkg.tar.*
+*.tar.zst
+*.tar.gz
+*.tar.xz
+
+# Security: SSH, GPG & Cryptographic Keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+id_ecdsa
+id_ecdsa.pub
+*.pem
+*.key
+*.gpg
+*.asc
+*.p12
+*.pfx
+*.keystore
+
+# Security: Environment & Secret Tokens
 .env
 .env.*
 !.env.example
-*.pem
-*.key
-*.trace
-*.qmltrace
+*.secret
+secrets.*
+credentials.json
+token.json
+auth.json
+
+# Security: Wi-Fi Passwords & Network Credentials
+hotspot.json
+*.nmconnection
+wifi-credentials.json
+airplane-restore.json
+
+# Local runtime state, sockets & backups
+.local/
+*.sock
+instance.lock
+alpora-backups/
+backups/
+
+# Fcitx5 runtime caches
+**/fcitx5/conf/cached_layouts

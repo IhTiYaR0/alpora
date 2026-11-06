@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# ALPORA Live Archiso Profile Definition
+# Documentation: https://wiki.archlinux.org/title/archiso
+
+iso_name="alpora-archlinux"
+iso_label="ALPORA_V1"
+iso_publisher="ALPORA Desktop <https://github.com/pnam-it309/alpora>"
+iso_application="ALPORA Desktop Live System & Installer"
+iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
+install_dir="arch"
+buildmodes=('iso')
+bootmodes=('bios.syslinux' 'uefi.systemd-boot')
+arch="x86_64"
+pacman_conf="pacman.conf"
+airootfs_image_type="squashfs"
+airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '9')
+file_permissions=(
+  ["/etc/shadow"]="0:0:400"
+  ["/etc/gshadow"]="0:0:400"
+  ["/etc/sudoers.d/alpora"]="0:0:440"
+  ["/etc/sysctl.d/99-alpora-security.conf"]="0:0:644"
+  ["/etc/sysctl.d/99-alpora-performance.conf"]="0:0:644"
+  ["/etc/systemd/journald.conf.d/alpora.conf"]="0:0:644"
+  ["/root"]="0:0:750"
+  ["/usr/local/bin/alpora-install"]="0:0:755"
+  ["/usr/local/bin/alpora-fetch"]="0:0:755"
+  ["/usr/local/bin/poly-shell"]="0:0:755"
+  ["/usr/local/bin/alpora-live-init"]="0:0:755"
+)

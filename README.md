@@ -7,12 +7,12 @@
   <a href="#landscapes">Landscapes</a> &nbsp; / &nbsp;
   <a href="#install">Install</a> &nbsp; / &nbsp;
   <a href="docs/README.md">Docs</a> &nbsp; / &nbsp;
-  <a href="README.ru.md">Русский</a>
+  <a href="docs/README.ru.md">Русский</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/ARCH_LINUX-HYPRLAND-b8cba1?style=flat-square&amp;labelColor=202829" alt="Arch Linux / Hyprland">
-  <img src="https://img.shields.io/badge/STATUS-PREVIEW-f1b791?style=flat-square&amp;labelColor=202829" alt="Development preview">
+  <img src="https://img.shields.io/badge/RELEASE-v1.0.0-58a6ff?style=flat-square&amp;labelColor=202829" alt="ALPORA OS v1.0.0">
   <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-a4c5c5?style=flat-square&amp;labelColor=202829" alt="MIT license"></a>
 </p>
 
@@ -60,7 +60,7 @@ window borders and supported applications. Work/Vibe behaviour stays independent
 
 **A seventh option: Timeline.** Explore landscapes for different times of day.
 You can also import your own wallpaper and extract its palette.
-[Theme controls →](docs/wallpaper-themes.md)
+[Theme controls →](docs/features/wallpaper-themes.md)
 
 ## 03 &nbsp; The small things belong together
 
@@ -93,12 +93,19 @@ Download or clone this repository into a permanent directory, then open a termin
 inside it. The installer creates links into the checkout, so keep that directory.
 
 ```sh
-git clone https://github.com/IhTiYaR0/alpora.git
+# One-line online installer (auto-clones and runs interactive setup)
+curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash
+```
+
+Or clone manually:
+
+```sh
+git clone https://github.com/pnam-it309/alpora.git
 cd alpora
 
-./install.sh --preview          # Live system card without installing; q to exit
-./install.sh --dry-run --wizard  # Explore the chooser and installation plan
-./install.sh                    # Install ALPORA and choose your first landscape
+./install/install.sh --preview          # Live system card without installing; q to exit
+./install/install.sh --dry-run --wizard  # Explore the chooser and installation plan
+./install/install.sh                    # Install ALPORA and choose your first landscape
 ```
 
 For the neofetch-style system card with ALPORA's faceted mountain and your active
@@ -128,35 +135,44 @@ With `~/.local/bin` on your `PATH`, use the short commands `poly-shell` and
 `alpora-fetch`. The card opens on request. The sample folders and Nautilus/Foot
 window arrangement are a demonstration composition; files and system readings
 will be your own.
-[System card](docs/system-card.md) · [Installed files and source layout](docs/repository-layout.md)
+[System card](docs/features/system-card.md) · [Installed files and source layout](docs/architecture/repository-layout.md)
 
 | Want to… | Use |
 | :--- | :--- |
-| Choose a theme directly | `./install.sh --theme=northern-lights` |
-| Read the full installation plan | `./install.sh --dry-run` |
-| Understand backups and recovery | [Installer guide](docs/arch-installer.md) |
-| Add only the desktop components | [Component installation](docs/installation.md) |
-| See every application and dependency | [Programs & services](docs/programs.md) |
+| Choose a theme directly | `./install/install.sh --theme=northern-lights` |
+| Install standalone UI shell only | `./install/install.sh --ui-only` |
+| Install core shell (skip bundled apps) | `./install/install.sh --core-only` |
+| Read the full installation plan | `./install/install.sh --dry-run` |
+| Cleanly uninstall ALPORA | `./install/uninstall.sh` (or `./install/uninstall.sh --restore-config`) |
+| Understand backups and recovery | [Installer guide](docs/guides/arch-installer.md) |
+| Add only the desktop components | [Component installation](docs/guides/installation.md) |
+| See every application and dependency | [Programs & services](docs/guides/programs.md) |
 
 <details>
 <summary><b>Compatibility & current preview limits</b></summary>
 
 The checked local baseline is Arch Linux, Hyprland **0.56.2**, Quickshell **0.3.2**
-and Qt **6.12.0**. Full installation and first login on a clean Arch system remain
-pending. The reference composition targets 1920×1080 at scale 1; other displays
-use the existing adaptive layout and need further validation.
+and Qt **6.12.0**. The installer supports Arch Linux and Arch-based derivatives
+(EndeavourOS, CachyOS, Manjaro, Garuda, Artix, ArcoLinux, Archcraft) as well as custom
+kernels. For users wishing to preserve existing personal Hyprland setups or use other
+distributions, `--ui-only` installs only the standalone ALPORA shell panel and widgets.
+An official `./install/uninstall.sh` script is provided to cleanly revert symlinks, systemd user
+services, and restore prior Hyprland configuration backups. Full first login on a clean
+Arch system remains pending. The reference composition targets 1920×1080 at scale 1;
+other displays use the existing adaptive layout and need further validation.
 
 Existing preferences are preserved. A fresh account receives the reviewed
 ALPORA preset, rather than the author's notes, clipboard, accounts or location.
 Hardware status, weather, app lists and third-party application internals vary.
 
-Animated widgets still have a measurable CPU cost. Suspend/resume, monitor
-hotplug and more device combinations remain to be checked. Bluetooth pairing
-uses a terminal helper; monitor layout editing is pending.
+Animated widgets and companion timers have been optimized for idle CPU efficiency.
+The shell supports English (baseline), Vietnamese, and Russian via the i18n framework.
+Suspend/resume, monitor hotplug and more device combinations remain to be checked.
+Bluetooth pairing uses a terminal helper; monitor layout editing is pending.
 
 The last local check passed **197 tests and strict QML lint**. These are local
-results, not a hosted CI claim. Read the [known issues](docs/known-issues.md),
-[new-user validation](docs/install-validation-2026-10-22.md) and [code audit](docs/code-audit-2026-10-22.md).
+results, not a hosted CI claim. Read the [known issues](docs/guides/known-issues.md),
+[new-user validation](docs/audits/install-validation-2026-10-22.md) and [code audit](docs/audits/code-audit-2026-10-22.md).
 
 </details>
 
@@ -176,9 +192,9 @@ These are the bundled session defaults. Change supported bindings in Settings �
 **Горячие клавиши**. The technical command and configuration namespace remain
 `poly-shell` to preserve compatibility.
 
-[Documentation](docs/README.md) &nbsp; / &nbsp; [Hotkeys](docs/shortcuts.md) &nbsp; / &nbsp;
-[Themes](docs/wallpaper-themes.md) &nbsp; / &nbsp; [Robot](docs/desktop-companion.md) &nbsp; / &nbsp;
-[Contributing](CONTRIBUTING.md) &nbsp; / &nbsp; [Changelog](CHANGELOG.md)
+[Documentation](docs/README.md) &nbsp; / &nbsp; [Hotkeys](docs/guides/shortcuts.md) &nbsp; / &nbsp;
+[Themes](docs/features/wallpaper-themes.md) &nbsp; / &nbsp; [Robot](docs/features/desktop-companion.md) &nbsp; / &nbsp;
+[Contributing](.github/CONTRIBUTING.md) &nbsp; / &nbsp; [Changelog](docs/CHANGELOG.md)
 
 ---
 
@@ -187,5 +203,5 @@ These are the bundled session defaults. Change supported bindings in Settings �
 
 Original code and authored vectors: [MIT](LICENSE). Papirus, Bibata and the
 historical Adwaita assets retain their upstream licenses. Landscapes were made
-with OpenAI's image generation tool. [Credits & third-party notices](THIRD_PARTY_NOTICES.md) ·
+with OpenAI's image generation tool. [Credits & third-party notices](licenses/THIRD_PARTY_NOTICES.md) ·
 [Capture provenance & presentation references](docs/media/README.md).

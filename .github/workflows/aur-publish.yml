@@ -1,0 +1,33 @@
+name: Publish to AUR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packaging/aur/**'
+      - 'poly_shell/**'
+      - 'shell/**'
+      - 'bin/**'
+  workflow_dispatch:
+
+jobs:
+  publish-aur:
+    name: Sync and Publish alpora-shell-git to AUR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        if: ${{ env.AUR_SSH_PRIVATE_KEY != '' }}
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        with:
+          pkgname: alpora-shell-git
+          pkgbuild: packaging/aur/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME || 'pnam-it309' }}
+          commit_email: ${{ secrets.AUR_EMAIL || 'nickhunter3009@gmail.com' }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "chore(aur): update alpora-shell-git (${{ github.sha }})"

@@ -22,10 +22,11 @@ qml_linter="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
 # The installed GlobalShortcut metadata names an internal PostReloadHook type
 # that qmllint cannot resolve. Keep this upstream metadata exception on the
 # tiny native shortcut wrapper only; all other QML keeps strict import checks.
-"$qml_linter" --max-warnings 0 --import disable -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell shell/NativeShortcut.qml
+"$qml_linter" --max-warnings 0 --import disable -i shell/qmldir -i shell/theme/qmldir -I /usr/lib/qt6/qml -I shell shell/core/NativeShortcut.qml
 qml_sources=()
-for qml_source in shell/*.qml shell/theme/*.qml; do
-    if [[ "$qml_source" != shell/NativeShortcut.qml ]]; then
+mapfile -t all_qmls < <(find shell -name "*.qml")
+for qml_source in "${all_qmls[@]}"; do
+    if [[ "$qml_source" != "shell/core/NativeShortcut.qml" ]]; then
         qml_sources+=("$qml_source")
     fi
 done

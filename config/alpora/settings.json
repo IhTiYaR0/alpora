@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "apps": {
+    "terminal": [
+      "foot"
+    ],
+    "launcher": [
+      "fuzzel"
+    ],
+    "audio": [
+      "pavucontrol"
+    ],
+    "lock": [
+      "hyprlock"
+    ],
+    "network": [
+      "nm-connection-editor"
+    ]
+  },
+  "bar": {
+    "height": 40,
+    "workspaceCount": 4,
+    "fontFamily": "Inter",
+    "fontSize": 13,
+    "margin": 20,
+    "top": 12,
+    "uiScale": 1.0
+  },
+  "input": {
+    "touchpad": {
+      "tapToClick": true,
+      "naturalScroll": true,
+      "disableWhileTyping": true,
+      "sensitivity": 0.0,
+      "scrollFactor": 1.0
+    }
+  },
+  "reducedMotion": false,
+  "locale": "en"
+}
+

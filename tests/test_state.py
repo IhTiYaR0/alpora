@@ -83,7 +83,7 @@ class SessionTests(unittest.TestCase):
         with ThreadPoolExecutor(max_workers=4) as executor:
             list(executor.map(lambda _: update_session(self.paths, "toggle"), range(10)))
         self.assertEqual(read_object(self.paths.session)["mode"], "work")
-        json.loads(self.paths.session.read_text())
+        json.loads(self.paths.session.read_text(encoding="utf-8"))
 
 
 class AutostartTests(unittest.TestCase):

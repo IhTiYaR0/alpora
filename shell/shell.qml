@@ -29,40 +29,68 @@ ShellRoot {
     Variants { model: Quickshell.screens; DesktopThemeMenu {} }
     Variants { model: Quickshell.screens; LivingLandscape {} }
     Variants { model: Quickshell.screens; DesktopWidgets {} }
+    Variants { model: Quickshell.screens; DeveloperMetricsPanel {} }
     Variants { model: Quickshell.screens; TimelineWallpaper {} }
     Variants { model: Quickshell.screens; WorkspaceOverview {} }
     Variants { model: Quickshell.screens; Dock {} }
+    Variants { model: Quickshell.screens; ScreenshotOverlay {} }
+    Variants { model: Quickshell.screens; PowerMenu {} }
+    Variants { model: Quickshell.screens; DisplayProjectMenu {} }
+    Variants { model: Quickshell.screens; BrightnessOverlay {} }
+    Variants { model: Quickshell.screens; VideoPipOverlay {} }
 
     // Native Wayland shortcuts avoid spawning an IPC client before input can
     // reach the launcher. Keep registration once per shell, not per monitor.
     NativeShortcut {
-        appid: "poly-shell"; name: "overview"; description: "Обзор рабочих столов"
+        appid: "poly-shell"; name: "power-menu"; description: I18n.tr("power.title")
+        onActivated: PowerState.toggle(root.focusedScreen())
+    }
+    NativeShortcut {
+        appid: "poly-shell"; name: "screenshot"; description: I18n.tr("quick.screenshot")
+        onActivated: ScreenshotState.open(root.focusedScreen())
+    }
+    NativeShortcut {
+        appid: "poly-shell"; name: "overview"; description: I18n.tr("shortcut.overview")
         onActivated: OverviewState.toggle(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "overview-open"; description: "Открыть обзор жестом вверх"
+        appid: "poly-shell"; name: "overview-open"; description: I18n.tr("shortcut.overview_open")
         onActivated: OverviewState.open(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "overview-close"; description: "Закрыть обзор жестом вниз"
+        appid: "poly-shell"; name: "overview-close"; description: I18n.tr("shortcut.overview_close")
         onActivated: OverviewState.close()
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "launcher"; description: "Открыть приложения"
+        appid: "poly-shell"; name: "launcher"; description: I18n.tr("shortcut.launcher")
         onActivated: BarState.toggle("launcher", root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "quick-settings"; description: "Быстрые настройки"
+        appid: "poly-shell"; name: "quick-settings"; description: I18n.tr("shortcut.quick_settings")
         onActivated: Session.toggleQuickSettings(root.focusedScreen())
     }
     NativeShortcut {
-        appid: "poly-shell"; name: "notifications"; description: "Уведомления"
+        appid: "poly-shell"; name: "notifications"; description: I18n.tr("shortcut.notifications")
         onActivated: BarState.toggle("notifications", root.focusedScreen())
     }
 
     NativeShortcut {
-        appid: "poly-shell"; name: "clipboard"; description: "История буфера обмена"
+        appid: "poly-shell"; name: "clipboard"; description: I18n.tr("shortcut.clipboard")
         onActivated: BarState.toggle("clipboard", root.focusedScreen())
+    }
+
+    NativeShortcut {
+        appid: "poly-shell"; name: "toggle-mode"; description: I18n.tr("shortcut.toggle_mode")
+        onActivated: Session.setMode("toggle")
+    }
+
+    NativeShortcut {
+        appid: "poly-shell"; name: "display-project"; description: I18n.tr("display_project.title")
+        onActivated: DisplayProjectState.toggle(root.focusedScreen())
+    }
+    NativeShortcut {
+        appid: "poly-shell"; name: "video-pip"; description: "Video PiP (TikTok / Shorts / YouTube)"
+        onActivated: VideoPipState.toggle(root.focusedScreen())
     }
 
     FileView {
@@ -119,6 +147,7 @@ ShellRoot {
         function setCenterPage(page: int): void { if (page >= 0 && page <= 1) BarState.centerPage = page; }
         function desktopAction(action: string, value: string): void { Desktop.request(action, value); }
         function showOsd(kind: string, value: real, muted: bool): void { OsdState.show(kind, value, muted); }
+        function showToggleOsd(kind: string, state: bool): void { OsdState.showToggle(kind, state); }
         function osdStatus(): string { return JSON.stringify({ opened: OsdState.opened, kind: OsdState.kind, value: OsdState.value, muted: OsdState.muted, screen: OsdState.screenName }); }
         function notificationsStatus(): string { return JSON.stringify({ active: BarState.notifications.map(item => item.id), history: BarState.visibleHistory.map(item => item.id), dnd: BarState.dnd, busy: BarState.notificationBusy, error: BarState.notificationError }); }
         function dismissNotification(id: int): void { BarState.dismissNotification(id); }
@@ -126,6 +155,10 @@ ShellRoot {
         function toggleDnd(): void { BarState.toggleDnd(); }
         function startFrameProbe(): void { FrameMetrics.start(); }
         function stopFrameProbe(): string { return FrameMetrics.finish(); }
+        function screenshot(): void { ScreenshotState.open(root.focusedScreen()); }
+        function powerMenu(): void { PowerState.toggle(root.focusedScreen()); }
+        function toggleOverview(): void { OverviewState.toggle(root.focusedScreen()); }
+        function toggleDisplayProject(): void { DisplayProjectState.toggle(root.focusedScreen()); }
     }
 
 

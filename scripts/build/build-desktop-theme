@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+"""Build repo-owned vectors and multi-resolution Xcursors from a theme manifest.
+
+No installed themes are edited. Install with user-local symlinks after reviewing
+the generated assets. Behavior modes never participate in theme asset selection.
+"""
+import argparse
+import json
+from pathlib import Path
+import os
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def svg(body, size=64):
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">{body}</svg>\n'
+
+
+def folder(colors, emblem=""):
+    c = colors
+    body = f'''<defs><linearGradient id="face" x1="0" y1="0" x2="0" y2="1"><stop stop-color="{c['folderTop']}"/><stop offset="1" stop-color="{c['folderBase']}"/></linearGradient></defs>
+<path d="M9 52H55" stroke="#0c1712" stroke-opacity=".25" stroke-width="5" stroke-linecap="round"/>
+<path d="M6 16Q6 11 11 11H25L31 17H53Q58 17 58 22V49Q58 54 53 54H11Q6 54 6 49Z" fill="{c['folderBack']}"/>
+<path d="M6 24Q6 20 11 20H53Q58 20 58 25V50Q58 55 53 55H11Q6 55 6 50Z" fill="url(#face)"/>
+<path d="M7 25L28 36L49 21H11Q7 21 7 25Z" fill="{c['folderLight']}" opacity=".24"/>
+<path d="M28 36L57 25V49L44 54Z" fill="{c['folderDark']}" opacity=".13"/>
+<path d="M7 25L28 36L12 54H11Q7 54 7 50Z" fill="{c['folderDark']}" opacity=".12"/>
+<path d="M28 36L44 54H12Z" fill="{c['folderLight']}" opacity=".08"/>
+<path d="M7 24Q7 21 11 21H53Q57 21 57 25" fill="none" stroke="{c['folderLight']}" stroke-opacity=".6"/>
+<g stroke="{c['folderLight']}" opacity=".28" transform="translate(0,1)" fill="none" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">{emblem}</g>
+<g stroke="{c['ink']}" fill="none" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">{emblem}</g>'''
+    return svg(body)
+
+
+def build(manifest):
+    theme = json.loads(manifest.read_text())
+    colors = theme['colors']
+    destination = ROOT / 'assets' / 'desktop-themes' / theme['id']
+    icons = destination / theme['iconTheme']
+    places = icons / 'scalable/places'
+    apps = icons / 'scalable/apps'
+    places.mkdir(parents=True, exist_ok=True)
+    apps.mkdir(parents=True, exist_ok=True)
+    emblems = {
+        'folder': '<path d="M27 37L32 32L37 37L32 43Z" stroke-width="1.8"/><path d="M32 32V43 M27 37H37" stroke-width="1.1" opacity=".65"/>',
+        'folder-documents': '<path d="M24 26H35L41 32V49H24Z M35 26V33H41 M28 37H36 M28 42H36"/>',
+        'folder-download': '<path d="M32 28V42 M26 36L32 42L38 36 M25 47H39"/>',
+        'folder-music': '<path d="M29 42V29L39 27V40 M29 31L39 29"/><ellipse cx="26" cy="43" rx="3" ry="2"/><ellipse cx="36" cy="41" rx="3" ry="2"/>',
+        'folder-pictures': '<path d="M22 44L29 34L34 40L38 35L44 44Z"/><circle cx="38" cy="29" r="2"/>',
+        'folder-videos': '<rect x="23" y="29" width="18" height="16" rx="2"/><path d="M30 33L36 37L30 41Z"/>',
+        'folder-projects': '<path d="M28 30L22 37L28 44 M36 30L42 37L36 44 M34 28L30 46"/>',
+        'folder-publicshare': '<circle cx="25" cy="34" r="3"/><circle cx="39" cy="34" r="3"/><path d="M19 44Q25 35 31 44 M33 44Q39 35 45 44"/>',
+        'folder-templates': '<path d="M25 28H35L40 33V46H25Z M35 28V34H40"/>',
+        'user-home': '<path d="M22 36L32 28L42 36 M25 34V46H39V34 M30 46V39H34V46"/>',
+        'folder-saved-search': '<circle cx="30" cy="35" r="6"/><path d="M35 40L41 46"/>',
+        'folder-favorites': '<path d="M32 27L35 34L43 35L37 40L39 48L32 44L25 48L27 40L21 35L29 34Z"/>',
+        'folder-remote': '<circle cx="32" cy="37" r="10"/><ellipse cx="32" cy="37" rx="4" ry="10"/><path d="M22 37H42"/>',
+        'user-desktop': '<rect x="21" y="27" width="22" height="16" rx="2"/><path d="M32 43V48 M26 48H38"/>',
+        'folder-games': '<path d="M23 31Q21 32 20 43Q20 48 25 44L28 41H36L39 44Q44 48 44 43L42 33Q41 30 37 31Z M25 34V40 M22 37H28"/><circle cx="37" cy="35" r=".8"/><circle cx="40" cy="38" r=".8"/>',
+    }
+    aliases = {'folder-open': 'folder', 'folder-drag-accept': 'folder', 'inode-directory': 'folder', 'folder-downloads': 'folder-download', 'folder-development': 'folder-projects', 'folder-code': 'folder-projects', 'folder-recent': 'folder-saved-search', 'folder-home': 'user-home', 'folder-desktop': 'user-desktop', 'folder-video': 'folder-videos', 'folder-image': 'folder-pictures', 'folder-photos': 'folder-pictures', 'folder-docs': 'folder-documents', 'folder-public': 'folder-publicshare', 'folder-favorite': 'folder-favorites'}
+    for name, emblem in emblems.items():
+        (places / f'{name}.svg').write_text(folder(colors, emblem))
+    for name, original in aliases.items():
+        if name != original:
+            (places / f'{name}.svg').write_text(folder(colors, emblems[original]))
+    terminal = svg(f'<rect x="6" y="8" width="52" height="48" rx="10" fill="{colors["surface"]}" stroke="{colors["amber"]}" stroke-width="1.5"/><path d="M16 23L26 32L16 41 M32 42H46" fill="none" stroke="{colors["text"]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>')
+    for name in ('utilities-terminal', 'org.gnome.Terminal', 'foot'):
+        (apps / f'{name}.svg').write_text(terminal)
+    for name in ('system-file-manager', 'org.gnome.Nautilus', 'nautilus'):
+        (apps / f'{name}.svg').write_text(folder(colors))
+    (icons / 'index.theme').write_text(f'''[Icon Theme]
+Name={theme['label']}
+Comment=Faceted Alpine folders with inherited application icons
+Inherits={','.join(theme['iconFallbacks'])}
+Directories=scalable/places,scalable/apps
+
+[scalable/places]
+Size=64
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Places
+
+[scalable/apps]
+Size=64
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Applications
+''')
+    # Third-party cursor assets are installed from a pinned, checksum-verified
+    # upstream release by `poly-shell assets install`, never copied from the host.
+    print(destination)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--theme', default='alpine')
+    args = parser.parse_args()
+    if not args.theme.isalnum():
+        parser.error('theme ID must be alphanumeric')
+    build(ROOT / 'assets/themes' / (args.theme + '.json'))

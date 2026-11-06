@@ -19,7 +19,10 @@ class TimelineTests(unittest.TestCase):
         atomic_json(self.paths.config/'appearance.json', {'theme': 'timeline'})
 
     def test_six_readable_same_size_images_and_one_catalog_theme(self):
-        from PIL import Image
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for image verification tests")
         assets = timeline.assets()
         self.assertEqual(len(assets), 6)
         sizes = []
@@ -139,6 +142,14 @@ class TimelineTests(unittest.TestCase):
         timeline.timeline_control(self.paths, 'set', {'minute': 0})
         self.assertEqual(update_session(self.paths)['appearance']['palette'], original)
         self.border.assert_not_called()
+
+    def test_timeline_sync_clock(self):
+        self.select()
+        result = timeline.timeline_control(self.paths, 'sync-clock', {})
+        self.assertTrue(result['synced'])
+        self.assertTrue(result['saved'])
+        self.assertIsInstance(result['minute'], int)
+        self.assertTrue(0 <= result['minute'] <= 1440)
 
 
 if __name__ == '__main__': unittest.main()

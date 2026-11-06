@@ -16,10 +16,10 @@ class ClockResumeTests(unittest.TestCase):
             directory = Path(temporary)
             # Expose the native clock only in this temporary test copy, so we
             # can pause its deadline without suspending the user's computer.
-            source = (ROOT / "shell/ClockState.qml").read_text()
+            source = (ROOT / "shell/core/ClockState.qml").read_text()
             (directory / "ClockState.qml").write_text(source.replace(
                 "id: root", "id: root\n    property alias testClock: clock", 1))
-            shutil.copy(ROOT / "shell/PanelMotion.qml", directory)
+            shutil.copy(ROOT / "shell/core/PanelMotion.qml", directory)
             (directory / "Motion.qml").write_text('''pragma Singleton
 import QtQuick
 QtObject { readonly property int openMs: 320; readonly property int closeMs: 200 }

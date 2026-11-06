@@ -15,10 +15,10 @@
 @define-color warning_color #d1b387;
 @define-color error_color #d18e82;
 @define-color success_color #a9b99a;
-.background { background-color: @theme_bg_color; color: @theme_fg_color; }
+.background { background-color: #272d2d; color: #e7e9e5; }
 window.background, window.background:backdrop { background-color: #272d2d; color: #e7e9e5; }
 .view, textview text, treeview.view { background-color: #202729; color: #e7e9e5; }
-headerbar, .titlebar { background-image: none; background-color: #2e3734; color: @theme_fg_color; box-shadow: inset 0 -1px #46514b; }
+headerbar, .titlebar { background-image: none; background-color: #2e3734; color: #e7e9e5; box-shadow: inset 0 -1px #46514b; }
 headerbar:backdrop, .titlebar:backdrop { background-color: #293130; }
 button { border-radius: 8px; }
 button.suggested-action { background-image: none; background-color: #a9b99a; color: #202729; border-color: #a9b99a; }

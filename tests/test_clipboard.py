@@ -2,6 +2,8 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from poly_shell.clipboard import History
 
@@ -50,7 +52,8 @@ class ClipboardTests(unittest.TestCase):
         data = b'\x89PNG\r\n\x1a\nexample'
         self.history.ingest(data, 'image')
         entry = self.entries()[0]
-        preview = Path(entry['image'].removeprefix('file://'))
+  
+        preview = Path(url2pathname(urlparse(entry['image']).path))
         self.assertEqual(preview.read_bytes(), data)
         with patch('poly_shell.clipboard.subprocess.run') as run:
             self.history.action('copy', entry['id'])

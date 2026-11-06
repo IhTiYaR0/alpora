@@ -41,8 +41,8 @@ class ThemeTests(unittest.TestCase):
             self.assertEqual(snapshot['appearance']['palette'], wanted)
             self.assertIn('moon-lake.png', snapshot['appearance']['wallpaper'])
             self.assertEqual(snapshot['visual']['windowRadius'], 27)
-        self.assertIn(wanted['accent'], (self.paths.state / 'mako-theme.conf').read_text())
-        self.assertIn(wanted['accent'][1:], (self.paths.state / 'hyprlock-theme.conf').read_text())
+        self.assertIn(wanted['accent'], (self.paths.state / 'mako-theme.conf').read_text(encoding="utf-8"))
+        self.assertIn(wanted['accent'][1:], (self.paths.state / 'hyprlock-theme.conf').read_text(encoding="utf-8"))
 
     def test_disabling_automatic_colors_changes_only_wallpaper(self):
         themes.apply_theme(self.paths, 'forest-mist')
@@ -168,7 +168,10 @@ class ThemeTests(unittest.TestCase):
         self.assertIn('background #172239', text)
 
     def test_import_is_deterministic_private_and_readable_after_original_removed(self):
-        from PIL import Image
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for wallpaper import tests")
         source = self.paths.state / 'my blue image.png'
         Image.new('RGB', (48, 48), (40, 90, 180)).save(source)
         first = themes.import_wallpaper(self.paths, str(source))
@@ -182,6 +185,10 @@ class ThemeTests(unittest.TestCase):
         themes.validate_palette(doc['palette'])
 
     def test_invalid_image_or_palette_cannot_inject_configuration(self):
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("PIL is required for wallpaper import tests")
         source = self.paths.state / 'bad.png'; source.write_text('not an image')
         with self.assertRaises(ConfigError): themes.import_wallpaper(self.paths, str(source))
         palette = themes.load_theme(self.paths, 'alpine')['palette']

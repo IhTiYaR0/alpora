@@ -1,0 +1,13 @@
+[Unit]
+Description=ALPORA Live Environment Initialization
+Before=network.target getty@tty1.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/alpora-live-init
+
+[Install]
+WantedBy=multi-user.target
+

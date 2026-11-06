@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 from pathlib import Path
 import shutil
@@ -8,9 +9,9 @@ import unittest
 @unittest.skipUnless(shutil.which('node'), 'JavaScript status checks require node')
 class BarStatusTests(unittest.TestCase):
     def evaluate(self, expression):
-        script = Path(__file__).resolve().parents[1] / 'shell/StatusLogic.js'
-        code = script.read_text() + '\nconsole.log(JSON.stringify(' + expression + '));'
-        return json.loads(subprocess.check_output(['node', '-e', code], text=True))
+        script = Path(__file__).resolve().parents[1] / 'shell/logic/StatusLogic.js'
+        code = script.read_text(encoding='utf-8') + '\nconsole.log(JSON.stringify(' + expression + '));'
+        return json.loads(subprocess.check_output(['node', '-e', code], text=True, encoding='utf-8'))
 
     def observation(self, **changes):
         data = dict(wifiAvailable=True, hardwareEnabled=True, wifiEnabled=True,

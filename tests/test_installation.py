@@ -8,6 +8,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 
 
+@unittest.skipIf(os.name == 'nt', 'Installer tests require POSIX execution')
 class CleanInstallationTests(unittest.TestCase):
     def setUp(self):
         temporary=tempfile.TemporaryDirectory(prefix='poly clean install ')

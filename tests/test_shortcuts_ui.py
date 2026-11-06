@@ -15,11 +15,14 @@ class ShortcutEditorTests(unittest.TestCase):
     def test_editor_add_apply_remove_reload_and_unsaved_form_state(self):
         with tempfile.TemporaryDirectory(prefix='poly-shortcuts-ui-') as temporary:
             d=Path(temporary)
-            for name in ('SettingsShortcuts.qml','ShortcutsState.qml'):
-                source=(ROOT/'shell'/name).read_text()
+            file_map = {'SettingsShortcuts.qml': ROOT/'shell/settings/SettingsShortcuts.qml', 'ShortcutsState.qml': ROOT/'shell/core/ShortcutsState.qml'}
+            for name, p in file_map.items():
+                source = p.read_text()
                 if name=='SettingsShortcuts.qml':source=source.replace('id: root','id: root\n    property alias testFooter:footer',1)
                 (d/name).write_text(source)
-            (d/'qmldir').write_text('singleton Session 1.0 Session.qml\nsingleton ShortcutsState 1.0 ShortcutsState.qml\nSettingsShortcuts 1.0 SettingsShortcuts.qml\nSettingsCard 1.0 SettingsCard.qml\nAppearanceButton 1.0 AppearanceButton.qml\n')
+            (d/'qmldir').write_text('singleton Session 1.0 Session.qml\nsingleton ShortcutsState 1.0 ShortcutsState.qml\nsingleton Glass 1.0 Glass.qml\nsingleton I18n 1.0 I18n.qml\nSettingsShortcuts 1.0 SettingsShortcuts.qml\nSettingsCard 1.0 SettingsCard.qml\nAppearanceButton 1.0 AppearanceButton.qml\n')
+            (d/'Glass.qml').write_text('pragma Singleton\nimport QtQuick\nQtObject {function tint(c, a) { return c; }}\n')
+            (d/'I18n.qml').write_text('pragma Singleton\nimport QtQuick\nQtObject {function tr(k) { return k }\nfunction trWith(k, p) { return k }\n}\n')
             (d/'SettingsCard.qml').write_text('import QtQuick.Layouts\nColumnLayout {property int padding:18}\n')
             (d/'AppearanceButton.qml').write_text('import QtQuick.Controls\nButton {property string symbol:"";property bool primary:false;property bool selected:false}\n')
             (d/'Session.qml').write_text('pragma Singleton\nimport QtQuick\nQtObject {readonly property color accent:"#aabbcc";readonly property color background:"#101010";readonly property color foreground:"white";readonly property color muted:"gray";readonly property color surface:"#303030";readonly property string fontFamily:"Sans";readonly property string controller:'+json.dumps(str(d/'controller'))+'}\n')

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Auto-formatting helper for ALPORA codebase.
+set -euo pipefail
+
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$project_dir"
+
+echo "=== 1. Formatting JSON files ==="
+python3 - <<'EOF'
+import json
+from pathlib import Path
+
+repo = Path(".")
+count = 0
+for p in repo.rglob("*.json"):
+    if ".git" in p.parts:
+        continue
+    try:
+        content = p.read_text(encoding="utf-8")
+        obj = json.loads(content)
+        formatted = json.dumps(obj, indent=2, ensure_ascii=False) + "\n"
+        if formatted != content:
+            p.write_text(formatted, encoding="utf-8")
+            count += 1
+    except Exception as e:
+        print(f"Skipping {p}: {e}")
+
+print(f"Re-formatted {count} JSON files.")
+EOF
+
+echo "=== 2. Formatting Shell scripts ==="
+if command -v shfmt >/dev/null 2>&1; then
+    shfmt -w -i 4 -ci install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/* || true
+    echo "Shell scripts formatted with shfmt."
+else
+    echo "shfmt not found. Install shfmt for shell script formatting (pacman -S shfmt / brew install shfmt)."
+fi
+
+echo "=== 3. Formatting Python files ==="
+if command -v ruff >/dev/null 2>&1; then
+    ruff format poly_shell/ tests/ scripts/ || true
+    echo "Python formatted with ruff."
+elif command -v black >/dev/null 2>&1; then
+    black poly_shell/ tests/ || true
+    echo "Python formatted with black."
+else
+    echo "ruff/black not found. Install ruff (pip install ruff) for Python auto-formatting."
+fi
+
+echo "=== Formatting complete ==="

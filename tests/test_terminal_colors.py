@@ -44,6 +44,7 @@ class TerminalColorsTests(unittest.TestCase):
                 (root/'fdinfo/4').write_text('tty-index:\t'+str(pid)+'\n')
             self.assertEqual(terminal.terminal_ptys(proc), [Path('/dev/pts/1'), Path('/dev/pts/2')])
 
+    @unittest.skipUnless(hasattr(os, 'openpty'), 'PTY requires POSIX support')
     def test_live_update_writes_output_to_pty_without_shell_input(self):
         master, slave = os.openpty()
         try:

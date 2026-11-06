@@ -29,7 +29,7 @@ assert.equal(g.destination(.85, -.004, 10, false, true), 0); // closing flick
 assert.equal(g.destination(.8, .01, 0, true, false), 0); // cancelled opening
 assert.equal(g.destination(.2, -.01, 0, true, true), 1); // cancelled closing
 '''
-        subprocess.run(['node', '-e', script, str(ROOT / 'shell/OverviewGesture.js')], check=True)
+        subprocess.run(['node', '-e', script, str(ROOT / 'shell/logic/OverviewGesture.js')], check=True)
 
     @unittest.skipUnless(shutil.which('lua'), 'Lua is needed to check compositor callbacks')
     def test_native_callbacks_accumulate_reverse_clamp_and_finish_once(self):
@@ -55,4 +55,4 @@ local down = factory("down")
 down.start({delta={y=90},time_ms=60})
 assert(sent[5]:match(',start,%-1,%-90%.000,60,0$'))
 '''
-        subprocess.run(['lua', '-', str(ROOT / 'integrations/hyprland-overview.lua')], input=script, text=True, check=True)
+        subprocess.run(['lua', '-', str(ROOT / 'dotfiles/hypr/.config/hypr/hyprland-overview.lua')], input=script, text=True, check=True)

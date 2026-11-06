@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""Opt-in desktop integration check. Moves only a temporary test window."""
+import argparse
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live', action='store_true')
+args = parser.parse_args()
+if not args.live:
+    parser.error('This exercises the running desktop; opt in with --live')
+
+root = Path(__file__).resolve().parents[2]
+base = ['quickshell', 'ipc', '--path', str(root / 'shell'), 'call']
+environment = dict(os.environ, YDOTOOL_SOCKET=os.environ.get('YDOTOOL_SOCKET', f'/run/user/{os.getuid()}/.ydotool_socket'))
+
+def command(argv):
+    return subprocess.check_output(argv, text=True, timeout=6, env=environment)
+
+def ipc(target, method):
+    for _ in range(30):
+        result = command(base + [target, method])
+        if 'Not ready to accept queries' not in result and (method != 'status' or result.lstrip().startswith('{')):
+            return result
+        time.sleep(.1)
+    raise RuntimeError(f'{target}.{method} unavailable after reload: {result}')
+
+def status():
+    return json.loads(ipc('overview', 'status'))
+
+def hypr(name):
+    return json.loads(command(['hyprctl', '-j', name]))
+
+def wait_for(predicate, message):
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        if predicate():
+            return
+        time.sleep(.08)
+    raise AssertionError(message)
+
+def keys(*codes):
+    command(['ydotool', 'key', *codes])
+
+def pointer(x, y):
+    # This virtual device reports absolute coordinates at twice input units.
+    command(['ydotool', 'mousemove', '--absolute', str(round(x / 2)), str(round(y / 2))])
+    time.sleep(.025)
+    for _ in range(3):
+        current = hypr('cursorpos')
+        dx, dy = round(x - current['x']), round(y - current['y'])
+        if abs(dx) <= 1 and abs(dy) <= 1:
+            return
+        command(['ydotool', 'mousemove', '--', str(dx), str(dy)])
+        time.sleep(.025)
+
+original_workspace = hypr('activeworkspace')['id']
+original_cursor = hypr('cursorpos')
+original_window = hypr('activewindow').get('address')
+screen = next(m['name'] for m in hypr('monitors') if m['focused'])
+test_process = None
+test_address = None
+try:
+    ipc('overview', 'close')
+    test_process = subprocess.Popen(['kitty', '--class', 'poly-overview-test', '--title', 'Overview drag test', 'cat'],
+                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    wait_for(lambda: any(c['class'] == 'poly-overview-test' for c in hypr('clients')), 'Test terminal did not map')
+    test_address = next(c['address'] for c in hypr('clients') if c['class'] == 'poly-overview-test')
+    command(['hyprctl', 'dispatch', f'hl.dsp.window.move({{ workspace = 6, window = "address:{test_address}", follow = false }})'])
+    command(['hyprctl', 'dispatch', f'hl.dsp.focus({{ workspace = {original_workspace} }})'])
+    keys('125:1', '15:1', '15:0', '125:0')
+    wait_for(lambda: status()['opened'], 'Super+Tab did not open the overview')
+    time.sleep(.7)
+    layout = json.loads(ipc('overview-layout-' + screen, 'status'))
+    initial_geometry = [(t['id'], t['x'], t['y'], t['width'], t['height']) for t in layout['tiles']]
+    keyboard_index = status()['selected']
+    for tile in layout['tiles']:
+        # Cross hover boundaries and nested thumbnail surfaces without clicking.
+        for offset in [1, 4, 28, tile['height'] / 2, tile['height'] - 2]:
+            pointer(tile['x'] + tile['width'] / 2, tile['y'] + offset)
+        measured = json.loads(ipc('overview-layout-' + screen, 'status'))
+        assert measured['scrollY'] == layout['scrollY'], 'Hover scrolled the grid'
+        assert measured['keyboardIndex'] == keyboard_index, 'Hover changed keyboard navigation'
+        assert [(t['id'], t['x'], t['y'], t['width'], t['height']) for t in measured['tiles']] == initial_geometry, 'Hover moved card hit areas'
+        assert measured['hovered'] == tile['id'] - 1, 'Card hover was lost over child content'
+    print('PASS: 50 edge/child hover positions keep geometry, scroll and keyboard selection stable')
+    source = next(w for t in layout['tiles'] for w in t['windows'] if w['address'] == test_address)
+    assert source['captured'], 'Test window has no captured frame'
+    target = next(t for t in layout['tiles'] if t['id'] == 7)
+    start = (source['x'] + source['width'] / 2, source['y'] + source['height'] / 2)
+    end = (target['x'] + target['width'] / 2, target['y'] + target['height'] / 2)
+    pointer(*start)
+    command(['ydotool', 'click', '0x40'])
+    for step in range(1, 13):
+        pointer(start[0] + (end[0] - start[0]) * step / 12, start[1] + (end[1] - start[1]) * step / 12)
+        time.sleep(.025)
+    assert status()['dragging'], 'Mouse drag did not begin'
+    command(['ydotool', 'click', '0x80'])
+    wait_for(lambda: next(c['workspace']['id'] for c in hypr('clients') if c['address'] == test_address) == 7, 'Drop did not move test window to workspace 7')
+    assert hypr('activeworkspace')['id'] == original_workspace, 'Drop unexpectedly switched the active workspace'
+    assert status()['opened'] and not status()['error'], status()
+    print('PASS: physical Super+Tab, captured preview, drag 6 → 7 without switching workspace')
+    # A cancelled second drag must leave the window on workspace 7.
+    time.sleep(.4)
+    layout = json.loads(ipc('overview-layout-' + screen, 'status'))
+    source = next(w for t in layout['tiles'] for w in t['windows'] if w['address'] == test_address)
+    pointer(source['x'] + source['width'] / 2, source['y'] + source['height'] / 2)
+    command(['ydotool', 'click', '0x40'])
+    pointer(source['x'] + source['width'] / 2 + 35, source['y'] + source['height'] / 2)
+    time.sleep(.1)
+    keys('1:1', '1:0')
+    command(['ydotool', 'click', '0x80'])
+    assert status()['opened'] and not status()['dragging'], 'Escape did not cancel only the drag'
+    assert next(c['workspace']['id'] for c in hypr('clients') if c['address'] == test_address) == 7
+    keys('1:1', '1:0')
+    wait_for(lambda: not status()['opened'], 'Escape did not close overview')
+    time.sleep(.5)
+    assert not json.loads(ipc('overview-' + screen, 'status'))['loaded'], 'Closed overview retained preview loader'
+    print('PASS: Escape cancels drag; second Escape closes and unloads captures')
+    keys('125:1', '15:1', '15:0', '125:0')
+    wait_for(lambda: status()['opened'], 'Could not reopen')
+    keys('7:1', '7:0')  # Digit 6
+    wait_for(lambda: hypr('activeworkspace')['id'] == 6 and not status()['opened'], 'Digit navigation failed')
+    print('PASS: digit navigation to an empty workspace')
+    pointer(50, 50)
+    keys('125:1', '15:1', '15:0', '125:0')
+    wait_for(lambda: status()['opened'], 'Could not reopen for keyboard navigation')
+    keys('102:1', '102:0')  # Home
+    for _ in range(6):
+        keys('106:1', '106:0')  # Right
+    keys('28:1', '28:0')  # Enter
+    wait_for(lambda: hypr('activeworkspace')['id'] == 7 and not status()['opened'], 'Arrow/Enter navigation failed')
+    print('PASS: Home, arrows and Enter select workspace 7')
+    command(['hyprctl', 'dispatch', 'hl.dsp.focus({ workspace = 6 })'])
+    keys('125:1', '15:1', '15:0', '125:0')
+    wait_for(lambda: status()['opened'], 'Could not reopen on workspace 6')
+    time.sleep(.5)
+    layout = json.loads(ipc('overview-layout-' + screen, 'status'))
+    source = next(w for t in layout['tiles'] for w in t['windows'] if w['address'] == test_address)
+    pointer(source['x'] + source['width'] / 2, source['y'] + source['height'] / 2)
+    command(['ydotool', 'click', '0xc0'])
+    wait_for(lambda: not status()['opened'] and hypr('activewindow').get('address') == test_address, 'Click did not focus test window')
+    print('PASS: clicking a preview focuses its window on another workspace')
+    # Exercise exactly the native dispatches registered by the swipe callbacks.
+    for _ in range(2):
+        command(['hyprctl', 'dispatch', 'hl.dsp.global("poly-shell:overview-open")'])
+        wait_for(lambda: status()['opened'], 'Swipe-up native callback did not open')
+        time.sleep(.15)
+    for _ in range(2):
+        command(['hyprctl', 'dispatch', 'hl.dsp.global("poly-shell:overview-close")'])
+        wait_for(lambda: not status()['opened'], 'Swipe-down native callback did not close')
+        time.sleep(.15)
+    print('PASS: native swipe handlers open/close idempotently')
+finally:
+    command(['ydotool', 'click', '0x80'])
+    keys('125:0', '15:0', '1:0')
+    ipc('overview', 'close')
+    if test_process:
+        test_process.terminate()
+        try:
+            test_process.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            test_process.kill()
+            test_process.wait()
+    command(['hyprctl', 'dispatch', f'hl.dsp.focus({{ workspace = {original_workspace} }})'])
+    if original_window and any(c['address'] == original_window for c in hypr('clients')):
+        command(['hyprctl', 'dispatch', f'hl.dsp.focus({{ window = "address:{original_window}" }})'])
+    pointer(original_cursor['x'], original_cursor['y'])
+print('Temporary window removed; original workspace, window and pointer restored.')

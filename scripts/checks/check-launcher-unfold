@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Opt-in live regression for the launcher Wings geometry."""
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live', action='store_true')
+args = parser.parse_args()
+if not args.live:
+    parser.error('This opens the desktop launcher; opt in with --live')
+root = Path(__file__).resolve().parents[2]
+base = ['quickshell', 'ipc', '--path', str(root / 'shell'), 'call']
+
+
+def call(target, method):
+    return subprocess.check_output(base + [target, method], text=True, timeout=4)
+
+
+monitors = json.loads(subprocess.check_output(['hyprctl', 'monitors', '-j'], text=True))
+target = 'launcher-' + next(m['name'] for m in monitors if m['focused'])
+
+
+def status():
+    return json.loads(call(target, 'motionStatus'))
+
+
+try:
+    call('shell', 'closeBarPanel')
+    time.sleep(.35)
+    call(target, 'startMotionTrace')
+    call('shell', 'toggleLauncher')
+    samples = []
+    deadline = time.monotonic() + .75
+    while time.monotonic() < deadline:
+        samples.append(status())
+        time.sleep(.008)
+    assert len(samples) >= 5, 'Too few geometry samples'
+    assert any(0 < s['progress'] < 1 for s in samples), 'Opening was not sampled'
+    origin = (samples[0]['x'], samples[0]['y'])
+    for before, after in zip(samples, samples[1:]):
+        assert (after['x'], after['y']) == origin, 'The surface slid away from its anchor'
+        assert after['width'] + .01 >= before['width'], 'Width jumped backwards'
+        assert after['height'] + .01 >= before['height'], 'Height jumped backwards'
+        assert after['fontSize'] == before['fontSize'], 'Search text changed size'
+    assert any(s['width'] < s['fullWidth'] * .25 and
+               s['height'] >= s['fullHeight'] * .85 for s in samples), 'No tall central stem before the wings'
+    final = samples[-1]
+    assert final['progress'] == 1 and abs(final['width'] - final['fullWidth']) < .01
+    assert abs(final['height'] - final['fullHeight']) < .01
+    print(f"PASS {len(samples)} samples: fixed anchor, central stem before wings, full final surface")
+    frames = json.loads(call(target, 'stopMotionTrace'))
+    moving = [f for f in frames if 0 < f['progress'] < 1]
+    assert len(moving) >= 14, f'Only {len(moving)} actual window frames during opening'
+    largest_step = max(abs(b['height'] - a['height']) for a, b in zip(moving, moving[1:]))
+    assert largest_step < final['fullHeight'] * .20, f'Surface jumped {largest_step:.1f}px in one frame'
+    intervals = sorted(b['ms'] - a['ms'] for a, b in zip(moving, moving[1:]))
+    print(f"PASS passive window trace: {len(moving)} moving frames, "
+          f"max height step {largest_step:.1f}px, "
+          f"p95/max interval {intervals[int((len(intervals) - 1) * .95)]}/{max(intervals)}ms")
+    for _ in range(3):
+        call('shell', 'closeBarPanel')
+        time.sleep(.045)
+        call('shell', 'toggleLauncher')
+        time.sleep(.065)
+    time.sleep(.65)
+    assert status()['progress'] == 1, 'Rapid reversals did not settle open'
+    print('PASS rapid reversals settle without changing the input target')
+finally:
+    call(target, 'stopMotionTrace')
+    call('shell', 'closeBarPanel')
+    time.sleep(.3)
+assert status()['progress'] == 0, 'Closed animation did not settle'
+assert json.loads(call(target, 'inputStatus'))['text'] == '', 'Search was not reset'
+print('PASS close/reset')

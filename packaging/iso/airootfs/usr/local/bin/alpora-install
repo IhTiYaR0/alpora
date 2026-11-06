@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# ALPORA OS Interactive System Installer
+# ==============================================================================
+set -euo pipefail
+
+clear
+cat <<'BANNER'
+======================================================================
+                  ALPORA OS SYSTEM INSTALLATION                      
+======================================================================
+BANNER
+
+echo "Select an installation method:"
+echo "  1) Install ALPORA OS onto Disk / SSD (Guided via archinstall)"
+echo "  2) Deploy ALPORA Desktop onto an existing Arch Linux system"
+echo "  3) Return to Live Desktop"
+echo ""
+read -r -p "Enter choice [1-3, default=1]: " choice
+choice="${choice:-1}"
+
+case "$choice" in
+    1)
+        echo ""
+        echo "Launching official Arch Linux guided disk installer..."
+        if command -v archinstall >/dev/null 2>&1; then
+            archinstall
+            echo ""
+            echo "Installation completed. If you wish to enable ALPORA desktop,"
+            echo "ensure you deploy ALPORA in your installed system."
+        else
+            echo "archinstall is not found. Attempting to install archinstall..."
+            pacman -Sy --needed --noconfirm archinstall && archinstall || {
+                echo "Could not launch archinstall. Please partition and mount disks manually,"
+                echo "then use pacstrap or option 2."
+            }
+        fi
+        ;;
+    2)
+        echo ""
+        echo "Deploying ALPORA desktop environment..."
+        if [[ -d /opt/alpora ]]; then
+            cd /opt/alpora
+            ./install/install.sh --harden "$@"
+        else
+            echo "Fetching latest ALPORA installer from online repository..."
+            curl -fsSL https://raw.githubusercontent.com/pnam-it309/alpora/main/install/get.sh | bash -s -- --harden "$@"
+        fi
+        ;;
+    3)
+        echo "Returning to Live Environment..."
+        exit 0
+        ;;
+    *)
+        echo "Invalid selection. Exiting."
+        exit 1
+        ;;
+esac

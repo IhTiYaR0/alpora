@@ -1,0 +1,34 @@
+[Hotkey]
+# Enumerate when press trigger key repeatedly
+EnumerateWithTriggerKeys=True
+# Enumerate Input Method Forward
+EnumerateForwardKeys=
+# Enumerate Input Method Backward
+EnumerateBackwardKeys=
+# Skip first input method while enumerating
+EnumerateSkipFirst=False
+
+[Hotkey/TriggerKeys]
+0=Control+Shift_L
+1=Control+Shift_R
+2=Super+space
+
+[Hotkey/EnumerateForwardKeys]
+0=Control+Shift_L
+1=Control+Shift_R
+
+[Hotkey/AltTriggerKeys]
+
+[Behavior]
+# Active By Default
+ActiveByDefault=False
+# Share Input State
+ShareInputState=All
+# Show preedit in application
+PreeditEnabledByDefault=True
+# Show Input Method Information when switch input method
+ShowInputMethodInformation=True
+# Show Input Method Information when first used
+showInputMethodInformationWhenFirstUsed=True
+# Compact profile list
+CompactProfileList=True

@@ -1,0 +1,20 @@
+[Unit]
+Description=ALPORA desktop panel & shell
+PartOf=graphical-session.target
+After=graphical-session.target
+StartLimitIntervalSec=30
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/poly-shell run
+Restart=always
+RestartSec=1
+TimeoutStopSec=5
+KillMode=control-group
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=poly-shell
+
+[Install]
+WantedBy=graphical-session.target

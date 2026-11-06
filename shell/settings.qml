@@ -22,25 +22,31 @@ ShellRoot {
     property string wallpaperPath: Quickshell.env("POLY_SHELL_ASSETS") + "/wallpapers/alpine-dawn.png"
     readonly property url wallpaperUrl: "file://" + encodeURI(wallpaperPath).replace(/#/g, "%23").replace(/\?/g, "%3F")
     readonly property var navigation: [
-        {group: "ОСНОВНОЕ", key: "overview", title: "Обзор", icon: "home", words: "главная режим тема"},
-        {group: "", key: "wifi", title: "Wi-Fi", icon: "wifi", words: "интернет сеть вайфай"},
-        {group: "", key: "bluetooth", title: "Bluetooth", icon: "bluetooth", words: "блютуз наушники"},
-        {group: "РАБОЧИЙ СТОЛ", key: "monitors", title: "Мониторы", icon: "monitor", words: "экран разрешение масштаб яркость"},
-        {group: "", key: "wallpaper", title: "Темы и обои", icon: "wallpaper", words: "фон картинка палитра тема цвета"},
-        {group: "", key: "appearance", title: "Внешний вид", icon: "palette", words: "тема скругления прозрачность размытие"},
-        {group: "", key: "widgets", title: "Виджеты", icon: "devices", words: "часы погода музыка положение рабочий стол робот грань персонаж компаньон"},
-        {group: "", key: "panel", title: "Панель и меню", icon: "panel", words: "бар"},
-        {group: "СИСТЕМА", key: "sound", title: "Звук", icon: "volume", words: "микрофон громкость динамики"},
-        {group: "", key: "power", title: "Питание", icon: "battery", words: "батарея энергия"},
-        {group: "", key: "notifications", title: "Уведомления", icon: "bell", words: "не беспокоить"},
-        {group: "", key: "input", title: "Горячие клавиши", icon: "mouse", words: "клавиатура сочетания бинды shortcuts hotkeys ввод"}
+        {group: I18n.tr("settings.group_main"), key: "overview", title: I18n.tr("settings.overview"), icon: "home", words: "general mode theme"},
+        {group: "", key: "wifi", title: "Wi-Fi", icon: "wifi", words: "wifi internet network"},
+        {group: "", key: "bluetooth", title: "Bluetooth", icon: "bluetooth", words: "bluetooth headphones"},
+        {group: I18n.tr("settings.group_desktop"), key: "monitors", title: I18n.tr("settings.monitors"), icon: "monitor", words: "monitors screen resolution scale brightness"},
+        {group: "", key: "wallpaper", title: I18n.tr("settings.themes_wallpaper"), icon: "wallpaper", words: "wallpaper background palette theme colors"},
+        {group: "", key: "appearance", title: I18n.tr("settings.appearance"), icon: "palette", words: "appearance theme radius transparency blur"},
+        {group: "", key: "widgets", title: I18n.tr("settings.widgets"), icon: "devices", words: "widgets clock weather music desktop companion gran"},
+        {group: "", key: "panel", title: I18n.tr("settings.panel_menus"), icon: "panel", words: "panel bar menu"},
+        {group: I18n.tr("settings.group_system"), key: "sound", title: I18n.tr("settings.sound"), icon: "volume", words: "sound volume microphone speakers audio"},
+        {group: "", key: "power", title: I18n.tr("settings.power"), icon: "battery", words: "power battery energy profiles"},
+        {group: "", key: "notifications", title: I18n.tr("settings.notifications"), icon: "bell", words: "notifications dnd alerts"},
+        {group: "", key: "input", title: I18n.tr("shortcuts.title"), icon: "terminal", words: "keyboard shortcuts hotkeys bindings input"},
+        {group: "", key: "touchpad", title: I18n.tr("settings.touchpad"), icon: "mouse", words: "touchpad pointer gestures tap speed sensitivity"},
+        {group: "", key: "language", title: I18n.tr("settings.language"), icon: "globe", words: "language locale vietnamese english tieng viet ngon ngu"}
     ]
-    readonly property string pageTitle: page === "modes" ? "Режим работы" : page === "devices" ? "Устройства" : (navigation.find(n => n.key === page) || {}).title || "Настройки"
-    function navigate(next: string): void { if (root.page === "input" && next !== "input" && ShortcutsState.editingForm) {root.statusMessage="Заверши редактирование горячей клавиши кнопкой «Готово» или «Отменить редактирование»";return;} root.statusMessage=""; root.page = next; search.text = ""; root.statusMessage = ""; }
+    readonly property string pageTitle: page === "modes" ? I18n.tr("settings.operating_mode") : page === "devices" ? I18n.tr("settings.devices") : (navigation.find(n => n.key === page) || {}).title || I18n.tr("settings.title")
+    function navigate(next: string): void { if (root.page === "input" && next !== "input" && ShortcutsState.editingForm) {root.statusMessage=I18n.tr("settings.finish_editing_hint");return;} root.statusMessage=""; root.page = next; search.text = ""; root.statusMessage = ""; }
     function close(): void {
-        if (AppearanceState.busy || ThemeState.busy || WidgetState.busy || ShortcutsState.busy || wallpaperWriter.running) return;
-        if (AppearanceState.dirty || ThemeState.dirty || WidgetState.dirty || ShortcutsState.dirty || ShortcutsState.editingForm) root.confirmClose = true;
-        else Qt.quit();
+        if (AppearanceState.dirty || ThemeState.dirty || WidgetState.dirty || ShortcutsState.dirty || ShortcutsState.editingForm) {
+            root.confirmClose = true;
+        } else {
+            settingsWindow.visible = false;
+            settingsWindow.close();
+            Qt.quit();
+        }
     }
     function restoreWindow(): void {
         if (!Hyprland.usingLua || root.restoringWindow) return;
@@ -74,7 +80,7 @@ ShellRoot {
     }
     function setWallpaper(path: string): void {
         if (wallpaperWriter.running) return;
-        root.statusMessage = "Применяю обои…";
+        root.statusMessage = I18n.tr("theme.applying");
         wallpaperWriter.command = [Session.controller, "wallpaper", path];
         wallpaperWriter.running = true;
     }
@@ -94,7 +100,7 @@ ShellRoot {
     Process {
         id: monitorReader
         command: ["hyprctl", "-j", "monitors"]
-        stdout: StdioCollector { onStreamFinished: { try { root.monitors = JSON.parse(text); } catch (_) { root.statusMessage = "Не удалось прочитать список мониторов"; } } }
+        stdout: StdioCollector { onStreamFinished: { try { root.monitors = JSON.parse(text); } catch (_) { root.statusMessage = I18n.tr("settings.error_read_monitors"); } } }
     }
     Connections {
         target: Hyprland
@@ -105,13 +111,13 @@ ShellRoot {
     Process {
         id: wallpaperWriter
         stderr: StdioCollector { onStreamFinished: if (text.trim()) root.statusMessage = text.trim().replace(/^poly-shell: /, "") }
-        onExited: exitCode => { if (exitCode === 0) root.statusMessage = "Обои сохранены"; else if (root.statusMessage === "Применяю обои…") root.statusMessage = "Не удалось применить обои"; }
+        onExited: exitCode => { if (exitCode === 0) root.statusMessage = I18n.tr("theme.wallpaper_saved"); else if (root.statusMessage === I18n.tr("theme.applying")) root.statusMessage = I18n.tr("theme.error_apply_wallpaper"); }
     }
     FileDialog {
         id: wallpaperDialog
         parentWindow: settingsWindow.contentItem.Window.window
-        title: "Выбрать обои"
-        nameFilters: ["Изображения (*.png *.jpg *.jpeg *.webp)"]
+        title: I18n.tr("theme.choose_wallpaper")
+        nameFilters: [I18n.tr("theme.image_filter")]
         onAccepted: ThemeState.importImage(decodeURIComponent(String(selectedFile).replace(/^file:\/\//, "")))
     }
     Component.onCompleted: { monitorReader.running = true; Desktop.request("status", ""); }
@@ -119,7 +125,7 @@ ShellRoot {
     FloatingWindow {
         // qmllint enable uncreatable-type
         id: settingsWindow
-        title: "Настройки · ALPORA"
+        title: I18n.tr("settings.window_title")
         implicitWidth: 1100; implicitHeight: 800
         minimumSize: Qt.size(1100, 800); maximumSize: Qt.size(1100, 800)
         color: "transparent"; visible: true
@@ -153,7 +159,7 @@ ShellRoot {
                             Column {
                                 spacing: 5
                                 Text { text: "ALPORA"; color: PolyTheme.Theme.color("#edf1f5"); font.family: Session.fontFamily; font.pixelSize: 22; font.letterSpacing: 2 }
-                                Text { text: "Настройки"; color: PolyTheme.Theme.color("#c2c8d1"); font.family: Session.fontFamily; font.pixelSize: 12 }
+                                Text { text: I18n.tr("settings.title"); color: PolyTheme.Theme.color("#c2c8d1"); font.family: Session.fontFamily; font.pixelSize: 12 }
                             }
                         }
                     }
@@ -161,7 +167,7 @@ ShellRoot {
                         id: search
                         Layout.fillWidth: true; implicitHeight: 36
                         leftPadding: 37; rightPadding: 10
-                        placeholderText: "Поиск настроек"; color: PolyTheme.Theme.color("#eef1f5"); placeholderTextColor: PolyTheme.Theme.color("#aeb7c1")
+                        placeholderText: I18n.tr("settings.search_placeholder"); color: PolyTheme.Theme.color("#eef1f5"); placeholderTextColor: PolyTheme.Theme.color("#aeb7c1")
                         font.family: Session.fontFamily; font.pixelSize: 11; selectByMouse: true
                         background: Rectangle { radius: 11; color: PolyTheme.Theme.color("#503d4349"); border.width: 1; border.color: search.activeFocus ? PolyTheme.Theme.color("#a7be92") : PolyTheme.Theme.color("#50575b") }
                         Icon { x: 11; anchors.verticalCenter: parent.verticalCenter; name: "search"; width: 18; height: 18 }
@@ -189,7 +195,7 @@ ShellRoot {
                                     SettingsNav { width: parent.width; text: navEntry.modelData.title; symbol: navEntry.modelData.icon; selected: root.page === navEntry.modelData.key; onClicked: root.navigate(navEntry.modelData.key) }
                                 }
                             }
-                            Text { width: parent.width; topPadding: 14; text: "Ничего не найдено"; color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; visible: !!search.text && !root.navigation.some(n => (n.title + " " + n.words).toLowerCase().includes(search.text.trim().toLowerCase())) }
+                            Text { width: parent.width; topPadding: 14; text: I18n.tr("launcher.not_found"); color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 12; visible: !!search.text && !root.navigation.some(n => (n.title + " " + n.words).toLowerCase().includes(search.text.trim().toLowerCase())) }
                         }
                     }
                     SettingsCard {
@@ -201,7 +207,7 @@ ShellRoot {
                             ColumnLayout {
                                 Layout.fillWidth: true; spacing: 5
                                 Text { text: PolyTheme.Theme.label; color: PolyTheme.Theme.color("#bbceaa"); font.family: Session.fontFamily; font.pixelSize: 12; font.letterSpacing: 1 }
-                                Text { text: "Текущая тема"; color: PolyTheme.Theme.color("#b4bec6"); font.family: Session.fontFamily; font.pixelSize: 10 }
+                                Text { text: I18n.tr("settings.current_theme"); color: PolyTheme.Theme.color("#b4bec6"); font.family: Session.fontFamily; font.pixelSize: 10 }
                             }
                             Icon { name: "chevron-right"; Layout.preferredWidth: 14; Layout.preferredHeight: 14 }
                         }
@@ -214,13 +220,13 @@ ShellRoot {
                 Item {
                     Layout.fillWidth: true; Layout.preferredHeight: 90
                     Image { anchors.right: parent.right; anchors.bottom: parent.bottom; width: 460; height: 90; source: Session.appearance.ridge ? "file://" + Session.appearance.ridge : "file://" + Quickshell.env("POLY_SHELL_ASSETS") + "/settings-ridge.svg"; fillMode: Image.PreserveAspectFit; verticalAlignment: Image.AlignBottom; opacity: 0.85 }
-                    MouseArea { anchors.fill: parent; onPressed: settingsWindow.startSystemMove() }
+                    MouseArea { anchors.fill: parent; anchors.rightMargin: 52; onPressed: settingsWindow.startSystemMove() }
                     Column {
                         y: 8; spacing: 8
                         Text { text: root.pageTitle; color: PolyTheme.Theme.color("#f2f3f6"); font.family: Session.fontFamily; font.pixelSize: 28; font.weight: Font.Medium }
-                        Text { text: root.page === "overview" ? "Твой рабочий стол — под тебя" : root.page === "wallpaper" ? "Выбери пейзаж — получи свою палитру" : root.page === "appearance" ? "Настрой каждый элемент под себя" : "Настрой всё так, как удобно тебе"; color: PolyTheme.Theme.color("#bdc6d2"); font.family: Session.fontFamily; font.pixelSize: 13 }
+                        Text { text: root.page === "overview" ? I18n.tr("settings.subtitle_overview") : root.page === "wallpaper" ? I18n.tr("settings.subtitle_wallpaper") : root.page === "appearance" ? I18n.tr("settings.subtitle_appearance") : I18n.tr("settings.subtitle_generic"); color: PolyTheme.Theme.color("#bdc6d2"); font.family: Session.fontFamily; font.pixelSize: 13 }
                     }
-                    IconButton { anchors.right: parent.right; anchors.top: parent.top; symbol: "close"; hint: "Закрыть настройки"; onClicked: root.close() }
+                    IconButton { z: 10; anchors.right: parent.right; anchors.top: parent.top; symbol: "close"; hint: I18n.tr("settings.close_settings"); onClicked: root.close() }
                     Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: PolyTheme.Theme.color("#34545e62") }
                 }
                 SettingsOverview { Layout.fillWidth: true; Layout.fillHeight: true; visible: root.page === "overview"; monitors: root.monitors; wallpaper: root.wallpaperUrl; onNavigate: page => root.navigate(page) }
@@ -244,12 +250,12 @@ ShellRoot {
             MouseArea { anchors.fill: parent }
             SettingsCard {
                 anchors.centerIn: parent; width: 430; height: 190
-                Text { text: "Закрыть без сохранения?"; color: PolyTheme.Theme.color("#f0f2f5"); font.family: Session.fontFamily; font.pixelSize: 19 }
-                Text { Layout.fillWidth: true; text: "Изменения настроек ещё не применены."; color: PolyTheme.Theme.color("#c2c9d1"); font.family: Session.fontFamily; font.pixelSize: 13; wrapMode: Text.Wrap }
+                Text { text: I18n.tr("settings.close_without_saving"); color: PolyTheme.Theme.color("#f0f2f5"); font.family: Session.fontFamily; font.pixelSize: 19 }
+                Text { Layout.fillWidth: true; text: I18n.tr("settings.unsaved_warning"); color: PolyTheme.Theme.color("#c2c9d1"); font.family: Session.fontFamily; font.pixelSize: 13; wrapMode: Text.Wrap }
                 RowLayout {
                     Layout.fillWidth: true
-                    AppearanceButton { Layout.fillWidth: true; text: "Остаться"; symbol: "chevron-left"; primary: true; onClicked: root.confirmClose = false }
-                    AppearanceButton { Layout.fillWidth: true; text: "Закрыть"; symbol: "close"; onClicked: Qt.quit() }
+                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("settings.stay"); symbol: "chevron-left"; primary: true; onClicked: root.confirmClose = false }
+                    AppearanceButton { Layout.fillWidth: true; text: I18n.tr("common.close"); symbol: "close"; onClicked: { settingsWindow.visible = false; settingsWindow.close(); Qt.quit(); } }
                 }
             }
         }

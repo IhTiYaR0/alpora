@@ -4,7 +4,7 @@ import runpy
 import tempfile
 import unittest
 
-KEY = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'scripts/build-app-icon-cache'))['cache_key']
+KEY = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'scripts/build/build-app-icon-cache'))['cache_key']
 
 
 class IconCacheTests(unittest.TestCase):

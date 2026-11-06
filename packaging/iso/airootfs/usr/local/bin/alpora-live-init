@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# ALPORA Live System First-Boot Initialization
+# ==============================================================================
+set -euo pipefail
+
+# Ensure home directory ownership
+if id -u alpora >/dev/null 2>&1; then
+    chown -R alpora:alpora /home/alpora || true
+fi
+
+# Configure UFW firewall rules for live session
+if command -v ufw >/dev/null 2>&1; then
+    ufw default deny incoming || true
+    ufw default allow outgoing || true
+    ufw allow 1714:1764/udp comment 'ALPORA Phone / KDE Connect' || true
+    ufw allow 1714:1764/tcp comment 'ALPORA Phone / KDE Connect' || true
+fi
+

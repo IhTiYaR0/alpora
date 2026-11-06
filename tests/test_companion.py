@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 @unittest.skipUnless(shutil.which('node'), 'Companion simulation requires Node')
 class CompanionBehaviorTests(unittest.TestCase):
     def evaluate(self, code):
-        source = (ROOT / 'shell/CompanionLogic.js').read_text().replace('.pragma library', '')
-        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True))
+        source = (ROOT / 'shell/logic/CompanionLogic.js').read_text(encoding='utf-8').replace('.pragma library', '')
+        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True, encoding='utf-8'))
 
     def test_long_sessions_remain_inside_rail_and_do_not_repeat_actions(self):
         result = self.evaluate('''
@@ -60,8 +60,8 @@ class CompanionBehaviorTests(unittest.TestCase):
 @unittest.skipUnless(shutil.which('node'), 'Flight simulation requires Node')
 class CompanionTravelTests(unittest.TestCase):
     def evaluate(self, code):
-        source = (ROOT / 'shell/CompanionTravel.js').read_text().replace('.pragma library', '')
-        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True))
+        source = (ROOT / 'shell/logic/CompanionTravel.js').read_text(encoding='utf-8').replace('.pragma library', '')
+        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True, encoding='utf-8'))
 
     def test_routes_complete_repeatedly_without_escaping_screen_or_teleporting(self):
         result = self.evaluate(''' 
@@ -174,10 +174,10 @@ class CompanionTravelTests(unittest.TestCase):
 @unittest.skipUnless(shutil.which('node'), 'Throw simulation requires Node')
 class CompanionThrowTests(unittest.TestCase):
     def evaluate(self, code):
-        source = (ROOT / 'shell/CompanionThrow.js').read_text().replace('.pragma library', '').replace('.import \"CompanionSurfaces.js\" as Surfaces', '')
-        support = (ROOT / 'shell/CompanionSurfaces.js').read_text().replace('.pragma library', '')
+        source = (ROOT / 'shell/logic/CompanionThrow.js').read_text(encoding='utf-8').replace('.pragma library', '').replace('.import \"CompanionSurfaces.js\" as Surfaces', '')
+        support = (ROOT / 'shell/logic/CompanionSurfaces.js').read_text(encoding='utf-8').replace('.pragma library', '')
         source = 'const Surfaces=(()=>{' + support + ';return {crossing};})();\n' + source
-        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True))
+        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True, encoding='utf-8'))
 
     def test_fast_release_keeps_momentum_then_brakes_recovers_and_folds_arms(self):
         result = self.evaluate('''
@@ -230,8 +230,8 @@ class CompanionThrowTests(unittest.TestCase):
 @unittest.skipUnless(shutil.which('node'), 'Surface simulation requires Node')
 class CompanionSurfaceTests(unittest.TestCase):
     def evaluate(self, code):
-        source = (ROOT / 'shell/CompanionSurfaces.js').read_text().replace('.pragma library', '')
-        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True))
+        source = (ROOT / 'shell/logic/CompanionSurfaces.js').read_text(encoding='utf-8').replace('.pragma library', '')
+        return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True, encoding='utf-8'))
 
     def test_occlusion_workspace_monitor_and_bar_clearance(self):
         result = self.evaluate('''

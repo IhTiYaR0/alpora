@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Opt-in desktop interaction check. Opens a temporary Foot and restores layouts."""
+import argparse
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live',action='store_true')
+args=parser.parse_args()
+if not args.live: parser.error('Uses the running desktop; explicitly pass --live')
+import json,subprocess,time
+from pathlib import Path
+root = Path(__file__).resolve().parents[2]
+base=['quickshell','ipc','--path',str(root / 'shell'),'call']
+def ipc(target,method,*args):
+ for _ in range(50):
+  s=subprocess.check_output(base+[target,method,*map(str,args)],text=True)
+  if not s.startswith('Not ready'):return s
+  time.sleep(.1)
+ raise RuntimeError('IPC unavailable')
+def hypr(n):return json.loads(subprocess.check_output(['hyprctl','-j',n],text=True))
+def st():return json.loads(ipc('landscape-'+screen,'status'))
+def move(x,y):
+ subprocess.run(['ydotool','mousemove','--absolute',str(round(x/2)),str(round(y/2))],check=True)
+ time.sleep(.16)
+def click():subprocess.run(['ydotool','click','0xC0'],check=True)
+def wait(fn,msg):
+ for _ in range(60):
+  if fn():return
+  time.sleep(.05)
+ raise AssertionError(msg+' '+str(st()))
+
+screen=next(m['name'] for m in hypr('monitors') if m['focused'])
+enabled_before=json.loads(ipc('landscape','status'))['enabled']
+ipc('landscape','enable','true')
+old_ws=hypr('activeworkspace')['id'];old_cursor=hypr('cursorpos')
+layouts=[(k['name'],k['active_layout_index']) for k in hypr('devices')['keyboards']]
+playback_before=subprocess.check_output(['playerctl','status'],text=True).strip()
+test_address=None
+before={c['address'] for c in hypr('clients')}
+used={c['workspace']['id'] for c in hypr('clients')};target=next(i for i in range(1,11) if i not in used and i!=old_ws)
+try:
+ subprocess.run(['hyprctl','dispatch',f'hl.dsp.focus({{workspace={target}}})'],check=True);time.sleep(.4)
+ s=st();p=s['scene']['peak'];move(p['x'],p['y']);click();wait(lambda:st()['active']=='apps','No apps')
+ b=st()['controls']['search'];move(b['x']+b['width']/2,b['y']+b['height']/2);click();wait(lambda:st()['focused'],'Search not focused')
+ subprocess.run(['hyprctl','switchxkblayout','all','0'],check=True);time.sleep(.35)
+ subprocess.run(['ydotool','key','--key-delay','25']+[e for code in [33,24,24,20] for e in [str(code)+':1',str(code)+':0']],check=True);wait(lambda:st()['search']=='foot','Search typing lost')
+ assert all('foot' in e['name'].lower() for e in st()['apps'])
+ subprocess.run(['ydotool','key','28:1','28:0'],check=True)
+ wait(lambda:any(c['address'] not in before and c['class']=='foot' for c in hypr('clients')),'Enter launch failed')
+ print('PASS real keyboard focus, search filter and Enter launch',flush=True)
+ client=next(c for c in hypr('clients') if c['address'] not in before and c['class']=='foot');test_address=client['address']
+ # Hover must pass through the same coordinates into the real window.
+ p=s['scene']['light'];move(p['x'],p['y']);time.sleep(.3);assert st()['active']=='','Landscape captured app hover'
+ print('PASS application stays above landscape input',flush=True)
+ subprocess.run(['hyprctl','dispatch','hl.dsp.window.close({window="address:'+client['address']+'"})'],check=True)
+ wait(lambda:not any(c['address']==client['address'] for c in hypr('clients')),'Foot failed to close')
+ for x,y in [(900,3),(1800,1000)]:
+  move(x,y)
+  wait(lambda:(lambda b:b['visible'] and b['surfaceOpacity']==1)(json.loads(ipc('bar-'+screen,'controls'))),'Bar must remain visible')
+ print('PASS bar stays visible at the top edge and on the empty desktop',flush=True)
+ # Exercise the real MPRIS player without changing its final playback state.
+ p=s['scene']['music'];move(p['x'],p['y']);wait(lambda:st()['active']=='music','No music')
+ b=st()['controls']['play'];playing=subprocess.check_output(['playerctl','status'],text=True).strip()
+ move(b['x']+b['width']/2,b['y']+b['height']/2);click()
+ wait(lambda:subprocess.check_output(['playerctl','status'],text=True).strip()!=playing,'Playback button failed')
+ click();wait(lambda:subprocess.check_output(['playerctl','status'],text=True).strip()==playing,'Playback not restored')
+ print('PASS real playback toggle and restore',flush=True)
+finally:
+ if test_address and any(c['address']==test_address for c in hypr('clients')):
+  subprocess.run(['hyprctl','dispatch','hl.dsp.window.close({window="address:'+test_address+'"})'],check=True)
+ ipc('landscape-'+screen,'close')
+ ipc('landscape','enable',str(enabled_before).lower())
+ subprocess.run(['playerctl','pause' if playback_before=='Paused' else 'play'],check=True)
+ [subprocess.run(['hyprctl','switchxkblayout',n,str(v)],check=True) for n,v in layouts]
+ subprocess.run(['hyprctl','dispatch',f'hl.dsp.focus({{workspace={old_ws}}})'],check=True)
+ move(old_cursor['x'],old_cursor['y'])

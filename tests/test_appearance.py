@@ -52,7 +52,7 @@ class AppearanceTests(unittest.TestCase):
         original = style.read_bytes()
         self.assertIn(b"border-radius=9", original)
         self.assertIn(b"padding=22", original)
-        self.assertIn(b"cc\ntext-color=", original)
+        self.assertTrue(b"cc\ntext-color=" in original or b"cc\r\ntext-color=" in original)
         files = [style, self.paths.config / "visual.json", appearance.generated_path(self.paths), self.paths.session]
         before = {path: path.read_bytes() for path in files}
         original_write = appearance.atomic_json

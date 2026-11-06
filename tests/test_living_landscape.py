@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 @unittest.skipUnless(shutil.which('node'), 'Geometry checks require Node')
 class LivingLandscapeGeometryTests(unittest.TestCase):
     def evaluate(self, code):
-        source = (ROOT / 'shell/LandscapeGeometry.js').read_text().replace('.pragma library', '')
+        source = (ROOT / 'shell/logic/LandscapeGeometry.js').read_text().replace('.pragma library', '')
         return json.loads(subprocess.check_output(['node', '-e', source + '\n' + code], text=True))
 
     def test_cover_mapping_tracks_the_artwork_instead_of_stretching(self):

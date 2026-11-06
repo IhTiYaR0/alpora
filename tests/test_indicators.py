@@ -54,5 +54,17 @@ class IndicatorTests(unittest.TestCase):
             mako_style({'profile': {'palette': {}}, 'appearance': {'fonts': {'interface': 'Noto\ninclude=other'}}})
 
 
+    def test_osd_toggle_cli(self):
+        from poly_shell.cli import main
+        with patch('poly_shell.cli.SafeRunner.run', return_value=CompletedProcess([], 0, '')) as mock_run:
+            ret = main(['osd', 'capslock', '--state', 'on'])
+            self.assertEqual(ret, 0)
+            mock_run.assert_called_once()
+            call_cmd = mock_run.call_args[0][0]
+            self.assertIn('showToggleOsd', call_cmd)
+            self.assertIn('capslock', call_cmd)
+            self.assertIn('true', call_cmd)
+
+
 if __name__ == '__main__':
     unittest.main()

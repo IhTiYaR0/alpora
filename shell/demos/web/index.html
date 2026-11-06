@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a1b">
+  <title>ALPORA · Unified Interactive Shell & Motion Sandbox</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Global SVG Symbol Definitions -->
+<svg class="icons" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <defs>
+    <symbol id="mountain" viewBox="0 0 24 24"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></symbol>
+    <symbol id="settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M9 3v8M16 13v8"/></symbol>
+    <symbol id="wifi" viewBox="0 0 24 24"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></symbol>
+    <symbol id="volume" viewBox="0 0 24 24"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></symbol>
+    <symbol id="bluetooth" viewBox="0 0 24 24"><path d="M12 2v20l7-6L6 6m0 12L19 8 12 2"/></symbol>
+    <symbol id="bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4ZM10 21h4"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></symbol>
+    <symbol id="repeat" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5 7a8 8 0 0 1 13-2l2 3M4 16l2 3a8 8 0 0 0 13-2"/></symbol>
+    <symbol id="code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  </defs>
+</svg>
+
+<!-- Header Hub Navigation -->
+<header class="hub-header">
+  <div class="hub-brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 20 8-16 5 10 3-6 5 12Z" fill="currentColor"/><path d="m10 4 1 13 4-3Z" fill="#fff" opacity=".35"/></svg>
+    <span>ALPORA · INTERACTIVE LAB</span>
+    <span class="backend-badge" id="backend-badge">● STANDALONE</span>
+  </div>
+
+  <div class="hub-tabs">
+    <button class="tab-btn active" data-tab="shell" id="tab-nav-shell">Desktop Shell</button>
+    <button class="tab-btn" data-tab="motion" id="tab-nav-motion">Phòng thí nghiệm Motion (16 Studies)</button>
+    <button class="tab-btn" data-tab="typo" id="tab-nav-typo">Bộ Typography</button>
+  </div>
+
+  <div class="lang-switch" aria-label="Language selection">
+    <button data-lang="vi" aria-pressed="true">VI</button>
+    <button data-lang="en" aria-pressed="false">EN</button>
+    <button data-lang="ru" aria-pressed="false">RU</button>
+  </div>
+
+  <a href="https://github.com/pnam-it309/alpora/releases/latest" target="_blank" rel="noopener noreferrer" class="download-iso-link" title="Tải ALPORA OS v1.0.0 Live ISO">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Tải ISO v1.0.0</span>
+  </a>
+</header>
+
+<main class="main-container">
+
+  <!-- TAB 1: Desktop Shell Simulator -->
+  <section id="view-shell" class="tab-view active">
+    <div class="desktop-viewport" id="viewport">
+      <!-- TopBar -->
+      <div class="sim-topbar">
+        <div class="sim-workspaces">
+          <div class="sim-logo">ALPORA</div>
+          <div class="ws-pill active" data-ws="1">1</div>
+          <div class="ws-pill" data-ws="2">2</div>
+          <div class="ws-pill" data-ws="3">3</div>
+          <div class="ws-pill" data-ws="4">4</div>
+        </div>
+
+        <div class="sim-clock-bar" id="bar-clock">10:14 · Th 6, 30 Th10</div>
+
+        <div class="sim-tray">
+          <button class="tray-icon-btn" id="dnd-btn" title="Do Not Disturb">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4ZM10 21h4"/></svg>
+          </button>
+          <button class="tray-icon-btn" id="wifi-icon-btn" title="Wi-Fi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+          </button>
+          <button class="tray-icon-btn" id="audio-icon-btn" title="Volume">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8M19 4a11 11 0 0 1 0 16"/></svg>
+          </button>
+          <button class="qs-toggle-pill" id="qs-pill-btn">
+            <span>98%</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 17h16M9 3v8M16 13v8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Approved Hover-Faceted Quick Menu -->
+      <div class="hover-faceted-menu" id="hover-menu">
+        <div class="faceted-cards-grid">
+          <div class="faceted-card active" id="hover-card-wifi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a14 14 0 0 1 18 0M6 12a9 9 0 0 1 12 0M9 16a4 4 0 0 1 6 0M12 20h.01"/></svg>
+            <small>Wi-Fi</small>
+          </div>
+          <div class="faceted-card" id="hover-card-bt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20l7-6L6 6m0 12L19 8 12 2"/></svg>
+            <small>Bluetooth</small>
+          </div>
+          <div class="faceted-card" id="hover-card-power">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg>
+            <small id="txt-power-label">Hiệu năng</small>
+          </div>
+        </div>
+        <div class="faceted-slider-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 4-5 4H2v8h4l5 4ZM16 8a6 6 0 0 1 0 8"/></svg>
+          <input type="range" min="0" max="100" value="72" id="sim-vol-range" aria-label="Âm lượng (Volume)">
+          <span id="sim-vol-val">72%</span>
+        </div>
+        <div class="faceted-slider-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <input type="range" min="0" max="100" value="85" id="sim-bri-range" aria-label="Độ sáng (Brightness)">
+          <span id="sim-bri-val">85%</span>
+        </div>
+      </div>
+
+      <!-- Desktop Widgets -->
+      <div class="sim-widgets-layer">
+        <!-- Desktop Clock Widget (Outfit Display font) -->
+        <div class="desktop-hero-clock">
+          <div class="hero-digits">
+            <span id="hero-hour">10</span>
+            <span class="colon">:</span>
+            <span id="hero-min">14</span>
+          </div>
+          <div class="hero-date" id="hero-date-text">Thứ Sáu, 30 Tháng 10</div>
+          <div class="seconds-bar-track">
+            <div class="seconds-bar-fill" id="seconds-fill"></div>
+          </div>
+        </div>
+
+        <!-- Developer Metrics Widget (JetBrains Mono font) -->
+        <div class="desktop-metrics-card">
+          <div class="metrics-head">
+            <span class="dev-badge">DEV METRICS</span>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent);">● LIVE</span>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-tile">
+              <span>CPU</span>
+              <strong id="metric-cpu">32% · 48°C</strong>
+            </div>
+            <div class="metric-tile">
+              <span>RAM</span>
+              <strong id="metric-ram">4.8 / 16 GB</strong>
+            </div>
+            <div class="metric-tile">
+              <span>GPU</span>
+              <strong id="metric-gpu">24% · RTX</strong>
+            </div>
+            <div class="metric-tile">
+              <span>NET RATE</span>
+              <strong id="metric-net">↓ 2.4 MB/s</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Dock -->
+    <div class="control-dock">
+      <div class="dock-group">
+        <span class="dock-label" id="lbl-theme">Chủ đề:</span>
+        <button class="theme-pill-btn active" data-theme="alpine">Alpine</button>
+        <button class="theme-pill-btn" data-theme="moon-lake">Moon Lake</button>
+        <button class="theme-pill-btn" data-theme="forest-mist">Forest Mist</button>
+        <button class="theme-pill-btn" data-theme="northern-lights">Northern Lights</button>
+        <button class="theme-pill-btn" data-theme="warm-desert">Warm Desert</button>
+        <button class="theme-pill-btn" data-theme="rose-sunset">Rose Sunset</button>
+        <button class="theme-pill-btn" data-theme="timeline">Timeline</button>
+      </div>
+
+      <div class="dock-group">
+        <span class="dock-label" id="lbl-mode">Chế độ:</span>
+        <button class="mode-btn active" id="btn-work-mode">Work</button>
+        <button class="mode-btn" id="btn-vibe-mode">Vibe</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: Motion Studies Lab (16 Animation Studies) -->
+  <section id="view-motion" class="tab-view">
+    <div class="toolbar" aria-label="Controls">
+      <button class="primary" id="play-all">↻ Chạy tất cả</button>
+      <button id="close-all">Đóng tất cả</button>
+      <div class="divider"></div>
+      <span class="label-tag" id="speed-label">Tốc độ</span>
+      <div class="segmented" aria-label="Animation Speed">
+        <button data-speed="1" aria-pressed="true">1×</button>
+        <button data-speed="0.5" aria-pressed="false">½×</button>
+        <button data-speed="0.25" aria-pressed="false">¼×</button>
+        <button data-speed="0.1" aria-pressed="false">0.1×</button>
+      </div>
+    </div>
+
+    <div class="grid" id="studies-grid">
+    <!-- Reusable Template: Standard Study Desktop Canvas & Footer -->
+    <template id="study-desktop-template">
+      <div class="desktop">
+        <div class="mini-bar">
+          <div class="workspaces">
+            <span class="workspace active">1</span>
+            <span class="workspace">2</span>
+            <span class="workspace">3</span>
+            <span class="workspace">4</span>
+          </div>
+          <div class="mini-time">14:20</div>
+          <div class="bar-actions">
+            <button data-page="settings" aria-label="Open settings" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#settings"/></svg></button>
+          </div>
+        </div>
+        <div class="desktop-clock">
+          <strong>14:20</strong>
+          <span>ALPORA DESKTOP</span>
+        </div>
+        <span class="demo-label">ALPORA</span>
+        <div class="panel" role="region" aria-label="Motion Study Preview" aria-hidden="true" inert>
+          <div class="panel-content">
+            <!-- Settings Page (Default) -->
+            <div class="panel-page active" data-page="settings">
+              <div class="panel-heading">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#mountain"/></svg>
+                <span class="heading-title">Cài đặt nhanh</span>
+                <button class="close" data-close aria-label="Close">×</button>
+              </div>
+              <div class="panel-subtitle">ALPORA · Không gian làm việc</div>
+              <div class="audio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#volume"/></svg>
+                <input type="range" min="0" max="100" value="68" aria-label="Âm lượng">
+                <output>68%</output>
+              </div>
+              <div class="audio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#sun"/></svg>
+                <input type="range" min="0" max="100" value="85" aria-label="Độ sáng">
+                <output>85%</output>
+              </div>
+              <div class="tiles">
+                <button class="tile" data-toggle aria-pressed="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#wifi"/></svg>
+                  <span>Wi-Fi<small>Đang bật</small></span>
+                </button>
+                <button class="tile off" data-toggle aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#bluetooth"/></svg>
+                  <span>Bluetooth<small>Đang tắt</small></span>
+                </button>
+              </div>
+              <div class="panel-bottom">
+                <span class="page-mode">Chế độ làm việc</span>
+                <span class="mini-tag">Cân bằng</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="study-footer">
+        <button class="toggle primary">Mở</button>
+        <span class="state">Đã đóng</span>
+        <button class="repeat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#repeat"/></svg>
+          <span class="repeat-label">Thử lại</span>
+        </button>
+        <button class="copy-qml" data-qml-id="">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#code"/></svg>
+          <span class="qml-label">Mã QML</span>
+        </button>
+      </div>
+    </template>
+
+    <!-- Reusable Template: Multi-page Action Buttons for Morph / Travel Studies -->
+    <template id="study-multi-bar-template">
+      <div class="mini-time"><button data-page="calendar" aria-label="Calendar">14:20</button></div>
+      <div class="bar-actions">
+        <button data-page="timeline" aria-label="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#sun"/></svg></button>
+        <button data-page="notifications" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#bell"/></svg></button>
+        <button data-page="settings" aria-label="Open settings" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#settings"/></svg></button>
+      </div>
+    </template>
+
+    <!-- Reusable Template: Extra Sub-pages (Calendar, Notifications, Timeline) -->
+    <template id="study-multi-pages-template">
+      <!-- Calendar Page -->
+      <div class="panel-page" data-page="calendar" hidden>
+        <div class="panel-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#mountain"/></svg>
+          <span class="heading-title">Lịch hôm nay</span>
+          <button class="close" data-close aria-label="Close">×</button>
+        </div>
+        <div class="calendar-top"><span>&lt;</span><span class="calendar-month">Tháng 10 2026</span><span>&gt;</span></div>
+        <div class="calendar-grid">
+          <span class="weekday">T2</span><span class="weekday">T3</span><span class="weekday">T4</span><span class="weekday">T5</span><span class="weekday">T6</span><span class="weekday">T7</span><span class="weekday">CN</span>
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+          <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+          <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span class="today">20</span><span>21</span>
+          <span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
+        </div>
+        <div class="panel-bottom"><span class="footer-note">Hôm nay là thời điểm tuyệt vời cho các dự định mới</span></div>
+      </div>
+
+      <!-- Notifications Page -->
+      <div class="panel-page" data-page="notifications" hidden>
+        <div class="panel-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#bell"/></svg>
+          <span class="heading-title">Thông báo</span>
+          <button class="close" data-close aria-label="Close">×</button>
+        </div>
+        <div class="notice">
+          <strong class="note-title-1">Chào mừng đến với ALPORA</strong>
+          <small class="note-desc-1">Hệ thống · vừa xong</small>
+        </div>
+        <div class="notice">
+          <strong class="note-title-2">Danh sách nhạc đã sẵn sàng</strong>
+          <small class="note-desc-2">Media · 5 phút trước</small>
+        </div>
+        <div class="panel-bottom"><span class="footer-note">Lịch sử thông báo hệ thống</span></div>
+      </div>
+
+      <!-- Timeline Page -->
+      <div class="panel-page" data-page="timeline" hidden>
+        <div class="panel-heading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#sun"/></svg>
+          <span class="heading-title">Dòng thời gian (Timeline)</span>
+          <span style="margin-left:auto;color:var(--accent)">14:20</span>
+          <button class="close" data-close aria-label="Close">×</button>
+        </div>
+        <div class="panel-subtitle">Từ bình minh đến đêm muộn</div>
+        <div class="timeline-range"></div>
+        <div class="timeline-hours">
+          <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
+        </div>
+      </div>
+    </template>
+
+    <!-- Study: slide -->
+    <article class="study" id="study-slide" data-study="slide">
+      <div class="study-head">
+        <span class="number">01</span>
+        <div>
+          <h2 class="study-title">Trượt mềm (Soft Slide)</h2>
+          <p class="study-desc">Panel trượt xuống êm ái từ mép dưới của TopBar rồi dừng nhẹ nhàng. Khi đóng trượt ngược lên.</p>
+        </div>
+      </div>
+      <div class="hint-line">Dịch chuyển trục Y + mờ dần (opacity). Chuẩn mặc định cho desktop.</div>
+    </article>
+
+    <!-- Study: curtain -->
+    <article class="study" id="study-curtain" data-study="curtain">
+      <div class="study-head">
+        <span class="number">02</span>
+        <div>
+          <h2 class="study-title">Kéo rèm (Curtain Drop)</h2>
+          <p class="study-desc">Mép trên cố định dưới TopBar. Panel mở dần xuống dưới như tấm rèm buông nhẹ.</p>
+        </div>
+      </div>
+      <div class="hint-line">Mở rộng chiều cao với clip-path bo tròn 14px; văn bản không bị kéo giãn.</div>
+    </article>
+
+    <!-- Study: origin -->
+    <article class="study" id="study-origin" data-study="origin">
+      <div class="study-head">
+        <span class="number">03</span>
+        <div>
+          <h2 class="study-title">Phóng từ icon (Origin Pop)</h2>
+          <p class="study-desc">Từ vị trí icon được nhấn trên TopBar, một khối nhỏ bung nở thành cửa sổ hoàn chỉnh.</p>
+        </div>
+      </div>
+      <div class="hint-line">Tâm biến đổi (transform-origin) gắn chặt với tọa độ icon bấm.</div>
+    </article>
+
+    <!-- Study: pop -->
+    <article class="study" id="study-pop" data-study="pop">
+      <div class="study-head">
+        <span class="number">04</span>
+        <div>
+          <h2 class="study-title">Nảy nhẹ (Subtle Pop-in)</h2>
+          <p class="study-desc">Panel xuất hiện với độ phóng to 94% -> 100% kèm tăng dần độ trong suốt, không rung lắc.</p>
+        </div>
+      </div>
+      <div class="hint-line">Tăng nhẹ kích thước + mượt mà. Rất phù hợp với chế độ Work tối giản.</div>
+    </article>
+
+    <!-- Study: spring -->
+    <article class="study" id="study-spring" data-study="spring">
+      <div class="study-head">
+        <span class="number">05</span>
+        <div>
+          <h2 class="study-title">Độ nảy lò xo (Spring Bounce)</h2>
+          <p class="study-desc">Panel trượt xuống, vượt nhẹ qua điểm dừng một chút rồi bật khẽ trở lại vị trí cân bằng.</p>
+        </div>
+      </div>
+      <div class="hint-line">Hiệu ứng lò xo tinh tế tạo cảm giác phản hồi vật lý sống động.</div>
+    </article>
+
+    <!-- Study: morph -->
+    <article class="study" id="study-morph" data-study="morph">
+      <div class="study-head">
+        <span class="number">06</span>
+        <div>
+          <h2 class="study-title">Biến đổi tab (Morph Switch)</h2>
+          <p class="study-desc">Panel tự động co giãn kích thước, di chuyển vị trí và đổi nội dung mượt mà khi bấm tab khác.</p>
+        </div>
+      </div>
+      <div class="hint-line">Thử chuyển qua lại giữa Đồng hồ, Lịch, Thông báo và Cài đặt!</div>
+    </article>
+
+    <!-- Study: center -->
+    <article class="study" id="study-center" data-study="center">
+      <div class="study-head">
+        <span class="number">07</span>
+        <div>
+          <h2 class="study-title">Mở từ tâm (Center Expand)</h2>
+          <p class="study-desc">Từ một điểm nhỏ ở giữa bung thành thanh ngang mỏng, sau đó mở rộng theo chiều dọc.</p>
+        </div>
+      </div>
+      <div class="hint-line">Chuyển động 2 pha: Chiều ngang (Width) -> Chiều dọc (Height).</div>
+    </article>
+
+    <!-- Study: iris -->
+    <article class="study" id="study-iris" data-study="iris">
+      <div class="study-head">
+        <span class="number">08</span>
+        <div>
+          <h2 class="study-title">Mở khẩu độ (Circular Iris)</h2>
+          <p class="study-desc">Một mặt nạ hình tròn từ icon nút bấm mở rộng dần ra xung quanh làm lộ panel.</p>
+        </div>
+      </div>
+      <div class="hint-line">Clip-path dạng circle(r at x y) mở rộng 0% -> 145%.</div>
+    </article>
+
+    <!-- Study: depth -->
+    <article class="study" id="study-depth" data-study="depth">
+      <div class="study-head">
+        <span class="number">09</span>
+        <div>
+          <h2 class="study-title">Chiều sâu 3D (Depth Perspective)</h2>
+          <p class="study-desc">Panel phóng to từ không gian 3D phía sau, xoay nhẹ góc nghiêng và áp sát màn hình.</p>
+        </div>
+      </div>
+      <div class="hint-line">Sử dụng perspective 800px + translateZ(-180px) + rotateX(22deg).</div>
+    </article>
+
+    <!-- Study: hinge -->
+    <article class="study" id="study-hinge" data-study="hinge">
+      <div class="study-head">
+        <span class="number">10</span>
+        <div>
+          <h2 class="study-title">Bản lề thả (Hinge Drop)</h2>
+          <p class="study-desc">Panel xoay quanh bản lề mép trên thả xuống như cánh cửa tủ mở nhẹ.</p>
+        </div>
+      </div>
+      <div class="hint-line">Xoay 3D quanh trục trên rotateX(-88deg -> 0deg).</div>
+    </article>
+
+    <!-- Study: fold -->
+    <article class="study" id="study-fold" data-study="fold">
+      <div class="study-head">
+        <span class="number">11</span>
+        <div>
+          <h2 class="study-title">Gấp nếp giấy (Origami Fold)</h2>
+          <p class="study-desc">Nửa trên mở ra trước, sau đó nửa dưới bung tiếp theo như mở một tờ giấy gấp đôi.</p>
+        </div>
+      </div>
+      <div class="hint-line">Hai mảnh độc lập với trục xoay riêng biệt.</div>
+    </article>
+
+    <!-- Study: liquid -->
+    <article class="study" id="study-liquid" data-study="liquid">
+      <div class="study-head">
+        <span class="number">12</span>
+        <div>
+          <h2 class="study-title">Giọt nước lỏng (Liquid Droplet)</h2>
+          <p class="study-desc">Giọt nước từ icon kéo dài xuống, biến dạng hữu cơ rồi nở bung thành hình panel chữ nhật.</p>
+        </div>
+      </div>
+      <div class="hint-line">Biến thiên border-radius bất đối xứng tạo cảm giác hữu cơ mềm mại.</div>
+    </article>
+
+    <!-- Study: outline -->
+    <article class="study" id="study-outline" data-study="outline">
+      <div class="study-head">
+        <span class="number">13</span>
+        <div>
+          <h2 class="study-title">Vẽ viền trước (Outline Trace)</h2>
+          <p class="study-desc">Một vệt sáng neon chạy vòng quanh viền bo góc trước, sau đó nền kính và nội dung hiện ra.</p>
+        </div>
+      </div>
+      <div class="hint-line">Vẽ đường nét SVG stroke-dashoffset rồi làm đầy nội dung.</div>
+    </article>
+
+    <!-- Study: cascade -->
+    <article class="study" id="study-cascade" data-study="cascade">
+      <div class="study-head">
+        <span class="number">14</span>
+        <div>
+          <h2 class="study-title">Thác đổ (Staggered Cascade)</h2>
+          <p class="study-desc">Mặt nền kính hiện lên, sau đó tiêu đề, thanh âm lượng và các ô nút lần lượt rơi vào vị trí.</p>
+        </div>
+      </div>
+      <div class="hint-line">Mỗi thành phần con xuất hiện cách nhau 75ms (stagger delay).</div>
+    </article>
+
+    <!-- Study: slit -->
+    <article class="study" id="study-slit" data-study="slit">
+      <div class="study-head">
+        <span class="number">15</span>
+        <div>
+          <h2 class="study-title">Khe sáng hẹp (Glowing Slit)</h2>
+          <p class="study-desc">Một khe sáng mảnh xuất hiện dưới thanh bar, rồi nở rộng xuống dưới thành panel.</p>
+        </div>
+      </div>
+      <div class="hint-line">Đa giác polygon thu hẹp thành khe 1px rồi mở rộng toàn phần.</div>
+    </article>
+
+    <!-- Study: travel -->
+    <article class="study" id="study-travel" data-study="travel">
+      <div class="study-head">
+        <span class="number">16</span>
+        <div>
+          <h2 class="study-title">Con nhộng di chuyển (Traveling Capsule)</h2>
+          <p class="study-desc">Panel thu gọn thành hình con nhộng, chạy ngang sang icon mới rồi bung mở trở lại.</p>
+        </div>
+      </div>
+      <div class="hint-line">Thu nhỏ capsule -> dịch chuyển ngang -> mở rộng kích thước mới.</div>
+    </article>
+    </div>
+
+    <footer style="margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 12px; color: var(--muted);">
+      <span id="footer-hint">Nhấn chuột vào các nút trên thanh TopBar để thử nghiệm tương tác · Phím Esc để thoát.</span>
+      <span>ALPORA Design System · 16 Motion Studies Native Spec</span>
+    </footer>
+  </section>
+
+  <!-- TAB 3: Typography Suite Showcase -->
+  <section id="view-typo" class="tab-view">
+    <div class="typography-section">
+      <h2 style="font-family: var(--font-display); font-size: 24px; margin: 0 0 4px;" id="lbl-typo-title">Bộ Typography Tiêu Chuẩn ALPORA</h2>
+      <p style="color: var(--muted); font-size: 14px; margin: 0 0 20px;" id="lbl-typo-desc">Được nạp trực tiếp qua FontLoader vào Quickshell và áp dụng đồng bộ cho toàn bộ hệ thống.</p>
+
+      <div class="typo-grid">
+        <div class="typo-card">
+          <h3 style="font-family: 'Inter', sans-serif;">Inter Variable</h3>
+          <div class="typo-spec">UI Sans-Serif · 100–900 Variable Weight</div>
+          <div class="typo-preview-large" style="font-family: 'Inter', sans-serif;">Aa Gg Rr 123</div>
+          <div class="typo-preview-sample" style="font-family: 'Inter', sans-serif;">
+            Sử dụng cho toàn bộ giao diện điều khiển, taskbar, nhãn biểu tượng, danh sách ứng dụng, và bộ gõ tiếng Việt Fcitx5. Cực kỳ sắc nét ở kích thước nhỏ.
+          </div>
+        </div>
+
+        <div class="typo-card">
+          <h3 style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</h3>
+          <div class="typo-spec">Code & Terminal Monospace · Ligatures</div>
+          <div class="typo-preview-large" style="font-family: 'JetBrains Mono', monospace;">0 != &lt;=&gt;</div>
+          <div class="typo-preview-sample" style="font-family: 'JetBrains Mono', monospace;">
+            Áp dụng cho terminal Foot, Kitty, widget chỉ số lập trình viên Developer Metrics, và các công cụ dòng lệnh poly-shell doctor.
+          </div>
+        </div>
+
+        <div class="typo-card">
+          <h3 style="font-family: 'Outfit', sans-serif;">Outfit Variable</h3>
+          <div class="typo-spec">Geometric Display · Rounded Curves</div>
+          <div class="typo-preview-large" style="font-family: 'Outfit', sans-serif;">10:14 ALPORA</div>
+          <div class="typo-preview-sample" style="font-family: 'Outfit', sans-serif;">
+            Dành riêng cho các chữ số đồng hồ lớn trên màn hình chính (DesktopClock), đồng hồ màn hình khóa (Hyprlock), và các tiêu đề trang trọng.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

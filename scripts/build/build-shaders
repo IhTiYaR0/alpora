@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
+shader_baker="${QSB:-/usr/lib/qt6/bin/qsb}"
+"$shader_baker" --qt6 -o "$project_dir/shell/shaders/landscape-reflection.frag.qsb" "$project_dir/assets/shaders/landscape-reflection.frag"
+for stage in vert frag; do
+    "$shader_baker" --qt6 -o "$project_dir/assets/shaders/panel.$stage.qsb" "$project_dir/assets/shaders/panel.$stage"
+done
+"$shader_baker" --qt6 -o "$project_dir/shell/shaders/wallpaper-reveal.frag.qsb" "$project_dir/assets/shaders/wallpaper-reveal.frag"
+
+for stage in vert frag; do
+    "$shader_baker" --qt6 -o "$project_dir/shell/shaders/wings.$stage.qsb" "$project_dir/assets/shaders/wings.$stage"
+done
+for stage in vert frag; do
+    "$shader_baker" --qt6 -o "$project_dir/shell/shaders/liquid-alpine-v2.$stage.qsb" "$project_dir/assets/shaders/liquid.$stage"
+done

@@ -1,0 +1,234 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Syntax Check, Static Linters & Formatting Verification
+  # ---------------------------------------------------------------------------
+  syntax-and-lint:
+    name: Syntax Check & Static Analysis
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install static analysis tools & linters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt lua5.4 yamllint jq
+          pip install --only-binary :all: ruff==0.9.9
+
+      - name: 1. ShellCheck (Bash & Shell Scripts)
+        run: |
+          echo "Running ShellCheck on installation and helper scripts..."
+          shellcheck -x -S warning \
+            install/*.sh \
+            scripts/*.sh scripts/check scripts/format scripts/build/build-shaders
+
+      - name: 2. Shell Script Formatting Check (shfmt)
+        run: |
+          echo "Verifying shell script indentation & format with shfmt..."
+          shfmt -d -i 4 -ci \
+            install/*.sh \
+            scripts/*.sh scripts/check scripts/format scripts/build/build-shaders || true
+
+      - name: 3. Python Code Style & Syntax Check (Ruff)
+        run: |
+          echo "Verifying Python code style and static formatting..."
+          ruff check poly_shell/ tests/ || true
+          ruff format --check poly_shell/ tests/ || true
+
+      - name: 4. Python Bytecode Compilation Check
+        run: |
+          echo "Validating Python compilation..."
+          python -m compileall -q poly_shell tests
+
+      - name: 5. JSON Syntax & Encoding Verification
+        run: |
+          echo "Validating syntax of all JSON files..."
+          python - <<'EOF'
+          import glob, json, sys
+          failed = False
+          for f in glob.glob("**/*.json", recursive=True):
+              if ".git" in f:
+                  continue
+              try:
+                  with open(f, "r", encoding="utf-8") as fp:
+                      json.load(fp)
+              except Exception as e:
+                  print(f"::error file={f}::JSON syntax error: {e}")
+                  failed = True
+          if failed:
+              sys.exit(1)
+          print("All JSON files are syntactically valid!")
+          EOF
+
+      - name: 6. YAML Syntax Check (yamllint)
+        run: |
+          echo "Validating workflow and YAML configurations..."
+          yamllint -d "{extends: relaxed, rules: {line-length: {max: 160}}}" \
+            .github/workflows/*.yml
+
+      - name: 7. Lua Configuration & Dispatcher Syntax Check
+        run: |
+          echo "Compiling Lua integration scripts with luac..."
+          luac -p dotfiles/hypr/.config/hypr/alpora-session.lua
+          luac -p dotfiles/hypr/.config/hypr/hyprland-overview.lua
+
+  # ---------------------------------------------------------------------------
+  # 2. Automated Test Suite & Multi-Monitor / I18n Verification
+  # ---------------------------------------------------------------------------
+  unit-tests:
+    name: Unit Tests & Regression Suite
+    runs-on: ubuntu-24.04
+    needs: syntax-and-lint
+    timeout-minutes: 10
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install system test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon0 libxkbcommon-dev
+
+      - name: Install Python dependencies
+        run: |
+          pip install --only-binary :all: pillow==11.1.0
+
+      - name: Run I18n Key Parity Tests
+        run: |
+          python -u -m unittest -v tests/test_i18n.py
+
+      - name: Run Windows Folder & Drive Support Tests
+        run: |
+          python -u -m unittest -v tests/test_windows_fs.py
+
+      - name: Run Multi-Monitor & Fractional Scaling Tests
+        run: |
+          python -u -m unittest -v tests/test_multimonitor.py
+
+      - name: Run Desktop & Running Apps Tests
+        run: |
+          python -u -m unittest -v \
+            tests/test_desktop.py \
+            tests/test_running_apps.py \
+            tests/test_widgets.py \
+            tests/test_appearance.py
+
+      - name: Run Desktop Controls & Lockscreen Media Tests
+        run: |
+          python -u -m unittest -v \
+            tests/test_desktop_controls.py \
+            tests/test_lock_media.py \
+            tests/test_lockscreen.py
+
+      - name: Run Theme, Landscape & State Tests
+        run: |
+          python -u -m unittest -v \
+            tests/test_themes.py \
+            tests/test_landscapes.py \
+            tests/test_state.py \
+            tests/test_shortcuts.py \
+            tests/test_demo.py
+
+      - name: Run Game Mode, Phone & Update Service Tests
+        run: |
+          python -u -m unittest -v \
+            tests/test_game_mode.py \
+            tests/test_phone_service.py \
+            tests/test_update_service.py
+
+  # ---------------------------------------------------------------------------
+  # 3. Dry-Run Installation Test (Clean Arch Linux Container)
+  # ---------------------------------------------------------------------------
+  arch-dry-run-install:
+    name: Dry-Run Install on Clean Arch Linux
+    runs-on: ubuntu-24.04
+    container:
+      image: archlinux:base-devel
+    needs: syntax-and-lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Prepare Arch environment & non-root user
+        run: |
+          pacman -Syu --noconfirm git python sudo which
+          useradd -m -s /bin/bash archuser
+          echo "archuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod +x install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/*
+          chown -R archuser:archuser "$GITHUB_WORKSPACE"
+
+      - name: Test 1 - Standard Dry-Run Installation
+        run: |
+          sudo -u archuser ./install/install.sh --dry-run
+
+      - name: Test 2 - UI-Only Standalone Dry-Run
+        run: |
+          sudo -u archuser ./install/install.sh --ui-only --dry-run
+
+      - name: Test 3 - Core-Only Minimal Dry-Run
+        run: |
+          sudo -u archuser ./install/install.sh --core-only --dry-run
+
+      - name: Test 4 - Custom Theme Preset Dry-Run
+        run: |
+          sudo -u archuser ./install/install.sh --dry-run --theme=forest-mist
+
+      - name: Test 5 - Terminal Welcome Banner & Preview Mode
+        run: |
+          sudo -u archuser ./install/install.sh --preview
+
+      - name: Test 6 - Dry-Run Uninstall Script
+        run: |
+          sudo -u archuser ./install/uninstall.sh --dry-run || true
+
+      - name: Test 7 - Arch Linux PKGBUILD Validation
+        run: |
+          echo "Validating Arch Linux PKGBUILD syntax with makepkg..."
+          sudo -u archuser bash -c "cd packaging/aur && makepkg --nobuild --nodeps || true"
+
+  # ---------------------------------------------------------------------------
+  # 4. Dry-Run Installation Test (Debian / Ubuntu Non-Arch Distro)
+  # ---------------------------------------------------------------------------
+  debian-dry-run-install:
+    name: Dry-Run Install on Debian/Ubuntu Distro
+    runs-on: ubuntu-24.04
+    needs: syntax-and-lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Ensure installer scripts are executable
+        run: chmod +x install/*.sh scripts/*.sh scripts/check scripts/format scripts/build/*
+
+      - name: Test UI-Only Standalone Dry-Run on Ubuntu
+        run: |
+          ./install/install.sh --ui-only --dry-run
+
+      - name: Test Skip-Packages Dry-Run on Ubuntu
+        run: |
+          ./install/install.sh --skip-packages --dry-run

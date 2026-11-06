@@ -55,6 +55,11 @@ class WidgetTests(unittest.TestCase):
         self.assertFalse(values_for(self.paths)['animations'])
         with self.assertRaises(ConfigError): self.save(self.values | {'animations': 1})
 
+    def test_running_apps_widget_migrates_old_layout(self):
+        old = deepcopy(self.values); old.pop('apps')
+        atomic_json(self.paths.config/'widgets.json', {'schemaVersion': 1, 'values': old})
+        self.assertEqual(values_for(self.paths), self.values)
+
     def test_failed_atomic_write_preserves_last_layout(self):
         self.save(); original = values_for(self.paths)
         self.values['clock']['x'] = 50

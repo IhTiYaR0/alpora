@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+"""Opt-in IPC checks of bar panel animations; no pointer, keys or workspace changes."""
+import argparse
+import itertools
+import json
+from pathlib import Path
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live', action='store_true')
+args = parser.parse_args()
+if not args.live:
+    parser.error('This opens real panels; use --live')
+root = Path(__file__).resolve().parents[2]
+base = ['qs', 'ipc', '--path', str(root / 'shell'), 'call']
+shared = {'calendar', 'notifications', 'timeline', 'tray'}
+pages = ['calendar', 'notifications', 'timeline', 'tray', 'launcher', 'quick-settings']
+
+def call(target, method, *values):
+    for _ in range(15):
+        result = subprocess.check_output(base + [target, method, *values], text=True, timeout=5).strip()
+        if 'Not ready to accept queries' not in result:
+            return json.loads(result) if result else None
+        time.sleep(.1)
+    raise RuntimeError('Shell reload did not finish')
+
+initial = call('shell', 'status')
+workspace = initial['workspace']
+screen = next(iter(json.loads(subprocess.check_output(['hyprctl', '-j', 'monitors'], text=True))))['name']
+expected = 'quick-settings' if initial['quickSettings'] else initial['bar']['popup']
+original = expected
+records = []
+
+def guard():
+    s = call('shell', 'status')
+    actual = 'quick-settings' if s['quickSettings'] else s['bar']['popup']
+    if actual != expected or s['workspace'] != workspace:
+        raise RuntimeError('Desktop selection changed during check; stopped without restoring panels')
+
+def select(page):
+    global expected
+    guard()
+    if page == expected:
+        return
+    if not page:
+        call('shell', 'closeQuickSettings' if expected == 'quick-settings' else 'closeBarPanel')
+    elif page == 'quick-settings':
+        call('shell', 'toggleQuickSettings')
+    else:
+        call('shell', 'toggleBarPanel', page)
+    expected = page
+
+def status(page):
+    target = 'bar-popup-' if page in shared else 'quick-settings-' if page == 'quick-settings' else 'launcher-'
+    return call(target + screen, 'motionStatus')
+
+def settled(page):
+    guard()
+    s = status(page)
+    assert s['opened'] and s['progress'] == 1 and s['effectReady'], (page, s)
+    if page in shared:
+        assert s['page'] == page, (page, s)
+    return s
+
+# Guard failures deliberately leave the user's changed selection untouched.
+select('')
+time.sleep(.24)
+for source, destination in itertools.permutations(pages, 2):
+    select(source)
+    time.sleep(.62)
+    settled(source)
+    select(destination)
+    time.sleep(.07)
+    early = status(destination)
+    assert early['opened'] and 0 < early['progress'] < 1, (source, destination, early)
+    if source in shared and destination in shared:
+        assert early['page'] == source and not early['opening'], (source, destination, early)
+        time.sleep(.20)
+        opening = status(destination)
+        assert opening['page'] == destination and opening['opening'] and 0 < opening['progress'] < 1, (source, destination, opening)
+    time.sleep(.44)
+    final = settled(destination)
+    records.append({'from': source, 'to': destination, 'earlyProgress': early['progress'], 'settled': final['progress']})
+    print('PASS', source, '->', destination, flush=True)
+
+# A newer selection must supersede a queued shared-panel destination.
+select('notifications'); time.sleep(.62)
+select('calendar'); time.sleep(.04)
+select('timeline'); time.sleep(.04)
+select('tray'); time.sleep(.62)
+settled('tray')
+print('PASS rapid changes select latest page', flush=True)
+
+# Clicking the same active block must still close it.
+for page in pages:
+    select(page); time.sleep(.62); settled(page)
+    guard()
+    call('shell', 'toggleQuickSettings' if page == 'quick-settings' else 'toggleBarPanel', *([] if page == 'quick-settings' else [page]))
+    expected = ''
+    time.sleep(.24)
+    guard()
+    s = status(page)
+    assert not s['opened'] and s['progress'] == 0, (page, s)
+    print('PASS repeated click closes', page, flush=True)
+select(original)
+print(json.dumps({'pairs': len(records), 'rapidSwitch': True, 'sameButtonClose': len(pages), 'records': records}), flush=True)

@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Exercise production Lua swipe callbacks over native socket2 (no physical touch)."""
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live', action='store_true')
+if not parser.parse_args().live:
+    parser.error('This temporarily opens the running overview; opt in with --live')
+root = Path(__file__).resolve().parents[2]
+base = ['quickshell', 'ipc', '--path', str(root / 'shell'), 'call', 'overview']
+
+def command(argv):
+    return subprocess.check_output(argv, text=True, timeout=5).strip()
+
+def status():
+    for _ in range(30):
+        result = command(base + ['status'])
+        if result.startswith('{'):
+            return json.loads(result)
+        time.sleep(.1)
+    raise RuntimeError('Overview IPC did not become ready')
+
+def wait_for(predicate, message):
+    for _ in range(50):
+        if predicate(status()):
+            return
+        time.sleep(.04)
+    raise AssertionError(message + ': ' + str(status()))
+
+def setup(direction):
+    command(['hyprctl', 'eval', '__polyOverviewSwipeTest = dofile(' + json.dumps(str(root / 'dotfiles/hypr/.config/hypr/hyprland-overview.lua')) + ')(' + json.dumps(direction) + ')'])
+
+def callback(phase, timestamp, delta=0, cancelled=False):
+    command(['hyprctl', 'eval', f'__polyOverviewSwipeTest.{phase}({{time_ms={timestamp}, delta={{x=0,y={delta}}}, cancelled={str(cancelled).lower()}}})'])
+
+def at(value):
+    wait_for(lambda s: s['gestureActive'] and abs(s['progress'] - value) < .002, f'Gesture failed to hold {value:.0%}')
+
+def settled(opened):
+    wait_for(lambda s: not s['gestureActive'] and s['opened'] == opened and abs(s['progress'] - int(opened)) < .001, 'Wrong settle target')
+
+was_open = status()['opened']
+try:
+    command(base + ['close'])
+    settled(False)
+    setup('up')
+    callback('start', 1000)
+    callback('update', 1100, -60)
+    at(.2)
+    time.sleep(.45)
+    at(.2)
+    callback('update', 1500, -90)
+    at(.5)
+    callback('update', 1700, 30)
+    at(.4)
+    callback('finish', 2200)
+    settled(False)
+    print('PASS: exact 20% hold, 50% advance, 40% reversal, short swipe returns closed', flush=True)
+
+    setup('up')
+    callback('start', 3000)
+    callback('update', 3300, -210)
+    at(.7)
+    callback('finish', 3600)
+    settled(True)
+    print('PASS: long swipe settles open', flush=True)
+
+    setup('down')
+    callback('start', 4000)
+    callback('update', 4300, 90)
+    at(.7)
+    callback('finish', 4600, cancelled=True)
+    settled(True)
+    callback('start', 5000)
+    callback('update', 5300, 240)
+    at(.2)
+    callback('finish', 5600)
+    settled(False)
+    print('PASS: cancelled down swipe restores open; long down swipe closes', flush=True)
+
+    setup('up')
+    callback('start', 6000)
+    callback('update', 6200, -180)
+    at(.6)
+    callback('finish', 6500, cancelled=True)
+    settled(False)
+    callback('start', 7000)
+    callback('update', 7020, -45)
+    at(.15)
+    callback('finish', 7030)
+    settled(True)
+    print('PASS: backend cancellation restores closed; a short fast flick can finish opening', flush=True)
+
+    setup('down')
+    callback('start', 8000)
+    callback('update', 8300, 180)
+    at(.4)
+    callback('update', 8600, -90)
+    at(.7)
+    callback('finish', 9000)
+    settled(True)
+    command(base + ['close'])
+    settled(False)
+    setup('up')
+    callback('start', 10000)
+    callback('update', 10300, -90)
+    at(.3)
+    command(base + ['close'])
+    settled(False)
+    callback('update', 10600, -90)
+    callback('finish', 10900)
+    settled(False)
+    print('PASS: reversed closing restores open; explicit close rejects late gesture frames', flush=True)
+finally:
+    command(base + ['close'])
+    command(['hyprctl', 'eval', '__polyOverviewSwipeTest = nil'])
+    if was_open:
+        command(base + ['open'])
+print('Overview state restored; no windows or workspace preferences changed.')

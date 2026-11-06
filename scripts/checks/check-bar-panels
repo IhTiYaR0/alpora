@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Opt-in desktop checks on a temporary empty workspace; never change device settings."""
+import argparse
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live', action='store_true')
+args = parser.parse_args()
+if not args.live:
+    parser.error('This exercises real desktop panels; use --live')
+root = Path(__file__).resolve().parents[2]
+base = ['qs', 'ipc', '--path', str(root/'shell'), 'call']
+env = dict(os.environ, YDOTOOL_SOCKET=os.environ.get('YDOTOOL_SOCKET', f'/run/user/{os.getuid()}/.ydotool_socket'))
+
+def command(*args):
+    return subprocess.check_output(list(args), text=True, timeout=8)
+
+def call(target, method, *args):
+    for _ in range(30):
+        result = command(*base, target, method, *args)
+        if 'Not ready to accept queries' not in result:
+            return json.loads(result) if result.strip() else None
+        time.sleep(.1)
+    raise RuntimeError('IPC unavailable during reload')
+
+def close():
+    call('shell', 'closeBarPanel'); call('shell', 'closeQuickSettings')
+
+def pointer(x, y, click=False):
+    subprocess.run(['ydotool', 'mousemove', '--absolute', str(round(x/2)), str(round(y/2))], env=env, check=True, stdout=subprocess.DEVNULL)
+    if click:
+        actual = json.loads(command('hyprctl', '-j', 'cursorpos'))
+        assert abs(actual['x']-x) < 2 and abs(actual['y']-y) < 2
+        subprocess.run(['ydotool', 'click', '0xC0'], env=env, check=True, stdout=subprocess.DEVNULL)
+
+def escape():
+    subprocess.run(['ydotool', 'key', '1:1', '1:0'], env=env, check=True, stdout=subprocess.DEVNULL)
+    time.sleep(.22)
+
+monitor = next(m for m in json.loads(command('hyprctl', '-j', 'monitors')) if m['focused'])
+screen = monitor['name']; original = monitor['activeWorkspace']['id']
+cursor = json.loads(command('hyprctl', '-j', 'cursorpos'))
+occupied = {w['id'] for w in json.loads(command('hyprctl', '-j', 'workspaces')) if w['windows']}
+temporary = next(w for w in range(10, 100) if w not in occupied and w != original)
+bar = 'bar-' + screen; popup = 'bar-popup-' + screen; quick = 'quick-settings-' + screen
+records = {}
+try:
+    close()
+    command('hyprctl', 'dispatch', f'hl.dsp.focus({{workspace={temporary}}})')
+    time.sleep(.3)
+    # Pointer leaves the bar so tooltips cannot obscure frame measurements.
+    pointer(monitor['x'] + monitor['width']/monitor['scale']/2, monitor['y'] + monitor['height']/monitor['scale'] - 30)
+    for page, target in [('calendar', popup), ('notifications', popup), ('quick-settings', quick), ('launcher', 'launcher-'+screen)]:
+        call(target, 'startMotionTrace')
+        if page == 'quick-settings': call('shell', 'toggleQuickSettings')
+        else: call('shell', 'toggleBarPanel', page)
+        time.sleep(.5)
+        status = call(target, 'motionStatus'); trace = call(target, 'stopMotionTrace')
+        assert status['opened'] and status['progress'] == 1, (page, status)
+        moving = [f for f in trace if 0 < f['progress'] < 1]
+        intervals = sorted(b['ms']-a['ms'] for a,b in zip(moving,moving[1:]))
+        records[page] = dict(animation="qml-liquid", frames=len(moving), p95Ms=intervals[int((len(intervals)-1)*.95)] if intervals else None,
+                             maxMs=max(intervals, default=0), trace=trace)
+        if page != 'launcher':
+            layers = json.loads(command('hyprctl', '-j', 'layers'))[screen]['levels']
+            expected = 'poly-panel-quick-settings' if page == 'quick-settings' else 'poly-panel-bar-popup'
+            layer = next(item for level in layers.values() for item in level if item['namespace'] == expected)
+            assert layer['w'] < monitor['width']/monitor['scale'] and layer['h'] < monitor['height']/monitor['scale'], layer
+        escape()
+        state = call('shell', 'status')
+        assert not state['quickSettings'] and not state['bar']['popup'], (page, state)
+        print('PASS open / Escape / bounded surface:', page, {k:v for k,v in records[page].items() if k!='trace'}, flush=True)
+    controls = call(bar, 'controls')
+    pages = [('calendar', 'calendar'), ('notifications', 'notifications'), ('quickSettings', 'quick-settings')]
+    if controls['timeline']['visible']: pages.insert(1, ('timeline', 'timeline'))
+    for key, page in pages:
+        current = next(m for m in json.loads(command('hyprctl', '-j', 'monitors')) if m['name'] == screen)
+        if current['activeWorkspace']['id'] != temporary:
+            raise RuntimeError('Desktop changed during the live check; discard this run')
+        r = controls[key]
+        pointer(monitor['x']+r['x']+r['width']/2, monitor['y']+r['y']+r['height']/2, True)
+        time.sleep(.62)
+        state = call('shell', 'status')
+        assert (state['quickSettings'] if page == 'quick-settings' else state['bar']['popup'] == page), (page, state)
+        print('PASS actual bar click / switch:', page, flush=True)
+    # A repeated click closes the active settings panel.
+    pointer(monitor['x']+r['x']+r['width']/2, monitor['y']+r['y']+r['height']/2, True)
+    time.sleep(.25)
+    assert not call('shell', 'status')['quickSettings']
+    call('shell', 'toggleQuickSettings'); time.sleep(.3)
+    for page in ['wifi','bluetooth','output','input','settings','power','nightlight','dnd','profiles','airplane']:
+        assert call(quick, 'navigate', page)
+        assert call(quick, 'motionStatus')['page'] == page
+        escape()
+        status = call(quick, 'motionStatus')
+        assert status['opened'] and status['page'] == 'main', (page, status)
+    print('PASS settings subpages / Escape returns to main', flush=True)
+    pointer(monitor['x']+monitor['width']/monitor['scale']/2, monitor['y']+monitor['height']/monitor['scale']-30, True)
+    time.sleep(.25)
+    assert not call('shell', 'status')['quickSettings']
+    print('PASS outside click dismisses panel', flush=True)
+    for page in ['calendar','notifications','tray','calendar','notifications']:
+        call('shell', 'toggleBarPanel', page); time.sleep(.035)
+    time.sleep(.62)
+    status = call(popup, 'motionStatus')
+    assert status['page'] == 'notifications' and status['opened'] and status['progress'] == 1, status
+    close(); time.sleep(.25)
+    layers = json.loads(command('hyprctl', '-j', 'layers'))
+    assert not [item for m in layers.values() for level in m['levels'].values() for item in level
+                if item['namespace'] in ('poly-panel-quick-settings','poly-panel-bar-popup')]
+    print('PASS rapid switches / closed panels unmap', flush=True)
+finally:
+    close()
+    command('hyprctl', 'dispatch', f'hl.dsp.focus({{workspace={original}}})')
+    pointer(cursor['x'],cursor['y'])
+    Path('/tmp/poly-bar-panels-trace.json').write_text(json.dumps(records,indent=2))

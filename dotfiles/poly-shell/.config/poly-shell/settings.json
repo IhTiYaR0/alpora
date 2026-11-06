@@ -1,0 +1,15 @@
+{
+  "theme": "alpine",
+  "mode": "work",
+  "reducedMotion": false,
+  "locale": "en",
+  "apps": {
+    "terminal": ["foot"],
+    "fileManager": ["nautilus", "--new-window"],
+    "browser": ["firefox"]
+  },
+  "bar": {
+    "fontFamily": "Inter",
+    "position": "top"
+  }
+}

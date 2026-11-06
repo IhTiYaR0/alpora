@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Opt-in native surface landing, drag/drop and window lifecycle checks.
+
+Uses the real pointer and a temporary Foot window. Requires Hyprland's Lua
+configuration and one desktop monitor at least 1500x900. Restores preferences,
+focus and cursor. Does not move or resize an existing application.
+"""
+import argparse
+import json,subprocess,time
+from pathlib import Path
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--live',action='store_true')
+if not parser.parse_args().live:parser.error('Moves the real pointer and opens a temporary window; pass --live')
+root=Path(__file__).resolve().parents[2]
+base=['quickshell','ipc','--path',str(root/'shell'),'call']
+def ipc(*args):
+ for _ in range(50):
+  value=subprocess.check_output(base+list(args),text=True).strip()
+  if not value.startswith('Not ready'):return json.loads(value) if value.startswith('{') else value
+  time.sleep(.1)
+ raise RuntimeError('IPC unavailable')
+def hypr(name):return json.loads(subprocess.check_output(['hyprctl','-j',name],text=True))
+def dispatch(value):
+ name,arg=value
+ if name=='setfloating':code='hl.dsp.window.float({window='+json.dumps(arg)+',action="set"})'
+ elif name=='closewindow':code='hl.dsp.window.close({window='+json.dumps(arg)+'})'
+ elif name=='focuswindow':code='hl.dsp.focus({window='+json.dumps(arg)+'})'
+ else:
+  dims,selector=arg.split(',');_,x,y=dims.split()
+  method='resize' if name=='resizewindowpixel' else 'move'
+  code='hl.dsp.window.'+method+'({window='+json.dumps(selector)+',x='+x+',y='+y+',relative=false})'
+ subprocess.run(['hyprctl','dispatch',code],check=True,stdout=subprocess.DEVNULL)
+def st():return ipc(endpoint,'status')
+def wait(pred,name,seconds=15):
+ end=time.monotonic()+seconds
+ while time.monotonic()<end:
+  s=st()
+  if pred(s):return s
+  time.sleep(.04)
+ raise AssertionError((name,st()))
+def shot(path,s):
+ b=s['bounds'];x=max(0,b['x']-60);y=max(0,b['y']-20)
+ subprocess.run(['grim','-g',f'{x},{y} 240x180',path],check=True)
+monitors=hypr('monitors')
+if len(monitors)!=1 or monitors[0]['width']/monitors[0]['scale']<1500 or monitors[0]['height']/monitors[0]['scale']<900:
+ raise RuntimeError('This native probe requires one desktop monitor at least 1500x900')
+endpoint='companion-'+monitors[0]['name']
+widget_endpoint='desktop-widgets-'+monitors[0]['name']
+original=ipc('companion','status');cursor=hypr('cursorpos');active=hypr('activewindow').get('address')
+probe=None;address=None;records=[];button_down=False
+try:
+ subprocess.run(['ydotool','mousemove','--absolute','900','450'],check=True)
+ ipc('companion','flights','true')
+ s=wait(lambda s:s['visible'],'visible')
+ widget=next(p for p in s['supports'] if p['kind']=='widget')
+ ipc(endpoint,'visitSurface',widget['id'])
+ s=wait(lambda s:s['travel']['support']==widget['id'] and s['travel']['mode']=='perch','widget landing')
+ time.sleep(.3);s=st()
+ assert abs(s['feetY']-ipc(widget_endpoint,'status')[widget['id'].split(':')[1]]['y'])<.1,s
+ shot('/tmp/companion-widget-standing.png',s);records.append({'check':'widget landing','status':s})
+ print('PASS actual widget landing',flush=True)
+ probe=subprocess.Popen(['foot','--app-id=poly-companion-probe','--title=Companion surface probe','sh','-c','sleep 180'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+ end=time.monotonic()+6
+ while time.monotonic()<end:
+  client=next((c for c in hypr('clients') if c['class']=='poly-companion-probe'),None)
+  if client:address=client['address'];break
+  time.sleep(.05)
+ assert address,'probe window missing'
+ dispatch(['setfloating','address:'+address]);dispatch(['resizewindowpixel','exact 700 420,address:'+address]);dispatch(['movewindowpixel','exact 700 320,address:'+address])
+ s=wait(lambda s:any(p['id'].startswith('window:'+address) for p in s['supports']),'window support')
+ support=next(p for p in s['supports'] if p['id'].startswith('window:'+address))
+ ipc(endpoint,'visitSurface',support['id'])
+ s=wait(lambda s:s['travel']['support']==support['id'] and s['travel']['mode']=='perch','window landing')
+ time.sleep(.3);s=st();assert abs(s['feetY']-320)<.1,s
+ shot('/tmp/companion-window-standing.png',s);records.append({'check':'window landing','status':s})
+ print('PASS actual floating-window landing; feet exactly on top edge',flush=True)
+ # A real stationary release above the edge must fall onto it, not rescue through it.
+ b=s['bounds']
+ subprocess.run(['ydotool','mousemove','--absolute',str(round((b['x']+35)/2)),str(round((b['y']+25)/2))],check=True)
+ wait(lambda s:s['held'],'hover window passenger',2)
+ subprocess.run(['ydotool','click','-D','0','0x40'],check=True,stdout=subprocess.DEVNULL)
+ button_down=True
+ wait(lambda s:s['pressing'],'press window passenger',2)
+ subprocess.run(['ydotool','mousemove','--','0','-70'],check=True)
+ wait(lambda s:s['dragging'],'lift window passenger',2)
+ time.sleep(.65)
+ subprocess.run(['ydotool','click','-D','0','0x80'],check=True,stdout=subprocess.DEVNULL)
+ button_down=False
+ s=wait(lambda s:not s['pressing'] and s['throwState']['mode']=='idle' and s['travel']['mode']=='perch','drop on window edge',1.2)
+ assert abs(s['feetY']-320)<.1,s
+ subprocess.run(['ydotool','mousemove','--absolute','900','450'],check=True)
+ print('PASS actual mouse drop lands on window edge',flush=True)
+ before=st();dispatch(['movewindowpixel','exact 780 390,address:'+address])
+ s=wait(lambda s:abs(s['feetY']-390)<.1,'follow moved window',2)
+ assert s['travel']['mode']=='perch' and abs(s['bounds']['x']-before['bounds']['x']-80)<8,s
+ records.append({'check':'window movement','status':s});print('PASS passenger follows moved window',flush=True)
+ dispatch(['resizewindowpixel','exact 400 420,address:'+address])
+ s=wait(lambda s:any(p['id']==support['id'] and p['maxX']-p['minX']<350 for p in s['supports']),'resize support',2)
+ time.sleep(.2);s=st();p=next(p for p in s['supports'] if p['id']==support['id'])
+ assert p['minX']-1<=s['bounds']['x']<=p['maxX']+1,s
+ print('PASS resize keeps feet within supporting edge',flush=True)
+ before=st();dispatch(['closewindow','address:'+address]);address=None
+ s=wait(lambda s:s['travel']['mode']=='fly','depart closed window',2)
+ assert abs(s['bounds']['x']-before['bounds']['x'])<12 and abs(s['bounds']['y']-before['bounds']['y'])<12,(before,s)
+ records.append({'check':'window close','status':s});print('PASS closed window causes takeoff without snapping home',flush=True)
+ Path('/tmp/companion-surface-live.json').write_text(json.dumps(records,indent=2))
+finally:
+ if button_down:subprocess.run(['ydotool','click','-D','0','0x80'],check=True,stdout=subprocess.DEVNULL)
+ if address:dispatch(['closewindow','address:'+address])
+ if probe:
+  try:probe.wait(timeout=2)
+  except subprocess.TimeoutExpired:probe.terminate()
+ if active:dispatch(['focuswindow','address:'+active])
+ ipc('companion','flights',str(original['flights']).lower())
+ subprocess.run(['ydotool','mousemove','--absolute',str(round(cursor['x']/2)),str(round(cursor['y']/2))],check=True)

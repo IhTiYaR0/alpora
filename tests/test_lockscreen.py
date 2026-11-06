@@ -1,7 +1,10 @@
 """Theme generation and real Hyprlock parsing, never locking the live desktop."""
 from datetime import datetime
 from pathlib import Path
-import resource
+try:
+    import resource
+except ImportError:
+    resource = None
 import shutil
 import subprocess
 import tempfile
@@ -64,11 +67,13 @@ class LockscreenTests(unittest.TestCase):
         config.write_text(f'source = {self.paths.state / "hyprlock-theme.conf"}\n'
                           f'source = {ROOT / "assets/lockscreen/layout.conf"}\n')
         def no_core_dump():
-            resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+            if resource:
+                resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
         # An absolute nonexistent socket path cannot resolve to the user's display.
+        kwargs = {"preexec_fn": no_core_dump} if resource else {}
         result = subprocess.run(['hyprlock', '--config', str(config), '--display',
                                  str(self.paths.state / 'nonexistent-wayland-socket')],
-                                capture_output=True, text=True, timeout=5, preexec_fn=no_core_dump)
+                                capture_output=True, text=True, timeout=5, **kwargs)
         output = result.stdout + result.stderr
         self.assertNotIn('Config has errors', output)
         self.assertNotIn('Config threw', output)

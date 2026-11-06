@@ -14,7 +14,7 @@ class PointerExitTests(unittest.TestCase):
     def test_stale_cursor_query_does_not_dismiss_new_owner(self):
         with tempfile.TemporaryDirectory(prefix='poly-pointer-exit-') as temporary:
             d=Path(temporary)
-            shutil.copy(ROOT/'shell/PointerExitGuard.qml',d/'PointerExitGuard.qml')
+            shutil.copy(ROOT/'shell/core/PointerExitGuard.qml',d/'PointerExitGuard.qml')
             (d/'qmldir').write_text('PointerExitGuard 1.0 PointerExitGuard.qml\n')
             (d/'hyprctl').write_text('#!/usr/bin/python3\nimport time\ntime.sleep(.15)\nprint(\'{"x":0,"y":0}\')\n')
             (d/'hyprctl').chmod(0o755)
