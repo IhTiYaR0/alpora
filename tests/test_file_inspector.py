@@ -61,7 +61,7 @@ class PropertiesCommandTests(unittest.TestCase):
 
     def test_safe_print_does_not_crash(self):
         """_safe_print must handle text safely."""
-        _safe_print("ALPORA Properties: 🟢 Ready")
+        _safe_print("ALPORA Properties: [OK] Ready")
 
     @patch("sys.stdout")
     def test_handle_properties_existing_file(self, _mock_stdout):

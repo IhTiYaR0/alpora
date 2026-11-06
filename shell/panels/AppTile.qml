@@ -60,10 +60,15 @@ Button {
             id: pin
             anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
             width: 25; height: 30
-            text: AppCatalog.pinnedIds.includes(tile.entry.id) ? "★" : "☆"
-            Accessible.name: AppCatalog.pinnedIds.includes(tile.entry.id) ? I18n.tr("app.remove_favorite") : I18n.tr("app.add_favorite")
-            contentItem: Text { text: pin.text; color: PolyTheme.Theme.color("#b9c9a7"); font.pixelSize: 17; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-            background: Rectangle { radius: 6; color: pin.hovered ? PolyTheme.Theme.color("#485348") : "transparent" }
+            readonly property bool isPinned: AppCatalog.pinnedIds.includes(tile.entry.id)
+            Accessible.name: isPinned ? I18n.tr("app.remove_favorite") : I18n.tr("app.add_favorite")
+            contentItem: Icon {
+                name: pin.isPinned ? "star-filled" : "star"
+                width: 15; height: 15
+                anchors.centerIn: parent
+                color: pin.isPinned ? Session.accent : Session.muted
+            }
+            background: Rectangle { radius: 6; color: pin.hovered ? Glass.tint(Session.accent, 0.2) : "transparent" }
             onClicked: AppCatalog.togglePin(tile.entry.id)
         }
     }

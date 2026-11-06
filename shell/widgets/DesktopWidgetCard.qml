@@ -19,6 +19,6 @@ Rectangle {
         GradientStop { position: 1; color: Glass.materialBottom(Session.visual.widgetOpacity); Behavior on color { ColorAnimation { duration: root.animate ? 360 : 0 } } }
     }
     border.width: Session.visual.widgetBorder
-    border.color: hover.hovered ? Session.accent : PolyTheme.Theme.color("#7e9173")
+    border.color: hover.hovered ? Session.accent : Glass.tint(Session.foreground, 0.22)
     Behavior on border.color { ColorAnimation { duration: root.animate ? 180 : 0 } }
 }

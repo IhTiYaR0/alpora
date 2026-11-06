@@ -276,6 +276,7 @@ Item {
             ShapePath { strokeWidth: 0.6; strokeColor: bot.edge; fillColor: bot.warm; PathSvg { path: "M5 0 L10 7 L5 14 L0 7 Z" } }
             ShapePath { strokeWidth: 0; fillColor: bot.metalLight; PathSvg { path: "M5 0 L5 14 L0 7 Z" } }
         }
-        Text { x: 79; y: 9; text: bot.sleeping ? "z" : bot.dancing ? "♪" : ""; color: bot.led; font.family: Session.fontFamily; font.pixelSize: 14; font.weight: Font.DemiBold }
+        Text { visible: bot.sleeping; x: 79; y: 9; text: "z"; color: bot.led; font.family: Session.fontFamily; font.pixelSize: 14; font.weight: Font.DemiBold }
+        Icon { visible: bot.dancing; x: 79; y: 9; width: 14; height: 14; name: "music"; color: bot.led }
     }
 }

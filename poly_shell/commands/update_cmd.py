@@ -27,7 +27,7 @@ def handle_update(args: argparse.Namespace) -> int:
     action = getattr(args, "update_action", "check")
 
     if action == "check":
-        _safe_print("🔍 Đang kiểm tra bản cập nhật từ máy chủ ALPORA...")
+        _safe_print("[Kiểm tra] Đang kiểm tra bản cập nhật từ máy chủ ALPORA...")
         info = service.check_update(force=True)
 
         if getattr(args, "json", False):
@@ -41,31 +41,31 @@ def handle_update(args: argparse.Namespace) -> int:
         _safe_print(f"  Phiên bản mới nhất : {info['latest_version']}")
 
         if info["has_update"]:
-            _safe_print("\n✨ ĐÃ TÌM THẤY BẢN CẬP NHẬT MỚI!")
+            _safe_print("\n[Thông báo] ĐÃ TÌM THẤY BẢN CẬP NHẬT MỚI!")
             _safe_print(f"  Tiêu đề: {info['release_title']}")
             if info.get("published_at"):
                 _safe_print(f"  Ngày phát hành: {info['published_at'][:10]}")
             if info.get("release_notes"):
-                _safe_print(f"\n📝 Nội dung cập nhật (Changelog):")
+                _safe_print(f"\nNội dung cập nhật (Changelog):")
                 for line in info["release_notes"].splitlines()[:10]:
                     _safe_print(f"    {line}")
             if info.get("iso_download_url"):
-                _safe_print(f"\n📦 Link tải Live ISO mới: {info['iso_download_url']}")
-            _safe_print("\n👉 Để tiến hành cập nhật ngay lập tức, chạy:")
+                _safe_print(f"\nLink tải Live ISO mới: {info['iso_download_url']}")
+            _safe_print("\nĐể tiến hành cập nhật ngay lập tức, chạy:")
             _safe_print("   poly-shell update apply\n")
         else:
-            _safe_print("\n✅ Hệ thống ALPORA của bạn đang ở phiên bản mới nhất!")
+            _safe_print("\n[OK] Hệ thống ALPORA của bạn đang ở phiên bản mới nhất!")
             _safe_print("==================================================")
         return 0
 
     elif action == "apply":
-        _safe_print("🚀 Bắt đầu quá trình cập nhật ALPORA OS...")
+        _safe_print("[Cập nhật] Bắt đầu quá trình cập nhật ALPORA OS...")
         res = service.apply_update(branch=getattr(args, "branch", "main") or "main")
         if res.get("success"):
-            _safe_print(f"🎉 {res.get('message', 'Cập nhật thành công!')}")
+            _safe_print(f"[Thành công] {res.get('message', 'Cập nhật thành công!')}")
             if res.get("backup_path"):
-                _safe_print(f"📁 Đã tạo bản sao lưu an toàn tại: {res['backup_path']}")
-            _safe_print("🔄 Đang làm mới giao diện và nạp lại cấu hình...")
+                _safe_print(f"Đã tạo bản sao lưu an toàn tại: {res['backup_path']}")
+            _safe_print("Đang làm mới giao diện và nạp lại cấu hình...")
             try:
                 import subprocess
                 subprocess.run(["systemctl", "--user", "restart", "poly-shell.service"], check=False)
@@ -73,7 +73,7 @@ def handle_update(args: argparse.Namespace) -> int:
                 pass
             return 0
         else:
-            _safe_print(f"❌ Cập nhật thất bại: {res.get('error')}", file=sys.stderr)
+            _safe_print(f"[Lỗi] Cập nhật thất bại: {res.get('error')}", file=sys.stderr)
             return 1
 
     elif action == "status":

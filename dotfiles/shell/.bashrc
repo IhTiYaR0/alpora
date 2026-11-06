@@ -15,11 +15,6 @@ export QT_QPA_PLATFORM="wayland;xcb"
 export QT_QPA_PLATFORMTHEME="gtk3"
 export GDK_BACKEND="wayland,x11,*"
 
-# Fcitx5 Vietnamese Input method integration
-export GTK_IM_MODULE="fcitx"
-export QT_IM_MODULE="fcitx"
-export XMODIFIERS="@im=fcitx"
-export SDL_IM_MODULE="fcitx"
 
 # Cursor theme
 export XCURSOR_THEME="Bibata-Modern-Ice"
@@ -42,4 +37,3 @@ alias grep="grep --color=auto"
 
 # PS1 Prompt (clean minimal prompt with git status)
 PS1='\[\033[38;2;133;158;146m\]\u@\h\[\033[0m\]:\[\033[38;2;104;144;168m\]\w\[\033[0m\]\$ '
-

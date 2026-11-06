@@ -65,7 +65,7 @@ class StorageCommandTests(unittest.TestCase):
 
     def test_safe_print_does_not_crash(self):
         """_safe_print must handle unicode cleanly."""
-        _safe_print("ALPORA Storage: 🟢 Clean")
+        _safe_print("ALPORA Storage: [OK] Clean")
 
     @patch("sys.stdout")
     def test_handle_storage_status(self, _mock_stdout):

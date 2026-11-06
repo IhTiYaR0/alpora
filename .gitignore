@@ -73,3 +73,6 @@ airplane-restore.json
 instance.lock
 alpora-backups/
 backups/
+
+# Fcitx5 runtime caches
+**/fcitx5/conf/cached_layouts

@@ -162,7 +162,7 @@ ColumnLayout {
             Text {
                 width: parent.width
                 visible: (root.popup.page === "input" && !Session.inputs.length) || (root.popup.page === "output" && !Session.outputs.length)
-                text: "No audio devices available"
+                text: I18n.tr("audio.no_devices")
                 color: Session.muted
                 font.family: Session.fontFamily
                 font.pixelSize: 12
@@ -234,7 +234,7 @@ ColumnLayout {
     SettingsRow {
         visible: root.popup.page === "bluetooth"
         Layout.fillWidth: true
-        text: "Pair a new device"
+        text: I18n.tr("bluetooth.pair_new")
         symbol: "bluetooth"
         enabled: Session.bluetoothEnabled
         onClicked: root.popup.launchTerminal(["bluetoothctl"])
@@ -624,15 +624,15 @@ ColumnLayout {
 
         GlowSectionDivider { Layout.fillWidth: true }
 
-        SettingsRow { Layout.fillWidth: true; text: "Sound output"; symbol: "volume"; onClicked: root.popup.page = "output" }
-        SettingsRow { Layout.fillWidth: true; text: "Microphone"; symbol: "microphone"; onClicked: root.popup.page = "input" }
+        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.sound_output"); symbol: "volume"; onClicked: root.popup.page = "output" }
+        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.microphone"); symbol: "microphone"; onClicked: root.popup.page = "input" }
         SettingsRow { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; onClicked: root.popup.page = "wifi" }
         SettingsRow { Layout.fillWidth: true; text: "Bluetooth"; symbol: "bluetooth"; onClicked: root.popup.page = "bluetooth" }
         SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.mobile_hotspot"); symbol: "hotspot"; onClicked: root.popup.page = "hotspot" }
         SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.power_mode"); symbol: "performance"; onClicked: root.popup.page = "profiles" }
         SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.airplane_mode"); symbol: "airplane"; onClicked: root.popup.page = "airplane" }
-        SettingsRow { Layout.fillWidth: true; text: "Night Light"; symbol: "moon-warm"; onClicked: root.popup.page = "nightlight" }
-        SettingsRow { Layout.fillWidth: true; text: "Do Not Disturb"; symbol: "bell"; onClicked: root.popup.page = "dnd" }
+        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.night_light"); symbol: "moon-warm"; onClicked: root.popup.page = "nightlight" }
+        SettingsRow { Layout.fillWidth: true; text: I18n.tr("quick.dnd"); symbol: "bell"; onClicked: root.popup.page = "dnd" }
         Item { Layout.fillHeight: true }
     }
 
@@ -743,14 +743,14 @@ ColumnLayout {
         Layout.fillHeight: true
         spacing: 12
         Text {
-            text: root.popup.powerAction ? "Confirm " + (root.popup.powerAction === "poweroff" ? "power off?" : "restart?") : "Choose an action"
+            text: root.popup.powerAction ? I18n.trWith("quick.confirm_action", {action: root.popup.powerAction === "poweroff" ? I18n.tr("quick.shutdown") : I18n.tr("quick.reboot")}) : I18n.tr("quick.choose_action")
             color: Session.foreground
             font.family: Session.fontFamily
             font.pixelSize: 14
         }
-        SettingsRow { text: "Restart"; symbol: "refresh"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "reboot" }
-        SettingsRow { text: "Power Off"; symbol: "power"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "poweroff" }
-        SettingsRow { text: "Confirm"; selected: true; symbol: "check"; visible: !!root.popup.powerAction; Layout.fillWidth: true; onClicked: { Quickshell.execDetached(["systemctl", root.popup.powerAction]); Session.closeQuickSettings(); } }
+        SettingsRow { text: I18n.tr("quick.reboot"); symbol: "refresh"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "reboot" }
+        SettingsRow { text: I18n.tr("quick.shutdown"); symbol: "power"; Layout.fillWidth: true; onClicked: root.popup.powerAction = "poweroff" }
+        SettingsRow { text: I18n.tr("common.confirm"); selected: true; symbol: "check"; visible: !!root.popup.powerAction; Layout.fillWidth: true; onClicked: { Quickshell.execDetached(["systemctl", root.popup.powerAction]); Session.closeQuickSettings(); } }
         Item { Layout.fillHeight: true }
     }
 }

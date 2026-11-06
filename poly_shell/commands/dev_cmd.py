@@ -34,7 +34,7 @@ def handle_dev(args: argparse.Namespace) -> int:
         _safe_print(f"{'Tool':<12} {'Trạng thái':<14} {'Nguồn (Source)':<15} {'Mô tả ngắn':<28}")
         _safe_print("-" * 72)
         for tool in st.tools:
-            status_str = "🟢 Đã cài" if tool.installed else "⚪ Chưa cài"
+            status_str = "[Đã cài]" if tool.installed else "[Chưa cài]"
             _safe_print(f"{tool.name:<12} {status_str:<14} {tool.source:<15} {tool.description:<28}")
 
         _safe_print("-" * 72)
@@ -56,10 +56,10 @@ def handle_dev(args: argparse.Namespace) -> int:
             return 1
         res = service.install_tool(tool_name)
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     if action == "remove":
@@ -69,10 +69,10 @@ def handle_dev(args: argparse.Namespace) -> int:
             return 1
         res = service.remove_tool(tool_name)
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     if action == "doctor":
@@ -81,26 +81,26 @@ def handle_dev(args: argparse.Namespace) -> int:
         _safe_print("             ALPORA Developer Environment Doctor                ")
         _safe_print("=" * 65)
         _safe_print(f"  • Thư mục Binary    : {doc['bin_dir']}")
-        _safe_print(f"  • Trạng thái $PATH  : {'🟢 Đã kích hoạt trong $PATH' if doc['in_path'] else '🔴 Chưa có trong $PATH'}")
+        _safe_print(f"  • Trạng thái $PATH  : {'[OK] Đã kích hoạt trong $PATH' if doc['in_path'] else '[!] Chưa có trong $PATH'}")
 
         if doc["cleaned_broken_links"]:
             _safe_print(f"  • Symlinks gãy đã tự dọn: {', '.join(doc['cleaned_broken_links'])}")
         else:
-            _safe_print("  • Symlinks toàn vẹn : 🟢 Không có liên kết gãy")
+            _safe_print("  • Symlinks toàn vẹn : [OK] Không có liên kết gãy")
 
         if not doc["in_path"]:
             _safe_print("\nCách kích hoạt vào shell của bạn:")
             _safe_print(f"  Thêm vào ~/.bashrc hoặc ~/.zshrc:")
             _safe_print(f"    {doc['export_command']}")
         else:
-            _safe_print("\n✅ Môi trường CLI của bạn đạt trạng thái tối ưu nhất!")
+            _safe_print("\n[OK] Môi trường CLI của bạn đạt trạng thái tối ưu nhất!")
         _safe_print("=" * 65)
         return 0
 
     if action == "export":
         out_file = getattr(args, "out", "alpora-dev-stack.json")
         res = service.export_stack(out_file)
-        _safe_print(f"✅ Đã xuất cấu hình {res['installed_count']} developer tools sang file: {out_file}")
+        _safe_print(f"[OK] Đã xuất cấu hình {res['installed_count']} developer tools sang file: {out_file}")
         return 0
 
     if action == "import":
@@ -110,10 +110,10 @@ def handle_dev(args: argparse.Namespace) -> int:
             return 1
         res = service.import_stack(in_file)
         if res.get("success"):
-            _safe_print(f"✅ Đã nhập và cài đặt thành công {res.get('count')} tools từ {in_file}!")
+            _safe_print(f"[OK] Đã nhập và cài đặt thành công {res.get('count')} tools từ {in_file}!")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     if action == "clone":
@@ -125,10 +125,10 @@ def handle_dev(args: argparse.Namespace) -> int:
             return 1
         res = service.clone_reflink(src, dst)
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     _safe_print(f"Lệnh dev không xác định: {action}")

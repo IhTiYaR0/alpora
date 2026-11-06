@@ -28,7 +28,7 @@ def handle_properties(args: argparse.Namespace) -> int:
 
     info = FileInspectorService.inspect(target)
     if not info.get("exists"):
-        _safe_print(f"❌ {info.get('error')}")
+        _safe_print(f"[Lỗi] {info.get('error')}")
         return 1
 
     _safe_print("=" * 65)

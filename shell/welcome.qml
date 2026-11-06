@@ -54,7 +54,7 @@ ShellRoot {
 
     FloatingWindow {
         id: welcomeWindow
-        title: "ALPORA Desktop Environment - Chào mừng"
+        title: I18n.tr("welcome.window_title")
         implicitWidth: 840
         implicitHeight: 560
         minimumSize: Qt.size(800, 520)
@@ -95,7 +95,7 @@ ShellRoot {
                         spacing: 2
 
                         Text {
-                            text: "Chào mừng đến với ALPORA"
+                            text: I18n.tr("welcome.welcome_heading")
                             color: Session.foreground
                             font.family: Session.fontFamily
                             font.pixelSize: 20
@@ -103,7 +103,7 @@ ShellRoot {
                         }
 
                         Text {
-                            text: "Hệ thống máy tính Arch Linux · Quickshell · Wayland · Vietnamese Native IME"
+                            text: I18n.tr("welcome.welcome_subheading")
                             color: Session.muted
                             font.family: Session.fontFamily
                             font.pixelSize: 12
@@ -111,7 +111,6 @@ ShellRoot {
                     }
 
                     Button {
-                        text: "✕"
                         Layout.preferredWidth: 32
                         Layout.preferredHeight: 32
                         onClicked: root.close()
@@ -119,12 +118,11 @@ ShellRoot {
                             radius: 16
                             color: parent.hovered ? Glass.tint(Session.accent, 0.25) : Glass.tint(Session.foreground, 0.08)
                         }
-                        contentItem: Text {
-                            text: "✕"
+                        contentItem: Icon {
+                            name: "close"
+                            anchors.centerIn: parent
+                            width: 14; height: 14
                             color: Session.foreground
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: 14
                         }
                     }
                 }
@@ -138,19 +136,19 @@ ShellRoot {
                         model: [
                             {
                                 id: "shortcuts",
-                                label: "Phím tắt cốt lõi"
+                                label: I18n.tr("welcome.tab_shortcuts")
                             },
                             {
                                 id: "ime",
-                                label: "Gõ Tiếng Việt"
+                                label: I18n.tr("welcome.tab_ime")
                             },
                             {
                                 id: "themes",
-                                label: "Giao diện & Chế độ"
+                                label: I18n.tr("welcome.tab_themes")
                             },
                             {
                                 id: "doctor",
-                                label: "Tình trạng hệ thống"
+                                label: I18n.tr("welcome.tab_doctor")
                             }
                         ]
 
@@ -207,43 +205,43 @@ ShellRoot {
                                 model: [
                                     {
                                         key: "Super + Space",
-                                        desc: "Mở Spotlight Launcher & Omni-Bar (Tìm app, tính toán, tra từ, web)"
+                                        desc: I18n.tr("welcome.sc_spotlight")
                                     },
                                     {
                                         key: "Super + V",
-                                        desc: "Mở lịch sử Clipboard & Quản lý khay nhớ tạm"
+                                        desc: I18n.tr("welcome.sc_clipboard")
                                     },
                                     {
                                         key: "Super + I",
-                                        desc: "Mở Quick Settings Control Center (Wi-Fi, Bluetooth, Âm lượng, Độ sáng)"
+                                        desc: I18n.tr("welcome.sc_quick_settings")
                                     },
                                     {
                                         key: "Super + ~",
-                                        desc: "Mở Quake Dropdown Terminal (Cửa sổ terminal trượt từ trên xuống)"
+                                        desc: I18n.tr("welcome.sc_quake_terminal")
                                     },
                                     {
                                         key: "Super + Return",
-                                        desc: "Mở Terminal tiêu chuẩn (Foot / Kitty)"
+                                        desc: I18n.tr("welcome.sc_standard_terminal")
                                     },
                                     {
                                         key: "Super + E",
-                                        desc: "Mở Trình quản lý tệp Nautilus"
+                                        desc: I18n.tr("welcome.sc_file_manager")
                                     },
                                     {
                                         key: "Super + Tab",
-                                        desc: "Mở Workspace & Window Overview toàn cảnh"
+                                        desc: I18n.tr("welcome.sc_overview")
                                     },
                                     {
                                         key: "Super + W",
-                                        desc: "Chuyển đổi tức thì chế độ Work Mode và Vibe Mode"
+                                        desc: I18n.tr("welcome.sc_mode_switch")
                                     },
                                     {
                                         key: "Super + Q",
-                                        desc: "Đóng cửa sổ đang chọn"
+                                        desc: I18n.tr("welcome.sc_close_window")
                                     },
                                     {
                                         key: "Super + Shift + S",
-                                        desc: "Chụp ảnh màn hình (Chọn vùng, cửa sổ hoặc toàn bộ)"
+                                        desc: I18n.tr("welcome.sc_screenshot")
                                     }
                                 ]
 
@@ -299,7 +297,7 @@ ShellRoot {
                         visible: root.currentTab === "ime"
 
                         Text {
-                            text: "Bộ gõ Tiếng Việt Fcitx5 Bamboo"
+                            text: I18n.tr("welcome.ime_title")
                             color: Session.foreground
                             font.family: Session.fontFamily
                             font.pixelSize: 16
@@ -307,7 +305,7 @@ ShellRoot {
                         }
 
                         Text {
-                            text: "ALPORA tích hợp sẵn Fcitx5 với bộ gõ Bamboo tối ưu cho Wayland và Qt/GTK. Nhấn Ctrl + Space để bật/tắt gõ Tiếng Việt."
+                            text: I18n.tr("welcome.ime_desc")
                             color: Session.muted
                             font.family: Session.fontFamily
                             font.pixelSize: 12
@@ -330,7 +328,7 @@ ShellRoot {
                                 spacing: 10
 
                                 Text {
-                                    text: "Thử gõ:"
+                                    text: I18n.tr("welcome.ime_test")
                                     color: Session.muted
                                     font.family: Session.fontFamily
                                     font.pixelSize: 12
@@ -339,7 +337,7 @@ ShellRoot {
                                 TextField {
                                     id: testField
                                     Layout.fillWidth: true
-                                    placeholderText: "Nhập chữ Tiếng Việt tại đây để kiểm tra (ví dụ: Cộng hòa Xã hội Chủ nghĩa Việt Nam)..."
+                                    placeholderText: I18n.tr("welcome.ime_placeholder")
                                     color: Session.foreground
                                     font.family: Session.fontFamily
                                     font.pixelSize: 13
@@ -352,7 +350,7 @@ ShellRoot {
                             spacing: 12
 
                             Button {
-                                text: "Khởi động lại Fcitx5 Bamboo"
+                                text: I18n.tr("welcome.ime_restart_btn")
                                 Layout.preferredHeight: 36
                                 onClicked: fcitxRestart.running = true
                                 background: Rectangle {
@@ -362,7 +360,7 @@ ShellRoot {
                                     border.color: Glass.tint(Session.accent, 0.4)
                                 }
                                 contentItem: Text {
-                                    text: "Khởi động lại Fcitx5 Bamboo"
+                                    text: I18n.tr("welcome.ime_restart_btn")
                                     color: Session.accent
                                     font.family: Session.fontFamily
                                     font.pixelSize: 12
@@ -373,7 +371,7 @@ ShellRoot {
                             }
 
                             Text {
-                                text: fcitxRestart.running ? "Đang khởi động..." : "Sẵn sàng"
+                                text: fcitxRestart.running ? I18n.tr("welcome.ime_starting") : I18n.tr("welcome.ime_ready")
                                 color: Session.muted
                                 font.family: Session.fontFamily
                                 font.pixelSize: 11
@@ -393,7 +391,7 @@ ShellRoot {
                         visible: root.currentTab === "themes"
 
                         Text {
-                            text: "Chủ đề & Trạng thái làm việc"
+                            text: I18n.tr("welcome.themes_title")
                             color: Session.foreground
                             font.family: Session.fontFamily
                             font.pixelSize: 16
@@ -404,7 +402,7 @@ ShellRoot {
                             spacing: 12
 
                             Button {
-                                text: "Chuyển Work / Vibe Mode (Hiện tại: " + Session.mode + ")"
+                                text: I18n.trWith("welcome.themes_toggle_mode", {mode: Session.mode.toUpperCase()})
                                 Layout.preferredHeight: 36
                                 onClicked: Session.setMode("toggle")
                                 background: Rectangle {
@@ -414,7 +412,7 @@ ShellRoot {
                                     border.color: Session.accent
                                 }
                                 contentItem: Text {
-                                    text: "Chuyển Work / Vibe Mode (" + Session.mode.toUpperCase() + ")"
+                                    text: I18n.trWith("welcome.themes_toggle_mode", {mode: Session.mode.toUpperCase()})
                                     color: Session.accent
                                     font.family: Session.fontFamily
                                     font.pixelSize: 12
@@ -426,7 +424,7 @@ ShellRoot {
                         }
 
                         Text {
-                            text: "Bộ sưu tập phong cảnh thích ứng tự động:"
+                            text: I18n.tr("welcome.themes_landscapes_heading")
                             color: Session.muted
                             font.family: Session.fontFamily
                             font.pixelSize: 12
@@ -440,23 +438,23 @@ ShellRoot {
                                 model: [
                                     {
                                         id: "alpine",
-                                        name: "Alpine Sage"
+                                        name: I18n.tr("theme.alpine")
                                     },
                                     {
                                         id: "moon-lake",
-                                        name: "Moon Lake"
+                                        name: I18n.tr("theme.moon_lake")
                                     },
                                     {
                                         id: "forest-mist",
-                                        name: "Forest Mist"
+                                        name: I18n.tr("theme.forest_mist")
                                     },
                                     {
                                         id: "warm-desert",
-                                        name: "Warm Desert"
+                                        name: I18n.tr("theme.warm_desert")
                                     },
                                     {
                                         id: "timeline",
-                                        name: "Timeline Auto-Chrono"
+                                        name: I18n.tr("theme.timeline")
                                     }
                                 ]
 
@@ -499,7 +497,7 @@ ShellRoot {
                         visible: root.currentTab === "doctor"
 
                         Text {
-                            text: "Kiểm tra sức khỏe hệ thống (System Doctor)"
+                            text: I18n.tr("welcome.doctor_title")
                             color: Session.foreground
                             font.family: Session.fontFamily
                             font.pixelSize: 16
@@ -522,7 +520,7 @@ ShellRoot {
                                     anchors.centerIn: parent
                                     spacing: 4
                                     Text {
-                                        text: "Compositor"
+                                        text: I18n.tr("welcome.doctor_compositor")
                                         color: Session.muted
                                         font.pixelSize: 11
                                     }
@@ -547,7 +545,7 @@ ShellRoot {
                                     anchors.centerIn: parent
                                     spacing: 4
                                     Text {
-                                        text: "Giao diện Shell"
+                                        text: I18n.tr("welcome.doctor_shell")
                                         color: Session.muted
                                         font.pixelSize: 11
                                     }
@@ -572,7 +570,7 @@ ShellRoot {
                                     anchors.centerIn: parent
                                     spacing: 4
                                     Text {
-                                        text: "Âm thanh & Multimedia"
+                                        text: I18n.tr("welcome.doctor_audio")
                                         color: Session.muted
                                         font.pixelSize: 11
                                     }
@@ -590,7 +588,7 @@ ShellRoot {
                             spacing: 12
 
                             Button {
-                                text: "Mở ALPORA Settings (Cài đặt đầy đủ)"
+                                text: I18n.tr("welcome.doctor_open_settings")
                                 Layout.preferredHeight: 36
                                 onClicked: {
                                     Quickshell.execDetached([Session.controller, "settings"]);
@@ -603,7 +601,7 @@ ShellRoot {
                                     border.color: Session.accent
                                 }
                                 contentItem: Text {
-                                    text: "Mở ALPORA Settings"
+                                    text: I18n.tr("welcome.doctor_open_settings")
                                     color: Session.accent
                                     font.family: Session.fontFamily
                                     font.pixelSize: 12
@@ -614,7 +612,7 @@ ShellRoot {
                             }
 
                             Button {
-                                text: "Mở Task Manager"
+                                text: I18n.tr("welcome.doctor_open_tasks")
                                 Layout.preferredHeight: 36
                                 onClicked: {
                                     Quickshell.execDetached([Session.controller, "task-manager"]);
@@ -626,7 +624,7 @@ ShellRoot {
                                     border.color: Glass.tint(Session.foreground, 0.15)
                                 }
                                 contentItem: Text {
-                                    text: "Mở Mini Task Manager"
+                                    text: I18n.tr("welcome.doctor_open_tasks")
                                     color: Session.foreground
                                     font.family: Session.fontFamily
                                     font.pixelSize: 12
@@ -649,7 +647,7 @@ ShellRoot {
 
                     CheckBox {
                         id: checkDontShow
-                        text: "Không hiển thị lại cửa sổ này khi khởi động"
+                        text: I18n.tr("welcome.dont_show_again")
                         checked: root.dontShowAgain
                         onCheckedChanged: root.dontShowAgain = checked
                     }
@@ -659,7 +657,7 @@ ShellRoot {
                     }
 
                     Button {
-                        text: "Bắt đầu trải nghiệm"
+                        text: I18n.tr("welcome.get_started")
                         Layout.preferredHeight: 38
                         Layout.preferredWidth: 160
                         onClicked: root.close()
@@ -668,7 +666,7 @@ ShellRoot {
                             color: Session.accent
                         }
                         contentItem: Text {
-                            text: "Bắt đầu trải nghiệm"
+                            text: I18n.tr("welcome.get_started")
                             color: Session.surface
                             font.family: Session.fontFamily
                             font.pixelSize: 12

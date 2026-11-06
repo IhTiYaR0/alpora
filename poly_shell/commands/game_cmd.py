@@ -30,7 +30,7 @@ def handle_game(args: argparse.Namespace) -> int:
         game_name = getattr(args, "game", None)
         service.enable(game_name)
         game_tag = f" [{game_name}]" if game_name else ""
-        _safe_print(f"🎮 ALPORA Game Mode: ĐÃ KÍCH HOẠT{game_tag}")
+        _safe_print(f"[ALPORA Game Mode] ĐÃ KÍCH HOẠT{game_tag}")
         _safe_print("   - Đã tạm dừng hoạt ảnh và hiệu ứng làm mờ kính (blur) của Hyprland")
         _safe_print("   - CPU Governor & Power Profile chuyển sang Performance mode")
         _safe_print("   - Dồn 100% GPU VRAM và render thread cho game")
@@ -38,7 +38,7 @@ def handle_game(args: argparse.Namespace) -> int:
 
     elif action == "off":
         service.disable()
-        _safe_print("🎮 ALPORA Game Mode: ĐÃ TẮT")
+        _safe_print("[ALPORA Game Mode] ĐÃ TẮT")
         _safe_print("   - Đã khôi phục toàn bộ hiệu ứng hoạt ảnh mượt mà của Hyprland")
         _safe_print("   - CPU Governor & Power Profile chuyển về Balanced mode")
         return 0
@@ -46,7 +46,7 @@ def handle_game(args: argparse.Namespace) -> int:
     elif action == "toggle":
         is_on = service.toggle(getattr(args, "game", None))
         status_text = "ĐÃ KÍCH HOẠT" if is_on else "ĐÃ TẮT"
-        _safe_print(f"🎮 ALPORA Game Mode: {status_text}")
+        _safe_print(f"[ALPORA Game Mode] {status_text}")
         return 0
 
     elif action == "status":
@@ -54,7 +54,7 @@ def handle_game(args: argparse.Namespace) -> int:
         if getattr(args, "json", False):
             _safe_print(state.to_json())
         else:
-            status_badge = "🟢 ĐANG BẬT" if state.enabled else "⚪ ĐANG TẮT"
+            status_badge = "[ON] ĐANG BẬT" if state.enabled else "[OFF] ĐANG TẮT"
             _safe_print("==================================================")
             _safe_print(f"       ALPORA Game Mode Status: {status_badge}")
             _safe_print("==================================================")
@@ -69,15 +69,15 @@ def handle_game(args: argparse.Namespace) -> int:
     elif action == "hoyo":
         game_name = getattr(args, "target", "zzz") or "zzz"
         preset = service.get_hoyoverse_preset(game_name)
-        _safe_print(f"\n🎮 ALPORA Hoyoverse Optimization Profile: {preset['title']}")
+        _safe_print(f"\n[ALPORA Optimization Profile] {preset['title']}")
         _safe_print(f"   {preset['description']}\n")
-        _safe_print("📌 Launcher khuyên dùng trên Arch Linux:")
+        _safe_print("[Launcher khuyên dùng trên Arch Linux]")
         _safe_print(f"   AUR: {preset['aur_launcher']}")
         _safe_print(f"   Lệnh cài: yay -S {preset['aur_launcher'].split()[0]}\n")
-        _safe_print("⚡ Biến môi trường đồ họa tối ưu (DXVK Async & Wine Fsync):")
+        _safe_print("[Biến môi trường đồ họa tối ưu (DXVK Async & Wine Fsync)]")
         for k, v in preset.get("env_vars", {}).items():
             _safe_print(f"   export {k}={v}")
-        _safe_print("\n💡 Khuyến nghị cài đặt:")
+        _safe_print("\n[Khuyến nghị cài đặt]")
         for rec in preset.get("recommendations", []):
             _safe_print(f"   • {rec}")
         _safe_print()
@@ -89,7 +89,7 @@ def handle_game(args: argparse.Namespace) -> int:
             _safe_print("Lỗi: Vui lòng truyền câu lệnh hoặc đường dẫn file game cần chạy.", file=sys.stderr)
             return 1
         game_title = getattr(args, "game", None) or cmd[0]
-        _safe_print(f"🚀 ALPORA đang khởi chạy {game_title} trong Game Mode tối ưu...")
+        _safe_print(f"[ALPORA] Đang khởi chạy {game_title} trong Game Mode tối ưu...")
         return service.launch_game(cmd, game_title)
 
     return 0

@@ -11,9 +11,9 @@ Button {
     Accessible.name: text
     background: Rectangle {
         radius: 10
-        color: control.hovered || control.down ? Glass.tint(Session.accent, 0.14) : Glass.tint(Session.surface, 0.30)
+        color: control.down ? Glass.tint(Session.accent, 0.28) : (control.hovered ? Glass.tint(Session.accent, 0.18) : Glass.tint(Session.surface, 0.35))
         border.width: control.visualFocus ? 1.5 : 1
-        border.color: Glass.tint(Session.accent, control.visualFocus ? 1 : 0.20)
+        border.color: control.visualFocus ? Session.accent : (control.hovered ? Glass.tint(Session.accent, 0.55) : Glass.tint(Session.accent, 0.22))
         Behavior on color { ColorAnimation { duration: Motion.responseMs } }
     }
     contentItem: Item {

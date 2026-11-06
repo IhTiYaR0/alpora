@@ -266,6 +266,7 @@ def status(paths):
         'caffeine': (paths.state / 'caffeine.active').exists(),
         'gameMode': (paths.state / 'gamemode.active').exists(),
         'phoneAvailable': bool(shutil.which('kdeconnect-cli')),
+        'locale': read_object(paths.config / 'settings.json').get('locale', 'en') if (paths.config / 'settings.json').exists() else 'en',
     }
 
 
@@ -347,7 +348,8 @@ VALID_CONTROL_ACTIONS = {
     'font': 'font',
     'caffeine': 'caffeine',
     'gamemode': 'gamemode',
-    'phone': 'phone'
+    'phone': 'phone',
+    'locale': 'locale'
 }
 
 
@@ -479,6 +481,16 @@ def control(paths, action, value=None):
         with state_lock(paths):
             data = settings_for(paths)
             data.setdefault('bar', {})['fontFamily'] = font_name
+            atomic_json(paths.config / 'settings.json', data)
+        update_session(paths)
+    elif safe_action == 'locale':
+        from ..core.i18n import supported_locales
+        new_locale = str(value).strip().lower()
+        if new_locale not in supported_locales():
+            raise ConfigError(f'Unsupported locale: {new_locale}. Supported: {supported_locales()}')
+        with state_lock(paths):
+            data = settings_for(paths)
+            data['locale'] = new_locale
             atomic_json(paths.config / 'settings.json', data)
         update_session(paths)
     else:

@@ -36,7 +36,7 @@ Singleton {
         if (root) return root + "/assets/locales";
         if (assets) return assets + "/locales";
         const resolved = Qt.resolvedUrl("../../assets/locales").toString();
-        return resolved.replace(/^file:\/\//, "");
+        return decodeURIComponent(resolved.replace(/^file:\/\//, ""));
     }
 
     // ── Public API ──────────────────────────────────────────────────────
@@ -84,15 +84,28 @@ Singleton {
 
     // ── Loading ─────────────────────────────────────────────────────────
 
-    onLocaleChanged: reload()
+    onLocaleChanged: applyLocale()
     onLocalesDirChanged: reload()
     Component.onCompleted: reload()
 
     function reload(): void {
         if (!root.localesDir) return;
-        // Always load English as the universal baseline, then overlay requested locale.
         baseLoader.path = root.localesDir + "/en.json";
         baseLoader.reload();
+    }
+
+    function applyLocale(): void {
+        if (!root.localesDir) return;
+        if (Object.keys(root._baseStrings).length === 0) {
+            reload();
+            return;
+        }
+        if (root.locale === "en") {
+            root.strings = Object.assign({}, root._baseStrings);
+        } else {
+            overlayLoader.path = root.localesDir + "/" + root.locale + ".json";
+            overlayLoader.reload();
+        }
     }
 
     FileView {
@@ -110,7 +123,7 @@ Singleton {
                 overlayLoader.path = root.localesDir + "/" + root.locale + ".json";
                 overlayLoader.reload();
             } else {
-                root.strings = root._baseStrings;
+                root.strings = Object.assign({}, root._baseStrings);
             }
         }
         onLoadFailed: {
@@ -127,15 +140,14 @@ Singleton {
         onLoaded: {
             try {
                 const overlay = JSON.parse(text());
-                const merged = Object.assign({}, root._baseStrings, overlay);
-                root.strings = merged;
+                root.strings = Object.assign({}, root._baseStrings, overlay);
             } catch (_) {
-                root.strings = root._baseStrings;
+                root.strings = Object.assign({}, root._baseStrings);
             }
         }
         onLoadFailed: {
             console.warn("I18n: cannot load locale", root.locale, "from", path, "; using English baseline");
-            root.strings = root._baseStrings;
+            root.strings = Object.assign({}, root._baseStrings);
         }
     }
 

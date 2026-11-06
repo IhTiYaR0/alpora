@@ -87,13 +87,22 @@ PanelWindow {
                         onClicked: VideoPipState.toggleMode()
                     }
 
-                    Text {
+                    RowLayout {
                         anchors.centerIn: parent
-                        text: VideoPipState.mode === "vertical" ? "9:16 📱" : "16:9 🖥️"
-                        color: Session.foreground
-                        font.family: Session.fontFamily
-                        font.pixelSize: 10
-                        font.weight: Font.Medium
+                        spacing: 4
+                        Icon {
+                            name: VideoPipState.mode === "vertical" ? "devices" : "monitor"
+                            width: 12
+                            height: 12
+                            color: Session.foreground
+                        }
+                        Text {
+                            text: VideoPipState.mode === "vertical" ? "9:16" : "16:9"
+                            color: Session.foreground
+                            font.family: Session.fontFamily
+                            font.pixelSize: 10
+                            font.weight: Font.Medium
+                        }
                     }
                 }
 
@@ -185,9 +194,9 @@ PanelWindow {
 
                 Repeater {
                     model: [
-                        { key: "tiktok", label: "🎵 TikTok", mode: "vertical" },
-                        { key: "shorts", label: "⚡ Shorts", mode: "vertical" },
-                        { key: "youtube", label: "▶️ YouTube", mode: "landscape" }
+                        { key: "tiktok", label: "TikTok", icon: "video", mode: "vertical" },
+                        { key: "shorts", label: "Shorts", icon: "pip", mode: "vertical" },
+                        { key: "youtube", label: "YouTube", icon: "play-dark", mode: "landscape" }
                     ]
 
                     Rectangle {
@@ -209,13 +218,22 @@ PanelWindow {
                             onClicked: VideoPipState.openApp(modelData.key)
                         }
 
-                        Text {
+                        RowLayout {
                             anchors.centerIn: parent
-                            text: modelData.label
-                            color: VideoPipState.targetApp === modelData.key ? Session.foreground : Session.muted
-                            font.family: Session.fontFamily
-                            font.pixelSize: 11
-                            font.weight: Font.Medium
+                            spacing: 5
+                            Icon {
+                                name: modelData.icon
+                                width: 13
+                                height: 13
+                                color: VideoPipState.targetApp === modelData.key ? Session.foreground : Session.muted
+                            }
+                            Text {
+                                text: modelData.label
+                                color: VideoPipState.targetApp === modelData.key ? Session.foreground : Session.muted
+                                font.family: Session.fontFamily
+                                font.pixelSize: 11
+                                font.weight: Font.Medium
+                            }
                         }
                     }
                 }
@@ -315,13 +333,22 @@ PanelWindow {
                                 onClicked: if (VideoPipState.player) VideoPipState.player.togglePlaying()
                             }
 
-                            Text {
+                            RowLayout {
                                 anchors.centerIn: parent
-                                text: VideoPipState.player && VideoPipState.player.isPlaying ? "Pause ⏸" : "Play ▶"
-                                color: PolyTheme.Theme.color("#ffffff")
-                                font.family: Session.fontFamily
-                                font.pixelSize: 11
-                                font.weight: Font.Bold
+                                spacing: 5
+                                Icon {
+                                    name: VideoPipState.player && VideoPipState.player.isPlaying ? "pause-dark" : "play-dark"
+                                    width: 14
+                                    height: 14
+                                    color: PolyTheme.Theme.color("#ffffff")
+                                }
+                                Text {
+                                    text: VideoPipState.player && VideoPipState.player.isPlaying ? "Pause" : "Play"
+                                    color: PolyTheme.Theme.color("#ffffff")
+                                    font.family: Session.fontFamily
+                                    font.pixelSize: 11
+                                    font.weight: Font.Bold
+                                }
                             }
                         }
 
@@ -357,7 +384,7 @@ PanelWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "Lướt " + (VideoPipState.targetApp === "tiktok" ? "TikTok" : (VideoPipState.targetApp === "shorts" ? "YouTube Shorts" : "YouTube"))
+                        text: I18n.trWith("pip.browse_hint", {app: (VideoPipState.targetApp === "tiktok" ? "TikTok" : (VideoPipState.targetApp === "shorts" ? "YouTube Shorts" : "YouTube"))})
                         horizontalAlignment: Text.AlignHCenter
                         color: Session.foreground
                         font.family: Session.fontFamily
@@ -367,7 +394,7 @@ PanelWindow {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "Bấm nút bên dưới để mở cửa sổ video nổi độc lập góc màn hình."
+                        text: I18n.tr("pip.window_hint")
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
                         color: Session.muted
@@ -391,8 +418,8 @@ PanelWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "Khởi chạy Cửa sổ PiP"
-                            color: PolyTheme.Theme.color("#ffffff")
+                            text: I18n.tr("pip.launch_window")
+                            color: Session.background
                             font.family: Session.fontFamily
                             font.pixelSize: 11
                             font.weight: Font.Bold

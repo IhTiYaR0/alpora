@@ -15,13 +15,16 @@ from ..core.state import ConfigError, ROOT, update_session
 
 def call_shell_ipc(method: str, *args) -> bool:
     """Send an IPC invocation to the running Quickshell root."""
-    entry = ROOT / "shell"
-    command = ["quickshell", "ipc", "--path", str(entry), "call", "shell", method, *args]
-    try:
-        res = subprocess.run(command, capture_output=True, text=True, timeout=2)
-        return res.returncode == 0
-    except (OSError, subprocess.SubprocessError):
-        return False
+    entries = [ROOT / "shell", Path.home() / ".config/quickshell/poly-shell"]
+    for entry in entries:
+        command = ["quickshell", "ipc", "--path", str(entry), "call", "shell", method, *args]
+        try:
+            res = subprocess.run(command, capture_output=True, text=True, timeout=2)
+            if res.returncode == 0:
+                return True
+        except (OSError, subprocess.SubprocessError):
+            continue
+    return False
 
 
 def handle_launcher(paths, args):

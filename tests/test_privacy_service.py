@@ -41,7 +41,7 @@ class PrivacyCommandTests(unittest.TestCase):
 
     def test_safe_print_does_not_crash(self):
         """_safe_print must handle text safely."""
-        _safe_print("ALPORA Privacy: 🟢 Isolated")
+        _safe_print("ALPORA Privacy: [OK] Isolated")
 
     @patch("sys.stdout")
     def test_handle_privacy_status(self, _mock_stdout):

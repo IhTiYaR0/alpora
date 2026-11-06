@@ -274,7 +274,7 @@ def main(argv=None):
     mode_parser.add_argument("mode", nargs="?", choices=(*MODES, "toggle"))
     mode_parser.add_argument("--json", action="store_true")
     control_parser = sub.add_parser("control", help="desktop adapters for the quick settings panel")
-    control_parser.add_argument("action", choices=("status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine"))
+    control_parser.add_argument("action", choices=("status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine", "gamemode", "phone", "locale"))
     control_parser.add_argument("value", nargs="?")
     theme_parser = sub.add_parser("theme", help="wallpaper-derived color themes")
     theme_parser.add_argument("action", choices=("list", "apply", "import"))

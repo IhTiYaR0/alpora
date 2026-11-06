@@ -34,7 +34,8 @@ ShellRoot {
         {group: "", key: "power", title: I18n.tr("settings.power"), icon: "battery", words: "power battery energy profiles"},
         {group: "", key: "notifications", title: I18n.tr("settings.notifications"), icon: "bell", words: "notifications dnd alerts"},
         {group: "", key: "input", title: I18n.tr("shortcuts.title"), icon: "terminal", words: "keyboard shortcuts hotkeys bindings input"},
-        {group: "", key: "touchpad", title: I18n.tr("settings.touchpad"), icon: "mouse", words: "touchpad pointer gestures tap speed sensitivity"}
+        {group: "", key: "touchpad", title: I18n.tr("settings.touchpad"), icon: "mouse", words: "touchpad pointer gestures tap speed sensitivity"},
+        {group: "", key: "language", title: I18n.tr("settings.language"), icon: "globe", words: "language locale vietnamese english tieng viet ngon ngu"}
     ]
     readonly property string pageTitle: page === "modes" ? I18n.tr("settings.operating_mode") : page === "devices" ? I18n.tr("settings.devices") : (navigation.find(n => n.key === page) || {}).title || I18n.tr("settings.title")
     function navigate(next: string): void { if (root.page === "input" && next !== "input" && ShortcutsState.editingForm) {root.statusMessage=I18n.tr("settings.finish_editing_hint");return;} root.statusMessage=""; root.page = next; search.text = ""; root.statusMessage = ""; }

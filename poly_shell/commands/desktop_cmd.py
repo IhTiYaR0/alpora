@@ -15,7 +15,8 @@ def handle_control(paths, args) -> int:
         "power-profile": "power-profile", "airplane": "airplane",
         "hotspot": "hotspot", "wifi-connect": "wifi-connect",
         "ui-scale": "ui-scale", "touchpad": "touchpad", "font": "font",
-        "caffeine": "caffeine"
+        "caffeine": "caffeine", "gamemode": "gamemode", "phone": "phone",
+        "locale": "locale"
     }
     safe_action = CONTROL_ACTIONS.get(args.action)
     if not safe_action:
@@ -32,21 +33,26 @@ def handle_wallpaper(paths, args) -> int:
 
 
 def handle_project(paths, args) -> int:
-    entry = ROOT / "shell/shell.qml"
+    from pathlib import Path
     ALLOWED_MODES = {
         "toggle": "toggle", "open": "open", "close": "close",
         "internal": "internal", "mirror": "mirror",
         "extend": "extend", "external": "external"
     }
     safe_mode = ALLOWED_MODES.get(args.mode, "toggle")
-    if safe_mode in ("toggle", "open", "close"):
-        cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", safe_mode]
-    else:
-        cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", safe_mode]
-    res = subprocess.run(cmd, capture_output=True, text=True, timeout=3)
-    if res.returncode == 0:
-        print(f"Display projection: {safe_mode}")
-        return 0
+    entries = [ROOT / "shell", Path.home() / ".config/quickshell/poly-shell"]
+    for entry in entries:
+        if safe_mode in ("toggle", "open", "close"):
+            cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", safe_mode]
+        else:
+            cmd = ["quickshell", "ipc", "--path", str(entry), "call", "display-project", "setMode", safe_mode]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=2)
+            if res.returncode == 0:
+                print(f"Display projection: {safe_mode}")
+                return 0
+        except (OSError, subprocess.SubprocessError):
+            continue
     raise ConfigError("Cannot connect to running Poly Shell for display projection")
 
 

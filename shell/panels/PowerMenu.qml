@@ -86,7 +86,7 @@ PanelWindow {
                             Layout.fillWidth: true
                         }
                         Text {
-                            text: "Esc to cancel"
+                            text: I18n.tr("common.esc_to_cancel")
                             color: Session.muted
                             font.family: Session.fontFamily
                             font.pixelSize: 12

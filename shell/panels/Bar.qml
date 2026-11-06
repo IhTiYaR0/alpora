@@ -48,7 +48,7 @@ PanelWindow {
         spacing: 5
 
         ActionButton {
-            text: "Apps"
+            text: I18n.tr("bar.apps")
             hint: I18n.tr("bar.open_apps")
             onClicked: Session.launch("launcher")
         }
@@ -78,7 +78,7 @@ PanelWindow {
         }
 
         ActionButton {
-            text: "Term"
+            text: I18n.tr("bar.term")
             hint: I18n.tr("bar.open_terminal")
             visible: !bar.compact
             onClicked: Session.launch("terminal")
@@ -118,7 +118,7 @@ PanelWindow {
         }
 
         ActionButton {
-            text: "Lock"
+            text: I18n.tr("bar.lock")
             hint: I18n.tr("bar.lock_screen")
             onClicked: Session.launch("lock")
         }

@@ -46,10 +46,10 @@ def handle_snapshot(args: argparse.Namespace) -> int:
         desc = getattr(args, "description", "Manual ALPORA Backup")
         res = service.create_snapshot(description=desc)
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     if action == "delete":
@@ -59,10 +59,10 @@ def handle_snapshot(args: argparse.Namespace) -> int:
             return 1
         res = service.delete_snapshot(int(snap_id))
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
             return 1
 
     _safe_print(f"Lệnh snapshot không xác định: {action}")

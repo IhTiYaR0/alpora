@@ -33,20 +33,20 @@ def handle_memory(args: argparse.Namespace) -> int:
         _safe_print("--------------------------------------------------")
         if state.has_zram:
             saved_mb = round(max(0, state.zram_orig_mb - state.zram_compr_mb), 1)
-            _safe_print(f"  • zRAM Compression    : 🟢 KÍCH HOẠT (Zstandard)")
+            _safe_print(f"  • zRAM Compression    : [KÍCH HOẠT] (Zstandard)")
             _safe_print(f"  • Dữ liệu nén trong RAM: {state.zram_compr_mb} MB (từ {state.zram_orig_mb} MB gốc)")
             _safe_print(f"  • Tỷ lệ nén           : {state.zram_ratio}x (Tiết kiệm được ~{saved_mb} MB RAM)")
         else:
-            _safe_print(f"  • zRAM Compression    : ⚠️ CHƯA BẬT (Dễ gây đơ máy khi đầy RAM!)")
+            _safe_print(f"  • zRAM Compression    : [CHƯA BẬT] (Dễ gây đơ máy khi đầy RAM!)")
             _safe_print(f"  • Swap hiện tại       : {state.swap_total_mb} MB (Dùng: {state.swap_used_mb} MB)")
-            _safe_print(f"  💡 Chạy: poly-shell memory setup-zram để kích hoạt nén RAM tự động.")
+            _safe_print(f"  [Lưu ý] Chạy: poly-shell memory setup-zram để kích hoạt nén RAM tự động.")
 
         _safe_print("--------------------------------------------------")
         _safe_print(f"  • Áp lực bộ nhớ (PSI) : Some={state.psi_some_avg10}% | Full={state.psi_full_avg10}%")
         if state.is_thrashing:
-            _safe_print("  ⚠️ CẢNH BÁO: Hệ thống đang bị nghẽn trang nhớ (Memory Thrashing)! Hãy chạy 'poly-shell memory drop'.")
+            _safe_print("  [CẢNH BÁO] Hệ thống đang bị nghẽn trang nhớ (Memory Thrashing)! Hãy chạy 'poly-shell memory drop'.")
         else:
-            _safe_print("  🟢 Trạng thái hệ thống: Mượt mà (Zero thrashing)")
+            _safe_print("  [Trạng thái] Mượt mà (Zero thrashing)")
 
         if state.workspaces:
             _safe_print("--------------------------------------------------")
@@ -61,29 +61,29 @@ def handle_memory(args: argparse.Namespace) -> int:
         return 0
 
     elif action in ("drop", "clean"):
-        _safe_print("🧹 Đang thực hiện dọn dẹp và nén trang bộ nhớ RAM (Memory Compaction & Drop Caches)...")
+        _safe_print("[Dọn dẹp] Đang thực hiện dọn dẹp và nén trang bộ nhớ RAM (Memory Compaction & Drop Caches)...")
         res = service.drop_caches()
         if res.get("dropped_caches") or res.get("compacted_memory"):
-            _safe_print(f"✅ Đã dọn dẹp và chống phân mảnh RAM thành công!")
+            _safe_print(f"[OK] Đã dọn dẹp và chống phân mảnh RAM thành công!")
             _safe_print(f"   RAM khả dụng trước: {res['available_before_mb']} MB")
             _safe_print(f"   RAM khả dụng sau  : {res['available_after_mb']} MB")
             if res['reclaimed_mb'] > 0:
                 _safe_print(f"   Giải phóng được    : +{res['reclaimed_mb']} MB RAM")
         else:
-            _safe_print(f"ℹ️ Đã gửi tín hiệu sync. Để xóa sâu pagecache kernel, chạy: sudo poly-shell memory drop")
+            _safe_print(f"[Thông báo] Đã gửi tín hiệu sync. Để xóa sâu pagecache kernel, chạy: sudo poly-shell memory drop")
         return 0
 
     elif action == "eco":
-        _safe_print("⚡ Đang kích hoạt chế độ EcoQoS (Hạ tải ứng dụng ở các Workspace nền)...")
+        _safe_print("[EcoQoS] Đang kích hoạt chế độ EcoQoS (Hạ tải ứng dụng ở các Workspace nền)...")
         res = service.eco_optimize_workspaces()
         if res.get("success"):
-            _safe_print(f"✅ Đã tối ưu hóa:")
+            _safe_print(f"[OK] Đã tối ưu hóa:")
             _safe_print(f"   • Workspace đang hoạt động : {res['active_workspace']} (Ưu tiên tối đa)")
             _safe_print(f"   • Ứng dụng nền đã hạ tải   : {res['throttled_count']} ứng dụng")
             for app in res.get("throttled_apps", []):
                 _safe_print(f"     - {app}")
         else:
-            _safe_print(f"❌ Lỗi: {res.get('error')}")
+            _safe_print(f"[Lỗi] {res.get('error')}")
         return 0
 
     elif action == "setup-zram":

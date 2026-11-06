@@ -40,9 +40,9 @@ EOF
 }
 
 info() { printf "${CYAN}${BOLD}[*]${NC} %s\n" "$*"; }
-success() { printf "${GREEN}${BOLD}[✓]${NC} %s\n" "$*"; }
+success() { printf "${GREEN}${BOLD}[OK]${NC} %s\n" "$*"; }
 warn() { printf "${YELLOW}${BOLD}[!]${NC} %s\n" "$*"; }
-error() { printf "${RED}${BOLD}[✗]${NC} %s\n" "$*" >&2; exit 1; }
+error() { printf "${RED}${BOLD}[ERROR]${NC} %s\n" "$*" >&2; exit 1; }
 
 check_system() {
     info "Verifying system compatibility..."

@@ -9,14 +9,19 @@ Singleton {
     property string error: ""
     readonly property bool changingSettings: IpcClient.busy
 
-    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine", "gamemode", "phone"]
+    readonly property var validActions: ["status", "brightness", "dnd", "nightlight", "bluetooth", "power-profile", "airplane", "hotspot", "wifi-connect", "ui-scale", "touchpad", "font", "caffeine", "gamemode", "phone", "locale"]
 
     function request(action: string, value: string): void {
         if (!validActions.includes(action)) {
             console.warn("Desktop.request: rejected unknown action:", action);
             return;
         }
-        if (action === "brightness") {
+        if (action === "locale") {
+            if (!["en", "vi", "ru", "es"].includes(String(value || "").toLowerCase())) {
+                console.warn("Desktop.request: invalid locale value:", value);
+                return;
+            }
+        } else if (action === "brightness") {
             const num = parseInt(value, 10);
             if (isNaN(num) || num < 5 || num > 100) {
                 console.warn("Desktop.request: invalid brightness value:", value);

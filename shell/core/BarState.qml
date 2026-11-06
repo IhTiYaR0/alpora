@@ -156,10 +156,18 @@ Singleton {
         if (!historyReader.running) historyReader.running = true;
         if (!modeReader.running) modeReader.running = true;
     }
-    function refreshLayout(): void { if (!keyboardReader.running) keyboardReader.running = true; }
+    function refreshLayout(): void {
+        if (!keyboardReader.running) keyboardReader.running = true;
+        if (!fcitxReader.running) fcitxReader.running = true;
+    }
+    property int keyboardCodeCount: 1
     function nextLayout(): void {
-        if (!layoutWriter.running && keyboardName.length) {
-            layoutWriter.command = ["hyprctl", "switchxkblayout", keyboardName, "next"];
+        if (!layoutWriter.running) {
+            if (keyboardCodeCount > 1 && keyboardName.length) {
+                layoutWriter.command = ["hyprctl", "switchxkblayout", keyboardName, "next"];
+            } else {
+                layoutWriter.command = ["fcitx5-remote", "-t"];
+            }
             layoutWriter.running = true;
         }
     }
@@ -196,13 +204,47 @@ Singleton {
                     if (!main) { root.keyboardName = ""; root.layout = "—"; return; }
                     root.keyboardName = main.name;
                     const codes = main.layout.split(",");
+                    root.keyboardCodeCount = codes.length;
                     const code = codes[main.active_layout_index] || "";
-                    root.layout = code === "us" ? "EN" : code.toUpperCase();
+                    if (codes.length > 1) {
+                        root.layout = code === "us" ? "EN" : code.toUpperCase();
+                    } else {
+                        if (!fcitxReader.running) fcitxReader.running = true;
+                    }
                 } catch (failure) { console.warn("Keyboard status:", String(failure)); }
             }
         }
     }
-    Process { id: layoutWriter; onExited: root.refreshLayout() }
+    Process {
+        id: fcitxReader
+        command: ["fcitx5-remote"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const state = text.trim();
+                if (state === "2") {
+                    root.layout = "VN";
+                } else if (state === "1") {
+                    if (root.keyboardCodeCount <= 1) root.layout = "EN";
+                }
+            }
+        }
+    }
+    Timer {
+        id: fcitxPoll
+        interval: 1200
+        running: true
+        repeat: true
+        onTriggered: {
+            if (!fcitxReader.running) fcitxReader.running = true;
+        }
+    }
+    Process {
+        id: layoutWriter
+        onExited: {
+            root.refreshLayout();
+            if (!fcitxReader.running) fcitxReader.running = true;
+        }
+    }
     FileView {
         id: historyPreferences
         path: (Quickshell.env("POLY_SHELL_STATE") || "").replace(/session\.json$/, "notification-history.json")

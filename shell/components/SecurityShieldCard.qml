@@ -8,7 +8,7 @@ Rectangle {
     id: root
 
     property int score: 95
-    property string statusText: score >= 80 ? "Hệ thống được bảo vệ" : (score >= 60 ? "Cần lưu ý" : "Nguy cơ bảo mật")
+    property string statusText: score >= 80 ? I18n.tr("security.status_protected") : (score >= 60 ? I18n.tr("security.status_attention") : I18n.tr("security.status_risk"))
     property bool firewallActive: true
     property bool waylandActive: true
     property bool apparmorActive: true
@@ -42,10 +42,12 @@ Rectangle {
                 border.width: 1.5
                 border.color: root.score >= 80 ? Session.accent : Session.muted
 
-                Text {
+                Icon {
                     anchors.centerIn: parent
-                    text: root.score >= 80 ? "🛡️" : "⚠️"
-                    font.pixelSize: 16
+                    name: root.score >= 80 ? "shield" : "shield-alert"
+                    width: 18
+                    height: 18
+                    color: root.score >= 80 ? Session.accent : Session.muted
                 }
             }
 
@@ -54,7 +56,7 @@ Rectangle {
                 spacing: 2
 
                 Text {
-                    text: "ALPORA Security Shield"
+                    text: I18n.tr("security.shield_title")
                     color: Session.muted
                     font.family: Session.fontFamily
                     font.pixelSize: 10
@@ -99,29 +101,50 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 8
 
-            Text {
-                text: "Wayland: " + (root.waylandActive ? "🟢 Cô lập" : "🔴 X11")
-                color: Session.muted
-                font.family: Session.fontFamily
-                font.pixelSize: 10
+            RowLayout {
+                spacing: 5
+                Rectangle {
+                    width: 6; height: 6; radius: 3
+                    color: root.waylandActive ? Session.accent : Glass.tint(Session.foreground, 0.4)
+                }
+                Text {
+                    text: "Wayland: " + (root.waylandActive ? I18n.tr("security.wayland_isolated") : I18n.tr("security.wayland_x11"))
+                    color: Session.muted
+                    font.family: Session.fontFamily
+                    font.pixelSize: 10
+                }
             }
 
             Item { Layout.fillWidth: true }
 
-            Text {
-                text: "UFW: " + (root.firewallActive ? "🟢 Đang bật" : "⚪ Chưa bật")
-                color: Session.muted
-                font.family: Session.fontFamily
-                font.pixelSize: 10
+            RowLayout {
+                spacing: 5
+                Rectangle {
+                    width: 6; height: 6; radius: 3
+                    color: root.firewallActive ? Session.accent : Glass.tint(Session.foreground, 0.4)
+                }
+                Text {
+                    text: "UFW: " + (root.firewallActive ? I18n.tr("security.ufw_enabled") : I18n.tr("security.ufw_disabled"))
+                    color: Session.muted
+                    font.family: Session.fontFamily
+                    font.pixelSize: 10
+                }
             }
 
             Item { Layout.fillWidth: true }
 
-            Text {
-                text: "Socket: 🟢 0o600"
-                color: Session.muted
-                font.family: Session.fontFamily
-                font.pixelSize: 10
+            RowLayout {
+                spacing: 5
+                Rectangle {
+                    width: 6; height: 6; radius: 3
+                    color: Session.accent
+                }
+                Text {
+                    text: "Socket: 0o600"
+                    color: Session.muted
+                    font.family: Session.fontFamily
+                    font.pixelSize: 10
+                }
             }
         }
     }

@@ -55,7 +55,7 @@ def handle_storage(args: argparse.Namespace) -> int:
         _safe_print("Đang tiến hành dọn dẹp các vùng cache phình to...")
         res = service.clean()
         _safe_print("=" * 65)
-        _safe_print(f"✅ ALPORA CleanGuard: Đã giải phóng {res.freed_human} thành công!")
+        _safe_print(f"[OK] ALPORA CleanGuard: Đã giải phóng {res.freed_human} thành công!")
         _safe_print("-" * 65)
         for target in res.cleaned_targets:
             _safe_print(f"  • {target}")
@@ -71,10 +71,10 @@ def handle_storage(args: argparse.Namespace) -> int:
             return 1
         res = service.move_directory_library(src, dst)
         if res.get("success"):
-            _safe_print(f"✅ {res.get('message')}")
+            _safe_print(f"[OK] {res.get('message')}")
             return 0
         else:
-            _safe_print(f"❌ Lỗi di dời: {res.get('error')}")
+            _safe_print(f"[Lỗi] Di dời thất bại: {res.get('error')}")
             return 1
 
     _safe_print(f"Lệnh storage không xác định: {action}")

@@ -21,9 +21,9 @@ Rectangle {
     signal detailsRequested()
     implicitHeight: details ? 86 : 80 - 36 * compactProgress
     radius: 13
-    color: toggle.hovered ? Glass.tint(Session.accent, 0.12) : Glass.tint(Session.surface, 0.40)
-    border.width: toggle.visualFocus || detailButton.visualFocus ? 1.5 : 1
-    border.color: toggle.visualFocus || detailButton.visualFocus ? Session.accent : Glass.tint(Session.accent, tile.active ? 0.40 : 0.19)
+    color: tile.active ? Glass.tint(Session.accent, toggle.hovered ? 0.32 : 0.22) : (toggle.hovered ? Glass.tint(Session.accent, 0.14) : Glass.tint(Session.surface, 0.45))
+    border.width: toggle.visualFocus || detailButton.visualFocus ? 1.5 : (tile.active ? 1.5 : 1)
+    border.color: toggle.visualFocus || detailButton.visualFocus ? Session.accent : (tile.active ? Session.accent : (toggle.hovered ? Glass.tint(Session.accent, 0.45) : Glass.tint(Session.accent, 0.22)))
     Behavior on color { ColorAnimation { duration: Motion.responseMs } }
     Button {
         id: toggle

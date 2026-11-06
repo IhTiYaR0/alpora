@@ -71,8 +71,8 @@ class SecurityCommandTests(unittest.TestCase):
     """Test suite for poly-shell security CLI command handler."""
 
     def test_safe_print_does_not_crash(self):
-        """_safe_print should safely handle UTF-8 and emoji strings."""
-        _safe_print("ALPORA Security: 🟢 Hardened")
+        """_safe_print should safely handle UTF-8 strings."""
+        _safe_print("ALPORA Security: [OK] Hardened")
 
     @patch("sys.stdout")
     def test_handle_security_status(self, _mock_stdout):

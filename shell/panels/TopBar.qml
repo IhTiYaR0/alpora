@@ -282,13 +282,24 @@ PanelWindow {
                 id: layoutButton
                 width: 32; height: 30
                 hoverEnabled: true; focusPolicy: Qt.StrongFocus; padding: 0
-                enabled: BarState.keyboardName.length > 0
+                enabled: true
                 Accessible.name: I18n.trWith("bar.layout_a11y", {layout: BarState.layout})
                 background: Rectangle {
-                    radius: 8; color: layoutButton.hovered || layoutButton.visualFocus ? PolyTheme.Theme.color("#353e39") : "transparent"
+                    radius: 8
+                    color: layoutButton.hovered || layoutButton.visualFocus ? Glass.tint(Session.accent, 0.18) : "transparent"
+                    border.width: layoutButton.hovered || layoutButton.visualFocus ? 1 : 0
+                    border.color: Glass.tint(Session.accent, 0.6)
                     Behavior on color { ColorAnimation { duration: Motion.responseMs } }
                 }
-                contentItem: Text { text: BarState.layout; font.family: Session.fontFamily; font.pixelSize: 11; color: Session.foreground; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                contentItem: Text {
+                    text: BarState.layout || "EN"
+                    font.family: Session.fontFamily
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                    color: (layoutButton.hovered || BarState.layout === "VN") ? Session.accent : Session.foreground
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
                 onClicked: BarState.nextLayout()
             }
             Rectangle { visible: BarState.trayItems.length > 0; width: 1; height: 18; y: 6; color: PolyTheme.Theme.color("#414943") }

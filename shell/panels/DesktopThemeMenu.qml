@@ -79,11 +79,12 @@ Scope {
         if (id === ThemeState.baseId) { opened = false; return; }
         // Use the saved color preference; the settings window owns its own draft.
         const payload = {id: id, colorsFromWallpaper: ThemeState.baseAutomatic};
+        const item = ThemeState.items.find(t => t.id === id);
         if (origin) {
             payload.transition = origin;
+            if (item && item.image) wallpaperReveal.prepare(item.image);
             wallpaperReveal.startAt(origin.x * overlay.width, origin.y * overlay.height);
         } else {
-            const item = ThemeState.items.find(t => t.id === id);
             if (item && item.image) wallpaperReveal.crossfade(item.image);
         }
         ThemeState.request("apply", payload);

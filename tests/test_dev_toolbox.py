@@ -90,8 +90,8 @@ class DevCommandTests(unittest.TestCase):
     """Test suite for poly-shell dev CLI subcommands."""
 
     def test_safe_print_does_not_crash(self):
-        """_safe_print should safely output emojis and text."""
-        _safe_print("ALPORA Dev Hub: 🟢 Ready")
+        """_safe_print should safely output text."""
+        _safe_print("ALPORA Dev Hub: [OK] Ready")
 
     @patch("sys.stdout")
     def test_handle_dev_list(self, _mock_stdout):

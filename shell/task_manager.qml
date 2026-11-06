@@ -82,7 +82,8 @@ ShellRoot {
         id: actionRunner
         onExited: exitCode => {
             root.fetchCurrentTab();
-            if (exitCode === 0) root.statusMessage = I18n.tr("common.done") || "Thành công";
+            if (exitCode === 0) root.statusMessage = I18n.tr("common.done");
+            else root.statusMessage = I18n.tr("tasks.action_failed");
         }
     }
 
@@ -149,7 +150,7 @@ ShellRoot {
                                 anchors.verticalCenter: parent.verticalCenter; spacing: 10
                                 GemMark { width: 22; height: 26; anchors.verticalCenter: parent.verticalCenter }
                                 Text {
-                                    text: "Task Manager"
+                                    text: I18n.tr("tasks.title")
                                     color: Session.foreground; font.family: Session.fontFamily
                                     font.pixelSize: 14; font.weight: Font.DemiBold
                                     anchors.verticalCenter: parent.verticalCenter
@@ -162,12 +163,12 @@ ShellRoot {
                             Layout.fillWidth: true; spacing: 4
                             Repeater {
                                 model: [
-                                    {key: "processes", label: "Processes"},
-                                    {key: "performance", label: "Performance"},
-                                    {key: "startup", label: "Startup"},
-                                    {key: "users", label: "Users"},
-                                    {key: "details", label: "Details"},
-                                    {key: "services", label: "Services"}
+                                    {key: "processes", label: I18n.tr("tasks.tab_processes")},
+                                    {key: "performance", label: I18n.tr("tasks.tab_performance")},
+                                    {key: "startup", label: I18n.tr("tasks.tab_startup")},
+                                    {key: "users", label: I18n.tr("tasks.tab_users")},
+                                    {key: "details", label: I18n.tr("tasks.tab_details")},
+                                    {key: "services", label: I18n.tr("tasks.tab_services")}
                                 ]
                                 delegate: Rectangle {
                                     required property var modelData
@@ -211,7 +212,7 @@ ShellRoot {
                                     onTextChanged: root.searchText = text
                                     Text {
                                         visible: !searchInput.text && !searchInput.activeFocus
-                                        text: "Lọc tiến trình..."
+                                        text: I18n.tr("tasks.filter_placeholder")
                                         color: Session.muted; font.family: Session.fontFamily; font.pixelSize: 11
                                     }
                                 }
@@ -241,12 +242,12 @@ ShellRoot {
                                 color: Glass.tint(Session.surface, 0.5)
                                 RowLayout {
                                     anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
-                                    Text { Layout.fillWidth: true; text: "Tên ứng dụng / Tiến trình"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 70; text: "PID"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: "Trạng thái"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 80; text: "CPU %"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: "Bộ nhớ RAM"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
-                                    Text { Layout.preferredWidth: 90; text: "Người dùng"; color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.fillWidth: true; text: I18n.tr("tasks.col_name"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.preferredWidth: 70; text: I18n.tr("tasks.col_pid"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_status"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.preferredWidth: 80; text: I18n.tr("tasks.col_cpu"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_memory"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                    Text { Layout.preferredWidth: 90; text: I18n.tr("tasks.col_user"); color: Session.muted; font.pixelSize: 11; font.weight: Font.DemiBold }
                                 }
                             }
                             // Process List
@@ -308,7 +309,7 @@ ShellRoot {
                                     ColumnLayout {
                                         anchors.fill: parent; anchors.margins: 12
                                         RowLayout {
-                                            Text { text: "Bộ nhớ (Memory)"; color: Session.accent; font.pixelSize: 13; font.weight: Font.Bold }
+                                            Text { text: I18n.tr("tasks.col_memory"); color: Session.accent; font.pixelSize: 13; font.weight: Font.Bold }
                                             Item { Layout.fillWidth: true }
                                             Text { text: ((root.performanceData.memory || {}).percent || 0) + "%"; color: Session.foreground; font.pixelSize: 15; font.weight: Font.Bold }
                                         }
@@ -324,7 +325,7 @@ ShellRoot {
                                 color: Glass.tint(Session.surface, 0.4); border.width: 1; border.color: Glass.tint(Session.accent, 0.2)
                                 ColumnLayout {
                                     anchors.fill: parent; anchors.margins: 16; spacing: 10
-                                    Text { text: "Đồ thị Tải CPU (60s gần nhất)"; color: Session.foreground; font.pixelSize: 14; font.weight: Font.DemiBold }
+                                    Text { text: I18n.tr("tasks.cpu_graph_title"); color: Session.foreground; font.pixelSize: 14; font.weight: Font.DemiBold }
                                     Canvas {
                                         id: perfCanvas
                                         Layout.fillWidth: true; Layout.fillHeight: true
@@ -359,7 +360,7 @@ ShellRoot {
                     Item {
                         ColumnLayout {
                             anchors.fill: parent; anchors.margins: 14; spacing: 10
-                            Text { text: "Ứng dụng Khởi động cùng Hệ thống"; color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
+                            Text { text: I18n.tr("tasks.startup_apps_title"); color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
                             ListView {
                                 Layout.fillWidth: true; Layout.fillHeight: true; clip: true; spacing: 6
                                 model: root.startupData
@@ -375,7 +376,7 @@ ShellRoot {
                                             Text { text: parent.parent.modelData.command || parent.parent.modelData.path; color: Session.muted; font.pixelSize: 10; elide: Text.ElideRight }
                                         }
                                         Button {
-                                            text: parent.parent.modelData.enabled ? "Bật" : "Tắt"
+                                            text: parent.parent.modelData.enabled ? I18n.tr("common.enable") : I18n.tr("common.disable")
                                             onClicked: root.toggleStartup(parent.parent.modelData.path, !parent.parent.modelData.enabled)
                                         }
                                     }
@@ -388,7 +389,7 @@ ShellRoot {
                     Item {
                         ColumnLayout {
                             anchors.fill: parent; anchors.margins: 16; spacing: 12
-                            Text { text: "Người dùng & Phiên Đăng nhập"; color: Session.foreground; font.pixelSize: 14; font.weight: Font.DemiBold }
+                            Text { text: I18n.tr("tasks.users_title"); color: Session.foreground; font.pixelSize: 14; font.weight: Font.DemiBold }
                             ListView {
                                 Layout.fillWidth: true; Layout.fillHeight: true; clip: true; spacing: 8
                                 model: root.usersData
@@ -402,7 +403,7 @@ ShellRoot {
                                         Column {
                                             Layout.fillWidth: true
                                             Text { text: parent.parent.modelData.user; color: Session.foreground; font.pixelSize: 13; font.weight: Font.DemiBold }
-                                            Text { text: "Phiên: " + parent.parent.modelData.session_type + " (" + parent.parent.modelData.desktop + ") · " + parent.parent.modelData.process_count + " tiến trình"; color: Session.muted; font.pixelSize: 11 }
+                                            Text { text: I18n.trWith("tasks.session_info", {type: parent.parent.modelData.session_type, desktop: parent.parent.modelData.desktop, count: parent.parent.modelData.process_count}); color: Session.muted; font.pixelSize: 11 }
                                         }
                                         Text { text: parent.parent.modelData.memory_mb + " MB RAM"; color: Session.accent; font.pixelSize: 13; font.weight: Font.Medium }
                                     }
@@ -466,7 +467,7 @@ ShellRoot {
                                             Text { text: parent.parent.modelData.description; color: Session.muted; font.pixelSize: 10; elide: Text.ElideRight }
                                         }
                                         Button {
-                                            text: "Restart"
+                                            text: I18n.tr("common.restart")
                                             onClicked: root.serviceAction(parent.parent.modelData.unit, "restart")
                                         }
                                     }
@@ -485,14 +486,14 @@ ShellRoot {
                     RowLayout {
                         anchors.fill: parent; anchors.leftMargin: 16; anchors.rightMargin: 16
                         Text {
-                            text: root.selectedPid > 1 ? ("Đang chọn: " + root.selectedProcessName + " (PID " + root.selectedPid + ")") : (root.processesData.length + " tiến trình đang chạy")
+                            text: root.selectedPid > 1 ? I18n.trWith("tasks.selected_process", {name: root.selectedProcessName, pid: root.selectedPid}) : I18n.trWith("tasks.running_processes_count", {count: root.processesData.length})
                             color: Session.muted; font.pixelSize: 12
                         }
                         Item { Layout.fillWidth: true }
                         Button {
                             visible: root.activeTab === "processes" || root.activeTab === "details"
                             enabled: root.selectedPid > 1
-                            text: "End Task (Dừng tiến trình)"
+                            text: I18n.tr("tasks.end_task")
                             onClicked: root.endSelectedProcess()
                         }
                     }
