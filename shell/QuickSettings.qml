@@ -117,7 +117,7 @@ PanelWindow {
     readonly property string profileLabel: ({"power-saver": "Экономия", balanced: "Баланс", performance: "Производительность"})[Desktop.data.powerProfile] || "Недоступно"
     function launchTerminal(args: var): void {
         Session.closeQuickSettings();
-        Quickshell.execDetached(Session.settings.apps.terminal.concat(["-e"]).concat(args));
+        Session.launchCommand("", Session.settings.apps.terminal.concat(["-e"]).concat(args), "", "");
     }
     onPageChanged: {
         localError = "";

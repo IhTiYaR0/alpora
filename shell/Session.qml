@@ -10,6 +10,7 @@ import Quickshell.Networking
 import Quickshell.Bluetooth
 import "StatusLogic.js" as StatusLogic
 import "AppearanceCatalog.js" as AppearanceCatalog
+import "AppLaunch.js" as AppLaunch
 
 Singleton {
     id: root
@@ -135,7 +136,28 @@ Singleton {
     function launch(name: string): void {
         const command = settings.apps ? settings.apps[name] : null;
         if (command && command.length)
-            Quickshell.execDetached(command);
+            launchCommand("", command, "", appSlices[name] || "");
+    }
+
+    // Each app gets its own transient service in app.slice, so restarting or
+    // OOM-killing the shell leaves it running. Must not contain "-".
+    readonly property string appLauncherName: "alpora"
+    // The lock screen is as essential as the shell, so it runs in session.slice
+    // like GNOME's and KDE's; every other app stays in app.slice. Not a setting.
+    readonly property var appSlices: ({lock: "session.slice"})
+
+    function launchCommand(appId: string, argv: var, workingDirectory: string, slice: string): void {
+        if (!argv || !argv.length)
+            return;
+        const random = Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, "0");
+        Quickshell.execDetached(AppLaunch.command(appLauncherName, appId, argv, random, workingDirectory, slice));
+    }
+
+    // Matches what Quickshell 0.3.2 runs for a desktop entry (command and Path=; field
+    // codes dropped, Terminal= ignored), but started in the app's own unit.
+    function launchEntry(entry: var): void {
+        if (entry)
+            launchCommand(entry.id, entry.command, entry.workingDirectory, "");
     }
 
     function focusWorkspace(workspaceId: int): void {

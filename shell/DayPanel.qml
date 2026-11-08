@@ -188,7 +188,7 @@ ColumnLayout {
                                 else {
                                     BarState.close();
                                     if (modelData.action === "terminal") Session.launch("terminal");
-                                    else Quickshell.execDetached(["xdg-open", Quickshell.env("HOME")]);
+                                    else Session.launchCommand("", ["xdg-open", Quickshell.env("HOME")], "", "");
                                 }
                             }
                         }

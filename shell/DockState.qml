@@ -61,7 +61,7 @@ Singleton {
         const item = group(id);
         if (!item || !item.entry || launchingId === id) return;
         dismissDockLauncher();
-        launchingId = id; launchCooldown.restart(); item.entry.execute();
+        launchingId = id; launchCooldown.restart(); Session.launchEntry(item.entry);
     }
     function activate(id: string): void {
         const item = group(id);
