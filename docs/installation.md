@@ -36,7 +36,7 @@ prove its service, permissions or hardware are available. `install` creates:
 - `~/.local/bin/poly-shell` — command symlink.
 - `~/.local/bin/alpora-fetch` — live system-card command symlink.
 - `${XDG_CONFIG_HOME:-~/.config}/quickshell/poly-shell` — QML configuration link.
-- A user `poly-shell.service` unit and a settings desktop entry.
+- A user `poly-shell.service` unit (run in `session.slice`) and a settings desktop entry.
 
 Unrelated files at these paths are preserved; installation refuses conflicts.
 Stop the foreground run with `Ctrl+C` before trying the managed service.

@@ -22,6 +22,7 @@ StartLimitBurst=3
 
 [Service]
 Type=simple
+Slice=session.slice
 ExecStart="{escaped}" run
 Restart=on-failure
 RestartSec=2
@@ -31,6 +32,11 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=poly-shell
 '''
+
+
+def previous_unit_texts(launcher):
+    # Units written by earlier releases are safe to replace; anything else was edited by hand.
+    return (unit_text(launcher).replace("Slice=session.slice\n", "", 1),)
 
 
 def install(paths):
@@ -44,8 +50,9 @@ def install(paths):
         if (target.exists() or target.is_symlink()) and target.resolve() != source.resolve():
             raise ConfigError(f"Refusing to overwrite existing {target}")
     unit = paths.config.parent / "systemd/user/poly-shell.service"
-    text = unit_text(Path.home() / ".local/bin/poly-shell")
-    if unit.exists() and unit.read_text() != text:
+    launcher = Path.home() / ".local/bin/poly-shell"
+    text = unit_text(launcher)
+    if unit.exists() and unit.read_text() not in (text, *previous_unit_texts(launcher)):
         raise ConfigError(f"Existing service differs; inspect {unit} before replacing it")
     # Validate every owned target before creating even the first command link.
     settings_desktop_plan()
