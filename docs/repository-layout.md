@@ -33,7 +33,7 @@ required by the distributed session.
 | `~/.local/bin/poly-shell` | Symlink to `bin/poly-shell` |
 | `~/.local/bin/alpora-fetch` | Symlink to `bin/alpora-fetch` |
 | `~/.config/quickshell/poly-shell` | Symlink to the QML source directory |
-| `~/.config/systemd/user/poly-shell.service` | Supervised desktop process |
+| `~/.config/systemd/user/poly-shell.service` | Supervised desktop process in `session.slice` |
 | `~/.local/share/applications/poly-shell-settings.desktop` | Settings launcher |
 | `~/.config/hypr/` | Full install: managed Lua session, appearance, lock, idle and screenshot helpers |
 | `~/.config/poly-shell/` | Preferences, custom themes and private desktop data |

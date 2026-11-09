@@ -277,9 +277,11 @@ def main(argv=None):
         elif args.command == "start":
             start(paths)
         elif args.command == "restart":
+            systemctl("daemon-reload")
             systemctl("stop", "poly-shell.service")
             start(paths)
         elif args.command == "stop":
+            systemctl("daemon-reload")
             systemctl("stop", "poly-shell.service")
         elif args.command == "status":
             return systemctl("status", "--no-pager", "poly-shell.service", check=False).returncode
