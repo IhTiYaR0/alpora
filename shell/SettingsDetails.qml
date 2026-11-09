@@ -18,7 +18,7 @@ ScrollView {
     signal chooseWallpaper()
     signal restoreWallpaper()
     clip: true; contentWidth: availableWidth
-    function terminal(args: var): void { Quickshell.execDetached((Session.settings.apps.terminal || ["kitty"]).concat(["-e"]).concat(args)); }
+    function terminal(args: var): void { Session.launchCommand("", (Session.settings.apps.terminal || ["kitty"]).concat(["-e"]).concat(args), "", ""); }
     onPageChanged: { selectedNetwork = null; password.clear(); localError = ""; }
     Binding {
         target: Session.wifiDevice; property: "scannerEnabled"

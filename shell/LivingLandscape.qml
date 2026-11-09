@@ -59,7 +59,7 @@ PanelWindow {
         else if (inside(musicTrigger)) open("music");
         else if (active.length && !inside(active === "light" ? lightStage : active === "music" ? musicStage : peakStage)) { lastExit = "position " + x + "," + y; close(); }
     }
-    function launch(entry: var): void { close(); entry.execute(); }
+    function launch(entry: var): void { close(); Session.launchEntry(entry); }
     onAllowedChanged: if (!allowed) close()
     Connections {
         target: Session

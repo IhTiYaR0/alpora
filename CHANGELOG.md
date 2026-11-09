@@ -2,6 +2,8 @@
 
 ## Unreleased — ALPORA preview
 
+- Started each app launched from the shell in its own `app-alpora-<AppID>@<RANDOM>.service` in `app.slice`, so apps survive a shell restart, crash or OOM kill and log to their own journal stream; the lock screen started from the shell runs in `session.slice`.
+
 - Validated production configuration in isolated UID 1000/1001 profiles, real asset downloads, spaced paths, repeat setup and a separate software Wayland display; documented the remaining clean-OS gate.
 - Fixed first-start QIcon worker loading in launcher/dock, enabling active-but-disabled network/Bluetooth services, and preflighting settings-launcher conflicts before installation writes.
 

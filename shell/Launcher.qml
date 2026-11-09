@@ -127,7 +127,7 @@ PanelWindow {
         function stopMotionTrace(): string { return JSON.stringify(frame.finishTrace()); }
     }
     function close(): void { BarState.close(); }
-    function launch(entry: var): void { entry.execute(); close(); }
+    function launch(entry: var): void { Session.launchEntry(entry); close(); }
     function moveSelection(delta: int): void {
         selectedIndex = Math.max(0, Math.min(shown.length - 1, selectedIndex + delta));
         const rowY = Math.floor(selectedIndex / columnCount) * rowHeight;
